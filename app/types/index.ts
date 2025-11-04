@@ -14,10 +14,6 @@ export type Agent = {
   id: number;
   name: string;
   codename: string;
-  photo: string;
-  location: string;
-  status: string;
-  specialization: string;
 };
 
 export type Skill = {
@@ -28,6 +24,5 @@ export type Skill = {
   cost: number;
   unlocked: boolean;
   description: string;
-  parentId: number | null;
 };
 

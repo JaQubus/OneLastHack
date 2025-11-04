@@ -1,132 +1,148 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { Agent, Skill } from "../types";
 
 interface SiatkaWywiadowczaButtonProps {
   intelligencePoints: number;
-  discoveredAgents: Agent[];
-  skillsData: Skill[];
+  activeAgents: Agent[];
+  activeAgentIds: number[];
+  availableAgents: Agent[];
+  skills: Skill[];
+  onAddAgent: () => void;
+  onLevelUpSkill: (skillId: number) => void;
 }
 
 export default function SiatkaWywiadowczaButton({
   intelligencePoints,
-  discoveredAgents,
-  skillsData,
+  activeAgents,
+  activeAgentIds,
+  availableAgents,
+  skills,
+  onAddAgent,
+  onLevelUpSkill,
 }: SiatkaWywiadowczaButtonProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <div className="relative" style={{ width: '20%' }}>
-      <button
-        onClick={() => {
-          setShowMenu(!showMenu);
-        }}
-        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-white font-semibold hover:shadow-xl flex items-center justify-center text-xs sm:text-sm"
-      >
-        Siatka Wywiadowcza
-      </button>
-      {showMenu && (
+    <>
+      <div className="relative min-w-[250px]">
+        <button
+          onClick={() => {
+            setShowMenu(!showMenu);
+          }}
+          className="w-full p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">🕵️</div>
+            <div className="flex-1 text-left">
+              <div className="text-sm font-semibold text-amber-50">Siatka Wywiadowcza</div>
+              <div className="text-xs text-amber-200 mt-1">Punkty: {intelligencePoints}</div>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* Centered Popup - Rendered via Portal */}
+      {showMenu && typeof window !== 'undefined' && createPortal(
         <>
           <div
-            className="fixed inset-0 z-[15]"
+            className="fixed inset-0 z-[50] bg-black/20"
             onClick={() => setShowMenu(false)}
           />
-          <div
-            className="absolute bottom-full left-0 mb-2 w-[500px] bg-amber-100/95 backdrop-blur-md rounded-lg shadow-2xl border-2 border-amber-800/50 p-4 z-30 pointer-events-auto max-h-[80vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="font-bold text-amber-900 mb-4 text-xl">Siatka Wywiadowcza</h3>
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vh] max-w-[90vw] max-h-[90vh] bg-amber-100/95 backdrop-blur-md rounded-lg shadow-2xl border-2 border-amber-800/50 p-6 z-[60] pointer-events-auto flex flex-col">
+            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+              <h3 className="font-bold text-amber-900 text-xl">Siatka Wywiadowcza</h3>
+              <button
+                onClick={() => setShowMenu(false)}
+                className="btn btn-sm btn-ghost text-amber-900 hover:bg-amber-200/50"
+              >
+                ✕
+              </button>
+            </div>
             
-            <div className="space-y-4">
-              {/* Intelligence Points */}
-              <div className="p-3 bg-amber-200/50 rounded-lg border border-amber-800/30">
-                <div className="flex items-center justify-between">
-                  <span className="text-amber-800 font-semibold">Punkty Wywiadu:</span>
-                  <span className="font-bold text-amber-900 text-xl">{intelligencePoints}</span>
-                </div>
-              </div>
-
-              {/* Discovered Agents */}
-              <div>
-                <h4 className="font-bold text-amber-900 mb-2">Odkryci Agenci</h4>
-                <div className="space-y-2">
-                  {discoveredAgents.map((agent) => (
-                    <div key={agent.id} className="flex items-center gap-3 p-2 bg-amber-200/50 rounded border border-amber-800/30">
-                      <div className="relative w-12 h-12 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0">
-                        <Image
-                          src={agent.photo}
-                          alt={agent.name}
-                          fill
-                          className="object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-amber-700 text-amber-50 text-xl">
-                          🕵️
+            <div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
+              {/* Left Column - Active Agents */}
+              <div className="flex flex-col min-h-0">
+                <h4 className="font-bold text-amber-900 mb-3 flex-shrink-0">Aktywni agenci: {activeAgentIds.length}/6</h4>
+                <div className="flex-1 space-y-2 overflow-y-auto min-h-0">
+                  {/* Agent Slots */}
+                  {Array.from({ length: 6 }).map((_, index) => {
+                    const agent = activeAgents[index];
+                    return (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg border-2 ${
+                          agent
+                            ? "bg-amber-200/50 border-amber-800/50"
+                            : "bg-amber-200/20 border-amber-800/20 border-dashed"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-12 h-12 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            <span className="text-amber-50 text-xl">🕵️</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            {agent ? (
+                              <div className="flex flex-col gap-1">
+                                <div className="text-sm font-semibold text-amber-900">{agent.name}</div>
+                                <div className="text-xs text-amber-800">Kryptonim: {agent.codename}</div>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-1">
+                                <div className="text-sm font-semibold text-amber-600/50">Pusty slot</div>
+                                <div className="text-xs text-amber-600/30">-</div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="w-[72px] flex-shrink-0"></div>
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-semibold text-amber-900">{agent.name}</div>
-                        <div className="text-xs text-amber-800">Kryptonim: {agent.codename}</div>
-                        <div className="text-xs text-amber-700">{agent.location} • {agent.specialization}</div>
-                      </div>
-                    </div>
-                  ))}
-                  {discoveredAgents.length === 0 && (
-                    <div className="text-sm text-amber-700 italic text-center py-2">
-                      Brak odkrytych agentów
-                    </div>
-                  )}
+                    );
+                  })}
                 </div>
+                <button
+                  onClick={onAddAgent}
+                  disabled={activeAgentIds.length >= 6 || availableAgents.length === 0}
+                  className="mt-4 w-full p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 text-amber-50 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  + Nowy agent
+                </button>
               </div>
 
-              {/* Skills Tree */}
-              <div>
-                <h4 className="font-bold text-amber-900 mb-2">Drzewo Umiejętności Wywiadu</h4>
-                <div className="space-y-2">
-                  {skillsData.map((skill) => {
-                    const indentLevel = skill.parentId ? (skillsData.find((s) => s.id === skill.parentId)?.parentId ? 8 : 4) : 0;
-                    const isUnlocked = skill.unlocked && skill.level > 0;
-                    
+              {/* Right Column - Intelligence Points & Upgrades */}
+              <div className="flex flex-col min-h-0">
+                <h4 className="font-bold text-amber-900 mb-3 flex-shrink-0">Punkty wywiadu: {intelligencePoints}</h4>
+                <div className="flex-1 space-y-2 overflow-y-auto min-h-0">
+                  {skills.map((skill: Skill) => {
                     return (
                       <div
                         key={skill.id}
-                        className={`p-2 rounded border ${
-                          isUnlocked
-                            ? "bg-amber-200/50 border-amber-800/30"
-                            : "bg-amber-200/30 border-amber-800/20"
-                        }`}
-                        style={{ marginLeft: `${indentLevel}px` }}
+                        className="p-3 rounded-lg border-2 bg-amber-200/50 border-amber-800/50"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className={`font-semibold text-sm ${isUnlocked ? "text-amber-900" : "text-amber-800"}`}>
-                              {skill.name}
-                            </div>
-                            <div className={`text-xs ${isUnlocked ? "text-amber-800" : "text-amber-700"}`}>
-                              {skill.description}
-                            </div>
-                            {!isUnlocked && (
-                              <div className="text-xs text-amber-700 mt-1">
-                                Wymaga: {skill.cost} punktów
-                              </div>
-                            )}
-                            {isUnlocked && skill.level < skill.maxLevel && (
-                              <div className="text-xs text-amber-700 mt-1">
-                                Poziom: {skill.level}/{skill.maxLevel}
-                              </div>
-                            )}
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-12 h-12 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            <span className="text-amber-50 text-xl">⚡</span>
                           </div>
-                          <div>
-                            {isUnlocked ? (
-                              <div className="badge badge-success">Aktywna</div>
-                            ) : (
-                              <div className="badge badge-warning">Zablokowana</div>
-                            )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-1">
+                              <div className="text-sm font-semibold text-amber-900">
+                                {skill.name}
+                              </div>
+                              <div className="text-xs text-amber-800">
+                                Poziom: {skill.level}
+                              </div>
+                            </div>
                           </div>
+                          <button
+                            onClick={() => onLevelUpSkill(skill.id)}
+                            disabled={skill.level >= skill.maxLevel || intelligencePoints < skill.cost}
+                            className="w-[72px] px-3 py-1.5 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border border-amber-700/50 text-amber-50 text-xs font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex-shrink-0"
+                            title={skill.level >= skill.maxLevel ? "Maksymalny poziom" : `${skill.cost} punkty wywiadu`}
+                          >
+                            +1 ({skill.cost})
+                          </button>
                         </div>
                       </div>
                     );
@@ -135,9 +151,10 @@ export default function SiatkaWywiadowczaButton({
               </div>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
-    </div>
+    </>
   );
 }
 

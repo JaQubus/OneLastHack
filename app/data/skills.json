@@ -4,7 +4,7 @@
     "name": "Infiltracja Podstawowa",
     "level": 1,
     "maxLevel": 5,
-    "cost": 0,
+    "cost": 10,
     "unlocked": true,
     "description": "+10% skuteczności misji",
     "parentId": null

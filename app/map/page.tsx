@@ -59,21 +59,26 @@ export default function MapPage() {
 
   // Function to level up a skill
   const levelUpSkill = (skillId: number) => {
-    setSkills(prevSkills => prevSkills.map(skill => {
-      if (skill.id === skillId && skill.level < skill.maxLevel && intelligencePoints >= skill.cost) {
-        setIntelligencePoints(prev => prev - skill.cost);
-        return { ...skill, level: skill.level + 1 };
-      }
-      return skill;
-    }));
+    // Find the skill first
+    const skill = skills.find(s => s.id === skillId);
+    if (!skill || skill.level >= skill.maxLevel || intelligencePoints < skill.cost) {
+      return; // Can't upgrade
+    }
+    
+    // Deduct points
+    setIntelligencePoints(prev => prev - skill.cost);
+    
+    // Update skill level
+    setSkills(prevSkills => 
+      prevSkills.map(s => 
+        s.id === skillId ? { ...s, level: s.level + 1 } : s
+      )
+    );
   };
   const [markers, setMarkers] = useState<Marker[]>(initialMarkers as Marker[]);
 
   // Get active stolen good (first one with progress > 0)
   const activeStolenGood = (stolenGoodsData as StolenGood[]).find((good: StolenGood) => good.progress > 0) || stolenGoodsData[0] as StolenGood;
-  
-  // Get discovered agents
-  const discoveredAgents = (agentsData as Agent[]).filter((agent: Agent) => agent.status === "odkryty");
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
@@ -95,9 +100,12 @@ export default function MapPage() {
       <BottomBar
         activeStolenGood={activeStolenGood}
         intelligencePoints={intelligencePoints}
-        discoveredAgents={discoveredAgents}
-        skillsData={skillsData as Skill[]}
-        overallProgress={progress}
+        activeAgents={activeAgents}
+        activeAgentIds={activeAgentIds}
+        availableAgents={availableAgents}
+        skills={skills}
+        onAddAgent={addNextAgent}
+        onLevelUpSkill={levelUpSkill}
       />
 
       {/* Clickable markers overlay */}
