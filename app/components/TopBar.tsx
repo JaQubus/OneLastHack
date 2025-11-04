@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Timeline from "./Timeline";
 
 export default function TopBar() {
   return (
@@ -9,7 +10,7 @@ export default function TopBar() {
         </Link>
         <h1 className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight">ARTiFACTS</h1>
         <div className="text-sm font-mono text-amber-100 bg-amber-800/50 px-3 py-1 rounded-md border border-amber-700/50">
-          <span className="font-semibold">1939</span> - <span className="font-semibold">1945</span>
+          <Timeline />
         </div>
       </div>
     </header>

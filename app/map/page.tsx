@@ -12,8 +12,57 @@ import type { StolenGood, Agent, Skill } from "../types";
 
 export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
-  const [intelligencePoints] = useState(125);
-  const [progress] = useState(35); // Overall progress for "Postęp rabunku"
+  const [showStolenGoodPopup, setShowStolenGoodPopup] = useState(false);
+  const [showSiatkaMenu, setShowSiatkaMenu] = useState(false);
+  const [intelligencePoints, setIntelligencePoints] = useState(125);
+  const [progress, setProgress] = useState(60); // Overall progress for "Postęp rabunku"
+  const [skills, setSkills] = useState<Skill[]>(skillsData);
+  
+  // State for active agents in slots (start with first agent if available)
+  const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
+    const firstAgent = agentsData[0];
+    return firstAgent ? [firstAgent.id] : [];
+  });
+  
+  // Get active agents from activeAgentIds
+  const activeAgents: Agent[] = activeAgentIds
+    .map(id => {
+      const agent = agentsData.find(a => a.id === id);
+      return agent ? {
+        id: agent.id,
+        name: agent.name,
+        codename: agent.codename
+      } : null;
+    })
+    .filter((agent): agent is Agent => agent !== null);
+  
+  // Get available agents (all agents from JSON that are not already active)
+  const availableAgents: Agent[] = agentsData
+    .filter(agent => !activeAgentIds.includes(agent.id))
+    .map(agent => ({
+      id: agent.id,
+      name: agent.name,
+      codename: agent.codename
+    }));
+  
+  // Function to add next available agent
+  const addNextAgent = () => {
+    if (activeAgentIds.length < 6 && availableAgents.length > 0) {
+      const nextAgent = availableAgents[0];
+      setActiveAgentIds([...activeAgentIds, nextAgent.id]);
+    }
+  };
+
+  // Function to level up a skill
+  const levelUpSkill = (skillId: number) => {
+    setSkills(prevSkills => prevSkills.map(skill => {
+      if (skill.id === skillId && skill.level < skill.maxLevel && intelligencePoints >= skill.cost) {
+        setIntelligencePoints(prev => prev - skill.cost);
+        return { ...skill, level: skill.level + 1 };
+      }
+      return skill;
+    }));
+  };
 
   // Get active stolen good (first one with progress > 0)
   const activeStolenGood = (stolenGoodsData as StolenGood[]).find((good: StolenGood) => good.progress > 0) || stolenGoodsData[0] as StolenGood;
