@@ -22,8 +22,9 @@ export default function Home() {
         {/* Game Title with vintage styling */}
         <div className="flex flex-col items-center gap-3 sm:gap-4">
           <h1 className="text-6xl font-bold tracking-wider text-amber-900 drop-shadow-[2px_2px_4px_rgba(139,69,19,0.3)] sm:text-7xl md:text-8xl lg:text-9xl">
-            ARTi
-            <span className="text-amber-800">FACTS</span>
+            ART
+            <span className="text-amber-700">&</span>
+            <span className="text-amber-900">FACTS</span>
           </h1>
           <div className="h-1 w-24 bg-amber-800 sm:w-32"></div>
         </div>
@@ -40,15 +41,15 @@ export default function Home() {
 
         {/* Main CTA Button - VERY CLICKABLE! */}
         <Link href="/map" className="mt-4 sm:mt-6">
-          <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-700 text-lg font-bold uppercase tracking-widest text-amber-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-amber-800 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl">
+          <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-700 text-lg font-bold uppercase tracking-widest text-amber-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-amber-800 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl rounded-xl">
             <span className="relative z-10">Rozpocznij Misję</span>
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-amber-800 to-amber-900 opacity-0 transition-opacity group-hover:opacity-100"></div>
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-800 to-amber-900 opacity-0 transition-opacity group-hover:opacity-100"></div>
           </button>
         </Link>
 
         {/* Additional Info Cards */}
         <div className="mt-8 grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
-          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm">
+          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm rounded-xl">
             <div className="card-body items-center p-4 text-center sm:p-6">
               <div className="mb-2 text-4xl">🗺️</div>
               <h3 className="card-title text-amber-900 text-base sm:text-lg">Strategiczna Mapa</h3>
@@ -58,7 +59,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm">
+          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm rounded-xl">
             <div className="card-body items-center p-4 text-center sm:p-6">
               <div className="mb-2 text-4xl">🕵️</div>
               <h3 className="card-title text-amber-900 text-base sm:text-lg">Siatka Wywiadowcza</h3>
@@ -68,7 +69,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm">
+          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm rounded-xl">
             <div className="card-body items-center p-4 text-center sm:p-6">
               <div className="mb-2 text-4xl">🎨</div>
               <h3 className="card-title text-amber-900 text-base sm:text-lg">Kolekcja Dzieł</h3>
