@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "top": "30%",
+    "left": "25%",
+    "title": "Zdarzenie #1",
+    "description": "Niewielkie przesunięcie ładunku w porcie."
+  },
+  {
+    "id": 2,
+    "top": "50%",
+    "left": "60%",
+    "title": "Zdarzenie #2",
+    "description": "Podejrzana aktywność w galerii miejskiej."
+  },
+  {
+    "id": 3,
+    "top": "20%",
+    "left": "70%",
+    "title": "Zdarzenie #3",
+    "description": "Zgubiony samochód dostawczy w okolicy magazynu." 
+  },
+  {
+    "id": 4,
+    "top": "65%",
+    "left": "15%",
+    "title": "Zdarzenie #4",
+    "description": "Ochrona wzmożona po alarmie w muzeum." 
+  }
+]

@@ -5,13 +5,26 @@ import { useState } from "react";
 import stolenGoodsData from "../data/stolen-goods.json";
 import agentsData from "../data/agents.json";
 import skillsData from "../data/skills.json";
+import initialMarkers from "../data/map-markers.json";
+import Timeline from "../components/Timeline";
+import EventModal from "../components/EventModal";
+import MapMarker from "../components/MapMarker";
+import { placeRandomMarker } from "../../lib/placeRandomMarker";
+import { useEffect } from "react";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
-import MapMarker from "../components/MapMarker";
 import type { StolenGood, Agent, Skill } from "../types";
 
+type Marker = {
+  id: number;
+  top: string;
+  left: string;
+  title?: string;
+  description?: string;
+};
+
 export default function MapPage() {
-  const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
+  const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
   const [showStolenGoodPopup, setShowStolenGoodPopup] = useState(false);
   const [showSiatkaMenu, setShowSiatkaMenu] = useState(false);
   const [intelligencePoints, setIntelligencePoints] = useState(125);
@@ -63,6 +76,7 @@ export default function MapPage() {
       return skill;
     }));
   };
+  const [markers, setMarkers] = useState<Marker[]>(initialMarkers as Marker[]);
 
   // Get active stolen good (first one with progress > 0)
   const activeStolenGood = (stolenGoodsData as StolenGood[]).find((good: StolenGood) => good.progress > 0) || stolenGoodsData[0] as StolenGood;
@@ -97,15 +111,28 @@ export default function MapPage() {
 
       {/* Clickable markers overlay */}
       <div className="absolute inset-0 z-10 pointer-events-none">
-        <div className="pointer-events-auto">
-          <MapMarker
-            top="30%"
-            left="25%"
-            title="Zdarzenie #1"
-            onMarkerClick={() => setSelectedMarker(1)}
-          />
+          <div className="pointer-events-auto">
+          {/* Example marker positions loaded from JSON */}
+          {markers.map((m) => (
+            <MapMarker
+              key={m.id}
+              id={m.id}
+              top={m.top}
+              left={m.left}
+              onClick={(id) => {
+                const found = markers.find((x) => x.id === id) || null;
+                setSelectedMarker(found);
+              }}
+              title={m.title}
+            />
+          ))}
         </div>
       </div>
+
+      {/* Event Info Modal - moved to component */}
+      {selectedMarker != null && (
+        <EventModal marker={selectedMarker} onClose={() => setSelectedMarker(null)} />
+      )}
     </div>
   );
 }
