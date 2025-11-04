@@ -82,15 +82,17 @@ export default function MapPage() {
       {/* Bottom Bar Overlay - Vintage Yellow */}
       <footer className="absolute bottom-0 left-0 right-0 z-20 bg-amber-900/50 backdrop-blur-sm border-t-2 border-amber-800/50 shadow-lg">
         <div className="container mx-auto px-4 py-4 sm:px-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            {/* Left Side - Stolen Good Progress Button */}
-            <div className="relative flex-1 min-w-[300px]">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left Side - Two Buttons (10% width each, centered) */}
+            <div className="flex items-center gap-3 justify-center" style={{ width: '20%' }}>
+              {/* Stolen Good Progress Button */}
+              <div className="relative" style={{ width: '50%' }}>
               <button
                 onClick={() => {
                   setShowStolenGoodPopup(true);
                   setShowSiatkaMenu(false);
                 }}
-                className="w-full p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-xs sm:text-sm"
               >
                 <div className="flex items-center gap-3">
                   <div className="text-2xl">🎨</div>
@@ -161,19 +163,19 @@ export default function MapPage() {
                   </div>
                 </div>
               )}
-            </div>
+              </div>
 
-            {/* Siatka Wywiadowcza Button */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setShowSiatkaMenu(!showSiatkaMenu);
-                  setShowStolenGoodPopup(false);
-                }}
-                className="btn btn-secondary btn-sm sm:btn-md text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 bg-amber-800 hover:bg-amber-900 border-amber-900"
-              >
-                Siatka Wywiadowcza
-              </button>
+              {/* Siatka Wywiadowcza Button */}
+              <div className="relative" style={{ width: '50%' }}>
+                <button
+                  onClick={() => {
+                    setShowSiatkaMenu(!showSiatkaMenu);
+                    setShowStolenGoodPopup(false);
+                  }}
+                  className="btn btn-secondary btn-sm sm:btn-md text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 bg-amber-800 hover:bg-amber-900 border-amber-900 w-full"
+                >
+                  Siatka Wywiadowcza
+                </button>
               {showSiatkaMenu && (
                 <div className="absolute bottom-full left-0 mb-2 w-[500px] bg-amber-100/95 backdrop-blur-md rounded-lg shadow-2xl border-2 border-amber-800/50 p-4 z-30 pointer-events-auto max-h-[80vh] overflow-y-auto">
                   <h3 className="font-bold text-amber-900 mb-4 text-xl">Siatka Wywiadowcza</h3>
@@ -275,10 +277,14 @@ export default function MapPage() {
                   </div>
                 </div>
               )}
+              </div>
             </div>
 
-            {/* Right Side - Progress Bar */}
-            <div className="flex flex-col items-end gap-2 min-w-[200px]">
+            {/* Center Spacer */}
+            <div className="flex-1"></div>
+
+            {/* Right Side - Progress Bar (centered with right) */}
+            <div className="flex flex-col items-end gap-2" style={{ width: '10%' }}>
               <label className="text-sm font-semibold text-amber-50 drop-shadow-sm">Postęp rabunku</label>
               <div className="w-full bg-amber-800/50 rounded-full h-6 border border-amber-700/50 shadow-inner overflow-hidden">
                 <div
