@@ -9,6 +9,7 @@ import skillsData from "../data/skills.json";
 import Timeline from "../components/Timeline";
 
 type StolenGood = {
+  
   id: number;
   name: string;
   artist: string;
