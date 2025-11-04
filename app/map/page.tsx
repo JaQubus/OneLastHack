@@ -89,7 +89,7 @@ export default function MapPage() {
       {/* Full Screen Map */}
       <div className="absolute inset-0">
         <Image
-          src="/map.png"
+          src="/map.svg"
           alt="Mapa operacyjna Europy"
           fill
           className="object-cover"
