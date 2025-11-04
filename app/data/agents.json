@@ -2,38 +2,51 @@
   {
     "id": 1,
     "name": "Jan Kowalski",
-    "codename": "Orzeł",
-    "photo": "/agent1.jpg",
-    "location": "Warszawa",
-    "status": "odkryty",
-    "specialization": "Infiltracja"
+    "codename": "Orzeł"
   },
   {
     "id": 2,
     "name": "Anna Nowak",
-    "codename": "Sowa",
-    "photo": "/agent2.jpg",
-    "location": "Kraków",
-    "status": "odkryty",
-    "specialization": "Szyfrowanie"
+    "codename": "Sowa"
   },
   {
     "id": 3,
     "name": "Piotr Wiśniewski",
-    "codename": "Wilk",
-    "photo": "/agent3.jpg",
-    "location": "Warszawa",
-    "status": "odkryty",
-    "specialization": "Sabotaż"
+    "codename": "Wilk"
   },
   {
     "id": 4,
     "name": "Maria Zielińska",
-    "codename": "Bocian",
-    "photo": "/agent4.jpg",
-    "location": "Gdańsk",
-    "status": "ukryty",
-    "specialization": "Wywiad"
+    "codename": "Bocian"
+  },
+  {
+    "id": 5,
+    "name": "Tomasz Lewandowski",
+    "codename": "Lis"
+  },
+  {
+    "id": 6,
+    "name": "Katarzyna Wójcik",
+    "codename": "Jastrząb"
+  },
+  {
+    "id": 7,
+    "name": "Michał Kamiński",
+    "codename": "Ryś"
+  },
+  {
+    "id": 8,
+    "name": "Agnieszka Dąbrowska",
+    "codename": "Żmija"
+  },
+  {
+    "id": 9,
+    "name": "Paweł Kaczmarek",
+    "codename": "Kruk"
+  },
+  {
+    "id": 10,
+    "name": "Ewa Piotrowska",
+    "codename": "Pantera"
   }
 ]
-
