@@ -13,6 +13,7 @@ import { placeRandomMarker } from "../../lib/placeRandomMarker";
 import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
+import PinsList from "../components/PinsList";
 import type { StolenGood, Agent, Skill } from "../types";
 
 type Marker = {
@@ -122,6 +123,13 @@ export default function MapPage() {
           priority
         />
       </div>
+
+      {/* Pins List - Left Side */}
+      <PinsList
+        markers={markers}
+        selectedMarkerId={selectedMarker?.id || null}
+        onMarkerClick={(marker) => setSelectedMarker(marker)}
+      />
 
       {/* Top Bar */}
       <TopBar />

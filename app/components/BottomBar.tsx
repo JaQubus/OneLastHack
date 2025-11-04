@@ -47,7 +47,7 @@ export default function BottomBar({
           {/* Center Spacer */}
           <div className="flex-1"></div>
 
-          <ProgressBar progress={overallProgress} />
+          <ProgressBar label="Postęp rabunku" />
         </div>
       </div>
     </footer>
