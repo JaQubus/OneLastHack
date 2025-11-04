@@ -26,7 +26,7 @@ type Marker = {
 export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
   const [intelligencePoints, setIntelligencePoints] = useState(125);
-  
+  const [progress, setProgress] = useState(60);
   const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
   
   // State for active agents in slots (start with first agent if available)
