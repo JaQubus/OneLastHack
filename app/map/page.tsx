@@ -1,16 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import stolenGoodsData from "../data/stolen-goods.json";
+import initialMarkers from "../data/map-markers.json";
 import agentsData from "../data/agents.json";
 import skillsData from "../data/skills.json";
-import initialMarkers from "../data/map-markers.json";
+// start with no pre-existing markers; markers will be spawned by the game time
 import Timeline from "../components/Timeline";
 import EventModal from "../components/EventModal";
 import MapMarker from "../components/MapMarker";
 import { placeRandomMarker } from "../../lib/placeRandomMarker";
-import { useEffect } from "react";
+import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
 import type { StolenGood, Agent, Skill } from "../types";
@@ -75,7 +76,39 @@ export default function MapPage() {
       )
     );
   };
-  const [markers, setMarkers] = useState<Marker[]>(initialMarkers as Marker[]);
+  // start with empty markers; the scheduled job will spawn markers over time
+  const [markers, setMarkers] = useState<Marker[]>([]);
+  const markersRef = useRef<Marker[]>(markers);
+  useEffect(() => {
+    markersRef.current = markers;
+  }, [markers]);
+
+  const { scheduleEvery, cancelScheduled } = useGameTime();
+
+  // Schedule an event every 30 in-game days to spawn a new marker and open its modal
+  useEffect(() => {
+    const id = scheduleEvery(30, () => {
+      // pick a random template from the JSON titles/descriptions
+      const pool = initialMarkers as { id: number; top: string; left: string; title: string; description: string }[];
+      const tpl = pool[Math.floor(Math.random() * pool.length)] || {};
+      // use placeRandomMarker util to compute a random position for the template
+      const moved = placeRandomMarker([ { id: tpl.id, top: tpl.top, left: tpl.left, title: tpl.title, description: tpl.description } ])[0];
+      const newMarker: Marker = {
+        id: Date.now(),
+        top: moved.top,
+        left: moved.left,
+        title: tpl.title ?? `Wydarzenie`,
+        description: tpl.description ?? "Nowe zdarzenie wykryte przez siatkę wywiadowczą.",
+      };
+
+      // add marker (do NOT open modal automatically)
+      setMarkers((prev) => [...prev, newMarker]);
+    });
+
+    return () => cancelScheduled(id);
+    // scheduleEvery/cancelScheduled are stable from provider; eslint disabled to avoid frequent reschedule
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Get active stolen good (first one with progress > 0)
   const activeStolenGood = (stolenGoodsData as StolenGood[]).find((good: StolenGood) => good.progress > 0) || stolenGoodsData[0] as StolenGood;
@@ -130,7 +163,15 @@ export default function MapPage() {
 
       {/* Event Info Modal - moved to component */}
       {selectedMarker != null && (
-        <EventModal marker={selectedMarker} onClose={() => setSelectedMarker(null)} />
+        <EventModal
+          marker={selectedMarker}
+          onClose={() => {
+            if (selectedMarker) {
+              setMarkers((prev) => prev.filter((m) => m.id !== selectedMarker.id));
+            }
+            setSelectedMarker(null);
+          }}
+        />
       )}
     </div>
   );

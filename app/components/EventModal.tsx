@@ -15,7 +15,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function EventModal2({ marker, onClose }: Props) {
+export default function EventModal({ marker, onClose }: Props) {
   return (
     <div className="absolute top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
       <div className="card bg-amber-100/95 backdrop-blur-md border-2 border-amber-800/50 shadow-2xl w-80 pointer-events-auto">
