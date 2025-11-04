@@ -1,0 +1,256 @@
+{
+  "stolen_artworks": [
+    {
+      "title": "Portret młodzieńca",
+      "img": "portret_mlodzienca.webp",
+      "artist": "Rafael Santi",
+      "origin": "Namalowany ok. 1513-1514 roku. Przed wojną w zbiorach Muzeum Książąt Czartoryskich w Krakowie",
+      "period": "ok. 1513-1514",
+      "theft": {
+        "date": "17 września 1944",
+        "perpetrator": "Naziści (grupa Hansa Franka)",
+        "circumstances": "Zagrabiony po upadku Powstania Warszawskiego, wywieziony z pałacu w Krakowie do rezydencji Franka w Niemczech"
+      },
+      "return": {
+        "status": "Nie powrócił",
+        "date": null,
+        "current_location": "Nieznane (zaginione)",
+        "notes": "Ostatni raz widziany w 1945 roku w willi Franka w Schliersee. Symbolicznie najcenniejsze zaginione polskie dzieło sztuki."
+      }
+    },
+    {
+      "title": "Chrystus upadający pod krzyżem",
+      "img": "chrystus_upadajacy_pod_krzyzem.jpg",
+      "artist": "Peter Paul Rubens",
+      "origin": "Namalowany ok. 1602-1605 roku. Przed wojną w katedrze Wniebowzięcia NMP we Fromborku",
+      "period": "ok. 1602-1605",
+      "theft": {
+        "date": "10 stycznia 1945",
+        "perpetrator": "Armia Czerwona (ZSRR)",
+        "circumstances": "Zrabowany pod koniec II wojny światowej w ramach tzw. 'trofiejnych akcji'"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "2004",
+        "current_location": "Katedra Wniebowzięcia NMP we Fromborku",
+        "notes": "Odnaleziony w 2001 roku w petersburskim Ermitażu, zwrócony dzięki polsko-rosyjskim negocjacjom"
+      }
+    },
+    {
+      "title": "Adoracja Baranka",
+      "img": "adoracja_baranka.jpg",
+      "artist": "Nieznany (Gdańsk)",
+      "origin": "Koniec XVII wieku. Przed wojną w kościele św. Jana w Gdańsku",
+      "period": "koniec XVII w.",
+      "theft": {
+        "date": "22 luty 1945",
+        "perpetrator": "Armia Czerwona (ZSRR)",
+        "circumstances": "Ewakuowany w 1944 roku do Fiszewa koło Elbląga, przejęty przez Armię Czerwoną w 1945 roku"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "2002",
+        "current_location": "Muzeum Narodowe w Gdańsku",
+        "notes": "Odnaleziony w Ermitażu w Petersburgu"
+      }
+    },
+    {
+      "title": "Apostołowie Szymon i Juda",
+      "img": "apostolowie_szymon_i_juda.jpg",
+      "artist": "Nieznany",
+      "origin": "II połowa XVII wieku. Przed wojną w kościele św. Mikołaja w Elblągu",
+      "period": "II połowa XVII w.",
+      "theft": {
+        "date": "19 marca 1945",
+        "perpetrator": "Armia Czerwona (ZSRR)",
+        "circumstances": "Ewakuowany z Gdańska w 1944 roku do Fiszewa, zrabowany przez żołnierzy radzieckich w 1945 roku"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "2002",
+        "current_location": "Muzeum Narodowe w Gdańsku",
+        "notes": "Zidentyfikowany w Muzeum Historii Religii i Ateizmu w Petersburgu"
+      }
+    },
+    {
+      "title": "Chrystus i setnik z Kafarnaum",
+      "img": "chrystus_i_setnik_z_kafarnaum.jpg",
+      "artist": "Nieznany (Gdańsk)",
+      "origin": "Pierwsza połowa XVII wieku. Przed wojną w kościele św. Jana w Gdańsku",
+      "period": "1 połowa XVII w.",
+      "theft": {
+        "date": "7 kwietnia 1945",
+        "perpetrator": "Armia Czerwona (ZSRR)",
+        "circumstances": "Ewakuacja do Fiszewa w 1944 roku, grabież przez Armię Czerwoną w 1945 roku"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "2002",
+        "current_location": "Muzeum Narodowe w Gdańsku",
+        "notes": "Odnaleziony w Muzeum w Awiło-Uspieńskim Monasterze w Rosji"
+      }
+    },
+    {
+      "title": "Żydówka z pomarańczami",
+      "img": "zydowka_z_pomaranczami.jpg",
+      "artist": "Aleksander Gierymski",
+      "origin": "Namalowany w 1880-1881 roku. Przed wojną w Muzeum Narodowym w Warszawie",
+      "period": "1880-1881",
+      "theft": {
+        "date": "12 października 1944",
+        "perpetrator": "Naziści",
+        "circumstances": "Zrabowany z Muzeum Narodowego w Warszawie podczas Powstania Warszawskiego"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "11 maja 2011",
+        "current_location": "Muzeum Narodowe w Warszawie",
+        "notes": "Odnaleziony w 2010 roku na niemieckim rynku antykwarycznym, zwrócony do Polski w 2011 roku"
+      }
+    },
+    {
+      "title": "Krajobraz z miłosiernym Samarytaninem",
+      "img": "krajobraz_z_milosiernym_samarytaninem.jpg",
+      "artist": "Rembrandt van Rijn",
+      "origin": "Namalowany w 1638 roku. Przed wojną w Muzeum Książąt Czartoryskich w Krakowie",
+      "period": "1638",
+      "theft": {
+        "date": "6 listopada 1939",
+        "perpetrator": "Naziści",
+        "circumstances": "Zrabowany z kolekcji Czartoryskich po zajęciu Krakowa przez Niemców"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "15 marca 1947",
+        "current_location": "Muzeum Książąt Czartoryskich w Krakowie",
+        "notes": "Odnaleziony po wojnie w Niemczech i zwrócony Polsce w 1947 roku"
+      }
+    },
+    {
+      "title": "Dama z gronostajem",
+      "img": "dama_z_gronostajem.jpg",
+      "artist": "Leonardo da Vinci",
+      "origin": "Namalowany ok. 1489-1490 roku. Przed wojną w Muzeum Książąt Czartoryskich w Krakowie",
+      "period": "ok. 1489-1490",
+      "theft": {
+        "date": "23 września 1939",
+        "perpetrator": "Naziści",
+        "circumstances": "Zrabowany z kolekcji Czartoryskich, wywieziony do Niemiec"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "20 maja 1946",
+        "current_location": "Muzeum Książąt Czartoryskich w Krakowie",
+        "notes": "Odnaleziony w 1945 roku w willi Hansa Franka w Bawarii, zwrócony Polsce w 1946 roku"
+      }
+    },
+    {
+      "title": "Bitwa pod Grunwaldem",
+      "img": "bitwa_pod_grunwaldem.jpg",
+      "artist": "Jan Matejko",
+      "origin": "Namalowany w 1878 roku. Przed wojną w Muzeum Narodowym w Warszawie",
+      "period": "1878",
+      "theft": {
+        "date": "15 października 1939",
+        "perpetrator": "Naziści",
+        "circumstances": "Wywieziony z Muzeum Narodowego w Warszawie, przeznaczony do zniszczenia jako dzieło 'antyniemieckie'"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "22 lipca 1949",
+        "current_location": "Muzeum Narodowe w Warszawie",
+        "notes": "Odnaleziony w 1945 roku w jednym z magazynów na Dolnym Śląsku, poddany konserwacji"
+      }
+    },
+    {
+      "title": "Dziewczyna w ramie obrazu",
+      "img": "dziewczyna_w_ramie_obrazu.jpg",
+      "artist": "Rembrandt van Rijn",
+      "origin": "Namalowany w 1641 roku. Przed wojną w Królewskim Zamku w Warszawie",
+      "period": "1641",
+      "theft": {
+        "date": "2 grudnia 1939",
+        "perpetrator": "Naziści",
+        "circumstances": "Zrabowany z Zamku Królewskiego w Warszawie"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "18 kwietnia 1947",
+        "current_location": "Zamek Królewski w Warszawie",
+        "notes": "Odnaleziony po wojnie w Niemczech, zwrócony Polsce w 1947 roku"
+      }
+    },
+    {
+      "title": "Polowanie na jelenia",
+      "img": "polowanie_na_jelenia.jpg",
+      "artist": "Juliusz Kossak",
+      "origin": "Namalowany w 1891 roku. Przed wojną w Muzeum Narodowym w Warszawie",
+      "period": "1891",
+      "theft": {
+        "date": "8 października 1944",
+        "perpetrator": "Naziści",
+        "circumstances": "Zrabowany z Muzeum Narodowego w Warszawie podczas Powstania Warszawskiego"
+      },
+      "return": {
+        "status": "Nie powrócił",
+        "date": null,
+        "current_location": "Nieznane (zaginione)",
+        "notes": "Jeden z wielu zaginionych obrazów Juliusza Kossaka, poszukiwany do dziś"
+      }
+    },
+    {
+      "title": "Madonna z Dzieciątkiem i św. Janem Chrzcicielem",
+      "img": "madonna_z_dzieciatkiem.jpg",
+      "artist": "Lucas Cranach Starszy",
+      "origin": "Namalowany ok. 1518-1520 roku. Przed wojną w Muzeum Śląskim w Katowicach",
+      "period": "ok. 1518-1520",
+      "theft": {
+        "date": "25 stycznia 1945",
+        "perpetrator": "Naziści",
+        "circumstances": "Ewakuowany z Katowic, zaginął podczas transportu"
+      },
+      "return": {
+        "status": "Nie powrócił",
+        "date": null,
+        "current_location": "Nieznane (zaginione)",
+        "notes": "Jeden z najcenniejszych zaginionych obrazów z kolekcji śląskich"
+      }
+    },
+    {
+      "title": "Czaty",
+      "img": "czaty.jpg",
+      "artist": "Józef Brandt",
+      "origin": "Namalowany w 1884 roku. Przed wojną w Muzeum Narodowym w Warszawie",
+      "period": "1884",
+      "theft": {
+        "date": "1 listopada 1944",
+        "perpetrator": "Naziści",
+        "circumstances": "Zrabowany z Muzeum Narodowego w Warszawie podczas okupacji"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "14 września 1956",
+        "current_location": "Muzeum Narodowe w Warszawie",
+        "notes": "Odnaleziony w Austrii, zwrócony Polsce w 1956 roku"
+      }
+    },
+    {
+      "title": "Babie lato",
+      "img": "babie_lato.jpg",
+      "artist": "Józef Chełmoński",
+      "origin": "Namalowany w 1875 roku. Przed wojną w Muzeum Narodowym w Warszawie",
+      "period": "1875",
+      "theft": {
+        "date": "28 września 1944",
+        "perpetrator": "Naziści",
+        "circumstances": "Zrabowany z Muzeum Narodowego w Warszawie podczas Powstania Warszawskiego"
+      },
+      "return": {
+        "status": "Powrócił",
+        "date": "30 czerwca 1946",
+        "current_location": "Muzeum Narodowe w Warszawie",
+        "notes": "Odnaleziony w Niemczech, zwrócony Polsce w 1946 roku"
+      }
+    }
+  ]
+}
