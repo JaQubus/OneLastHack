@@ -1,63 +1,89 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
+      {/* Vintage yellow/old paper background */}
+      <div className="fixed inset-0 bg-[#f4e4bc] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iYSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNMCAwaDQwdjQwSDB6IiBmaWxsPSIjZjBkODk1IiBmaWxsLW9wYWNpdHk9Ii4xNSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg==')]"></div>
+      
+      {/* Sepia/vintage filter overlays for aged paper effect */}
+      <div className="fixed inset-0 bg-gradient-to-br from-amber-200/30 via-transparent to-amber-300/20 mix-blend-multiply"></div>
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(139,69,19,0.05)_100%)]"></div>
+      <div className="fixed inset-0 bg-gradient-to-b from-amber-100/40 via-transparent to-amber-200/30"></div>
+      
+      {/* Vintage stains/age spots */}
+      <div className="fixed inset-0 opacity-10">
+        <div className="absolute top-20 left-10 h-32 w-32 rounded-full bg-amber-800 blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 h-40 w-40 rounded-full bg-amber-700 blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/3 h-24 w-24 rounded-full bg-amber-900 blur-2xl"></div>
+      </div>
+      
+      <main className="relative z-10 flex w-full max-w-5xl flex-col items-center justify-center gap-8 px-4 py-12 text-center sm:gap-12 sm:px-6 sm:py-16">
+        {/* Game Title with vintage styling */}
+        <div className="flex flex-col items-center gap-3 sm:gap-4">
+          <h1 className="text-6xl font-bold tracking-wider text-amber-900 drop-shadow-[2px_2px_4px_rgba(139,69,19,0.3)] sm:text-7xl md:text-8xl lg:text-9xl">
+            ARTi
+            <span className="text-amber-800">FACTS</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+          <div className="h-1 w-24 bg-amber-800 sm:w-32"></div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Subtitle */}
+        <p className="max-w-2xl text-lg font-semibold text-amber-900 drop-shadow-sm sm:text-xl md:text-2xl">
+          Odzyskaj skradzione dzieła sztuki z II wojny światowej
+        </p>
+        <p className="max-w-xl text-base text-amber-800 sm:text-lg">
+          Wciel się w szefa wywiadu polskiego państwa podziemnego
+          <br className="hidden sm:block" />
+          <span className="sm:hidden"> </span>i prowadź operację odzyskania zagrabionych skarbów kultury.
+        </p>
+
+        {/* Main CTA Button - VERY CLICKABLE! */}
+        <Link href="/map" className="mt-4 sm:mt-6">
+          <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-700 text-lg font-bold uppercase tracking-widest text-amber-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-amber-800 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl">
+            <span className="relative z-10">Rozpocznij Misję</span>
+            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-amber-800 to-amber-900 opacity-0 transition-opacity group-hover:opacity-100"></div>
+          </button>
+        </Link>
+
+        {/* Additional Info Cards */}
+        <div className="mt-8 grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm">
+            <div className="card-body items-center p-4 text-center sm:p-6">
+              <div className="mb-2 text-4xl">🗺️</div>
+              <h3 className="card-title text-amber-900 text-base sm:text-lg">Strategiczna Mapa</h3>
+              <p className="text-sm text-amber-800 sm:text-base">
+                Śledź wydarzenia na interaktywnej mapie Europy
+              </p>
+            </div>
+          </div>
+
+          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm">
+            <div className="card-body items-center p-4 text-center sm:p-6">
+              <div className="mb-2 text-4xl">🕵️</div>
+              <h3 className="card-title text-amber-900 text-base sm:text-lg">Siatka Wywiadowcza</h3>
+              <p className="text-sm text-amber-800 sm:text-base">
+                Rekrutuj agentów i zarządzaj operacjami
+              </p>
+            </div>
+          </div>
+
+          <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm">
+            <div className="card-body items-center p-4 text-center sm:p-6">
+              <div className="mb-2 text-4xl">🎨</div>
+              <h3 className="card-title text-amber-900 text-base sm:text-lg">Kolekcja Dzieł</h3>
+              <p className="text-sm text-amber-800 sm:text-base">
+                Odzyskaj najcenniejsze skarby kultury
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline Indicator */}
+        <div className="mt-6 flex items-center gap-2 text-sm font-mono text-amber-800 sm:mt-8 sm:text-base">
+          <span className="font-semibold">1939</span>
+          <div className="h-px w-12 bg-amber-800 sm:w-16"></div>
+          <span className="font-semibold">1945</span>
         </div>
       </main>
     </div>
