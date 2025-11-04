@@ -1,0 +1,63 @@
+[
+  {
+    "id": 1,
+    "name": "Infiltracja Podstawowa",
+    "level": 1,
+    "maxLevel": 5,
+    "cost": 0,
+    "unlocked": true,
+    "description": "+10% skuteczności misji",
+    "parentId": null
+  },
+  {
+    "id": 2,
+    "name": "Zaawansowana Infiltracja",
+    "level": 0,
+    "maxLevel": 5,
+    "cost": 50,
+    "unlocked": false,
+    "description": "+20% skuteczności misji",
+    "parentId": 1
+  },
+  {
+    "id": 3,
+    "name": "Szyfrowanie",
+    "level": 0,
+    "maxLevel": 5,
+    "cost": 50,
+    "unlocked": false,
+    "description": "+15% prędkości zbierania informacji",
+    "parentId": 1
+  },
+  {
+    "id": 4,
+    "name": "Ekspercka Infiltracja",
+    "level": 0,
+    "maxLevel": 5,
+    "cost": 100,
+    "unlocked": false,
+    "description": "+30% skuteczności misji",
+    "parentId": 2
+  },
+  {
+    "id": 5,
+    "name": "Pojemność Sieci",
+    "level": 1,
+    "maxLevel": 5,
+    "cost": 0,
+    "unlocked": true,
+    "description": "+1 dostępny agent",
+    "parentId": null
+  },
+  {
+    "id": 6,
+    "name": "Ochrona Agentów",
+    "level": 0,
+    "maxLevel": 5,
+    "cost": 75,
+    "unlocked": false,
+    "description": "-20% ryzyko wykrycia",
+    "parentId": 5
+  }
+]
+

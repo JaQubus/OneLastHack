@@ -1,0 +1,92 @@
+{
+  "stolenGoods": [
+    {
+      "id": 1,
+      "name": "Portret Młodzieńca",
+      "artist": "Rafael",
+      "photo": "/placeholder-art.jpg",
+      "info": "Jeden z najcenniejszych obrazów z kolekcji księcia Czartoryskiego. Zrabowany przez nazistów w 1939 roku.",
+      "progress": 45,
+      "timeRemaining": "12h 30m",
+      "location": "Warszawa"
+    },
+    {
+      "id": 2,
+      "name": "Dama z gronostajem",
+      "artist": "Leonardo da Vinci",
+      "photo": "/placeholder-art.jpg",
+      "info": "Słynny portret Cecylii Gallerani, znany również jako Dama z łasiczką. Zrabowany z Muzeum Czartoryskich.",
+      "progress": 28,
+      "timeRemaining": "18h 45m",
+      "location": "Kraków"
+    },
+    {
+      "id": 3,
+      "name": "Krajobraz z miłosiernym Samarytaninem",
+      "artist": "Rembrandt",
+      "photo": "/placeholder-art.jpg",
+      "info": "Jedno z najważniejszych dzieł Rembrandta w polskich zbiorach. Zaginione podczas II wojny światowej.",
+      "progress": 15,
+      "timeRemaining": "24h 10m",
+      "location": "Warszawa"
+    }
+  ],
+  "agents": [
+    {
+      "id": 1,
+      "name": "Jan Kowalski",
+      "photo": "/agent1.jpg",
+      "location": "Warszawa",
+      "level": 3,
+      "specialization": "Infiltracja"
+    },
+    {
+      "id": 2,
+      "name": "Anna Nowak",
+      "photo": "/agent2.jpg",
+      "location": "Kraków",
+      "level": 2,
+      "specialization": "Szyfrowanie"
+    },
+    {
+      "id": 3,
+      "name": "Piotr Wiśniewski",
+      "photo": "/agent3.jpg",
+      "location": "Warszawa",
+      "level": 4,
+      "specialization": "Sabotaż"
+    }
+  ],
+  "intelligencePoints": 125,
+  "skills": [
+    {
+      "id": 1,
+      "name": "Szybkość zbierania informacji",
+      "level": 2,
+      "maxLevel": 5,
+      "description": "Zwiększa prędkość zbierania informacji o dziełach sztuki"
+    },
+    {
+      "id": 2,
+      "name": "Pojemność sieci",
+      "level": 1,
+      "maxLevel": 5,
+      "description": "Zwiększa liczbę dostępnych agentów"
+    },
+    {
+      "id": 3,
+      "name": "Efektywność misji",
+      "level": 3,
+      "maxLevel": 5,
+      "description": "Zwiększa szansę na sukces misji"
+    },
+    {
+      "id": 4,
+      "name": "Ochrona agentów",
+      "level": 1,
+      "maxLevel": 5,
+      "description": "Zmniejsza ryzyko wykrycia agentów"
+    }
+  ]
+}
+

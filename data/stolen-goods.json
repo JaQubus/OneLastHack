@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "name": "Portret Młodzieńca",
+    "artist": "Rafael",
+    "year": "1513-1514",
+    "description": "Jeden z najcenniejszych obrazów w polskich zbiorach. Zaginął podczas II wojny światowej.",
+    "image": "/artworks/portret-mlodzienca.jpg",
+    "progress": 45,
+    "estimatedTime": "2 dni 14 godzin",
+    "location": "Warszawa"
+  },
+  {
+    "id": 2,
+    "name": "Dama z gronostajem",
+    "artist": "Leonardo da Vinci",
+    "year": "1489-1490",
+    "description": "Słynny portret Cecylii Gallerani, kochanki Lodovica Sforzy.",
+    "image": "/artworks/dama-z-gronostajem.jpg",
+    "progress": 28,
+    "estimatedTime": "5 dni 8 godzin",
+    "location": "Kraków"
+  },
+  {
+    "id": 3,
+    "name": "Krajobraz z miłosiernym Samarytaninem",
+    "artist": "Rembrandt",
+    "year": "1638",
+    "description": "Jedno z najważniejszych dzieł holenderskiego mistrza w polskich zbiorach.",
+    "image": "/artworks/rembrandt-samarytanin.jpg",
+    "progress": 12,
+    "estimatedTime": "8 dni 3 godziny",
+    "location": "Warszawa"
+  }
+]
+

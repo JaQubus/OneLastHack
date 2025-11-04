@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "name": "Portret Młodzieńca",
+    "artist": "Rafael",
+    "year": "1513-1514",
+    "description": "Jeden z najcenniejszych obrazów z kolekcji księcia Czartoryskiego. Zrabowany przez nazistów w 1939 roku z Muzeum Narodowego w Warszawie.",
+    "image": "/placeholder-art.jpg",
+    "progress": 45,
+    "estimatedTime": "12h 30m",
+    "location": "Warszawa"
+  },
+  {
+    "id": 2,
+    "name": "Dama z gronostajem",
+    "artist": "Leonardo da Vinci",
+    "year": "1489-1490",
+    "description": "Słynny portret Cecylii Gallerani, znany również jako Dama z łasiczką. Zrabowany z Muzeum Czartoryskich w Krakowie.",
+    "image": "/placeholder-art.jpg",
+    "progress": 28,
+    "estimatedTime": "18h 45m",
+    "location": "Kraków"
+  },
+  {
+    "id": 3,
+    "name": "Krajobraz z miłosiernym Samarytaninem",
+    "artist": "Rembrandt",
+    "year": "1638",
+    "description": "Jedno z najważniejszych dzieł Rembrandta w polskich zbiorach. Zaginione podczas II wojny światowej.",
+    "image": "/placeholder-art.jpg",
+    "progress": 15,
+    "estimatedTime": "24h 10m",
+    "location": "Warszawa"
+  }
+]
+

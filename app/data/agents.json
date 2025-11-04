@@ -1,0 +1,39 @@
+[
+  {
+    "id": 1,
+    "name": "Jan Kowalski",
+    "codename": "Orzeł",
+    "photo": "/agent1.jpg",
+    "location": "Warszawa",
+    "status": "odkryty",
+    "specialization": "Infiltracja"
+  },
+  {
+    "id": 2,
+    "name": "Anna Nowak",
+    "codename": "Sowa",
+    "photo": "/agent2.jpg",
+    "location": "Kraków",
+    "status": "odkryty",
+    "specialization": "Szyfrowanie"
+  },
+  {
+    "id": 3,
+    "name": "Piotr Wiśniewski",
+    "codename": "Wilk",
+    "photo": "/agent3.jpg",
+    "location": "Warszawa",
+    "status": "odkryty",
+    "specialization": "Sabotaż"
+  },
+  {
+    "id": 4,
+    "name": "Maria Zielińska",
+    "codename": "Bocian",
+    "photo": "/agent4.jpg",
+    "location": "Gdańsk",
+    "status": "ukryty",
+    "specialization": "Wywiad"
+  }
+]
+
