@@ -21,12 +21,11 @@ export default function Home() {
       <main className="relative z-10 flex w-full max-w-5xl flex-col items-center justify-center gap-8 px-4 py-12 text-center sm:gap-12 sm:px-6 sm:py-16">
         {/* Game Title with vintage styling */}
         <div className="flex flex-col items-center gap-3 sm:gap-4">
-          <h1 className="text-6xl font-bold tracking-wider text-amber-900 drop-shadow-[2px_2px_4px_rgba(139,69,19,0.3)] sm:text-7xl md:text-8xl lg:text-9xl">
-            ART
-            <span className="text-amber-700">&</span>
-            <span className="text-amber-900">FACTS</span>
+          <h1 className="text-6xl font-bold flex flex-row tracking-wider  drop-shadow-[2px_2px_4px_rgba(139,69,19,0.3)] sm:text-7xl md:text-8xl lg:text-9xl">
+            <div className="text-amber-900">KULT</div>
+            <div className="text-amber-700">UR</div>
+            <div className="text-amber-800"> KAMPF</div>
           </h1>
-          <div className="h-1 w-24 bg-amber-800 sm:w-32"></div>
         </div>
 
         {/* Subtitle */}

@@ -137,6 +137,7 @@ export default function MapPage() {
         activeAgentIds={activeAgentIds}
         availableAgents={availableAgents}
         skills={skills}
+        overallProgress={progress}
         onAddAgent={addNextAgent}
         onLevelUpSkill={levelUpSkill}
       />

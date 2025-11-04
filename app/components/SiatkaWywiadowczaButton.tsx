@@ -27,12 +27,12 @@ export default function SiatkaWywiadowczaButton({
 
   return (
     <>
-      <div className="relative min-w-[250px]">
+      <div className="relative" style={{ width: '20%' }}>
         <button
           onClick={() => {
             setShowMenu(!showMenu);
           }}
-          className="w-full p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-xs sm:text-sm flex items-center"
         >
           <div className="flex items-center gap-3">
             <div className="text-2xl">🕵️</div>

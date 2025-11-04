@@ -12,6 +12,7 @@ interface BottomBarProps {
   activeAgentIds: number[];
   availableAgents: Agent[];
   skills: Skill[];
+  overallProgress: number;
   onAddAgent: () => void;
   onLevelUpSkill: (skillId: number) => void;
 }
@@ -23,6 +24,7 @@ export default function BottomBar({
   activeAgentIds,
   availableAgents,
   skills,
+  overallProgress,
   onAddAgent,
   onLevelUpSkill,
 }: BottomBarProps) {
@@ -45,7 +47,7 @@ export default function BottomBar({
           {/* Center Spacer */}
           <div className="flex-1"></div>
 
-          <ProgressBar />
+          <ProgressBar progress={overallProgress} />
         </div>
       </div>
     </footer>
