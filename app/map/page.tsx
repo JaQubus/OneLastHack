@@ -23,21 +23,21 @@ export default function MapPage() {
         />
       </div>
 
-      {/* Top Bar Overlay - Modern */}
-      <header className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-r from-slate-900/70 via-slate-800/70 to-slate-900/70 backdrop-blur-md border-b border-slate-700/50 shadow-lg">
+      {/* Top Bar Overlay - Vintage Yellow */}
+      <header className="absolute top-0 left-0 right-0 z-20 bg-amber-900/50 backdrop-blur-sm border-b-2 border-amber-800/50 shadow-lg">
         <div className="container mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
-          <Link href="/" className="btn btn-ghost btn-sm text-slate-100 hover:bg-slate-700/50 hover:text-white transition-all">
+          <Link href="/" className="btn btn-ghost btn-sm text-amber-50 hover:bg-amber-800/50 transition-all">
             ← Powrót
           </Link>
-          <h1 className="text-2xl font-bold text-white drop-shadow-lg sm:text-3xl tracking-tight">ARTiFACTS</h1>
-          <div className="text-sm font-mono text-slate-200 bg-slate-800/50 px-3 py-1 rounded-md border border-slate-700/50">
+          <h1 className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight">ARTiFACTS</h1>
+          <div className="text-sm font-mono text-amber-100 bg-amber-800/50 px-3 py-1 rounded-md border border-amber-700/50">
             <span className="font-semibold">1939</span> - <span className="font-semibold">1945</span>
           </div>
         </div>
       </header>
 
-      {/* Bottom Bar Overlay - Modern */}
-      <footer className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-r from-slate-900/70 via-slate-800/70 to-slate-900/70 backdrop-blur-md border-t border-slate-700/50 shadow-lg">
+      {/* Bottom Bar Overlay - Vintage Yellow */}
+      <footer className="absolute bottom-0 left-0 right-0 z-20 bg-amber-900/50 backdrop-blur-sm border-t-2 border-amber-800/50 shadow-lg">
         <div className="container mx-auto px-4 py-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             {/* Left Side - Buttons */}
@@ -49,29 +49,23 @@ export default function MapPage() {
                     setShowMisjaMenu(!showMisjaMenu);
                     setShowSiatkaMenu(false);
                   }}
-                  className="btn btn-primary btn-sm sm:btn-md text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+                  className="btn btn-primary btn-sm sm:btn-md text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 bg-amber-700 hover:bg-amber-800 border-amber-800"
                 >
                   Misja
                 </button>
                 {showMisjaMenu && (
-                  <div className="absolute bottom-full left-0 mb-2 w-64 bg-slate-800/95 backdrop-blur-md rounded-lg shadow-2xl border border-slate-700/50 p-4 z-30">
-                    <h3 className="font-bold text-white mb-3 text-lg">Aktywne Misje</h3>
+                  <div className="absolute bottom-full left-0 mb-2 w-64 bg-amber-100/95 backdrop-blur-md rounded-lg shadow-2xl border-2 border-amber-800/50 p-4 z-30 pointer-events-auto">
+                    <h3 className="font-bold text-amber-900 mb-3 text-lg">Aktywne Misje</h3>
                     <div className="space-y-2">
-                      <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600/50 hover:bg-slate-700/70 transition-colors cursor-pointer">
-                        <div className="font-semibold text-amber-300">Obraz #1 - "Portret Młodzieńca"</div>
-                        <div className="text-xs text-slate-400 mt-1">Postęp: 45%</div>
+                      <div className="p-3 bg-amber-200/50 rounded-lg border border-amber-800/30 hover:bg-amber-200/70 transition-colors cursor-pointer">
+                        <div className="font-semibold text-amber-900">Obraz #1 - "Portret Młodzieńca"</div>
+                        <div className="text-xs text-amber-800 mt-1">Postęp: 45%</div>
                       </div>
-                      <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600/50 hover:bg-slate-700/70 transition-colors cursor-pointer">
-                        <div className="font-semibold text-amber-300">Obraz #2 - "Dama z gronostajem"</div>
-                        <div className="text-xs text-slate-400 mt-1">Postęp: 28%</div>
+                      <div className="p-3 bg-amber-200/50 rounded-lg border border-amber-800/30 hover:bg-amber-200/70 transition-colors cursor-pointer">
+                        <div className="font-semibold text-amber-900">Obraz #2 - "Dama z gronostajem"</div>
+                        <div className="text-xs text-amber-800 mt-1">Postęp: 28%</div>
                       </div>
                     </div>
-                    <button
-                      onClick={() => setShowMisjaMenu(false)}
-                      className="mt-3 btn btn-sm btn-ghost w-full text-slate-300 hover:text-white"
-                    >
-                      Zamknij
-                    </button>
                   </div>
                 )}
               </div>
@@ -83,54 +77,48 @@ export default function MapPage() {
                     setShowSiatkaMenu(!showSiatkaMenu);
                     setShowMisjaMenu(false);
                   }}
-                  className="btn btn-secondary btn-sm sm:btn-md text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+                  className="btn btn-secondary btn-sm sm:btn-md text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 bg-amber-800 hover:bg-amber-900 border-amber-900"
                 >
                   Siatka Wywiadowcza
                 </button>
                 {showSiatkaMenu && (
-                  <div className="absolute bottom-full left-0 mb-2 w-72 bg-slate-800/95 backdrop-blur-md rounded-lg shadow-2xl border border-slate-700/50 p-4 z-30">
-                    <h3 className="font-bold text-white mb-3 text-lg">Siatka Wywiadowcza</h3>
+                  <div className="absolute bottom-full left-0 mb-2 w-72 bg-amber-100/95 backdrop-blur-md rounded-lg shadow-2xl border-2 border-amber-800/50 p-4 z-30 pointer-events-auto">
+                    <h3 className="font-bold text-amber-900 mb-3 text-lg">Siatka Wywiadowcza</h3>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-300">Aktywni Agenci:</span>
-                        <span className="font-semibold text-amber-300">2/5</span>
+                        <span className="text-amber-800">Aktywni Agenci:</span>
+                        <span className="font-semibold text-amber-900">2/5</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-300">Punkty Wywiadu:</span>
-                        <span className="font-semibold text-emerald-400">125</span>
+                        <span className="text-amber-800">Punkty Wywiadu:</span>
+                        <span className="font-semibold text-amber-700">125</span>
                       </div>
-                      <div className="divider my-2"></div>
+                      <div className="divider my-2 border-amber-800/30"></div>
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 p-2 bg-slate-700/50 rounded">
+                        <div className="flex items-center gap-2 p-2 bg-amber-200/50 rounded border border-amber-800/30">
                           <div className="avatar placeholder">
-                            <div className="bg-amber-600 text-white rounded-full w-8">
+                            <div className="bg-amber-700 text-amber-50 rounded-full w-8">
                               <span className="text-xs">🕵️</span>
                             </div>
                           </div>
                           <div className="flex-1">
-                            <div className="text-sm font-semibold text-white">Agent #1</div>
-                            <div className="text-xs text-slate-400">Warszawa</div>
+                            <div className="text-sm font-semibold text-amber-900">Agent #1</div>
+                            <div className="text-xs text-amber-800">Warszawa</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 p-2 bg-slate-700/50 rounded">
+                        <div className="flex items-center gap-2 p-2 bg-amber-200/50 rounded border border-amber-800/30">
                           <div className="avatar placeholder">
-                            <div className="bg-amber-600 text-white rounded-full w-8">
+                            <div className="bg-amber-700 text-amber-50 rounded-full w-8">
                               <span className="text-xs">🕵️</span>
                             </div>
                           </div>
                           <div className="flex-1">
-                            <div className="text-sm font-semibold text-white">Agent #2</div>
-                            <div className="text-xs text-slate-400">Kraków</div>
+                            <div className="text-sm font-semibold text-amber-900">Agent #2</div>
+                            <div className="text-xs text-amber-800">Kraków</div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={() => setShowSiatkaMenu(false)}
-                      className="mt-3 btn btn-sm btn-ghost w-full text-slate-300 hover:text-white"
-                    >
-                      Zamknij
-                    </button>
                   </div>
                 )}
               </div>
@@ -138,10 +126,10 @@ export default function MapPage() {
 
             {/* Right Side - Progress Bar */}
             <div className="flex flex-col items-end gap-2 min-w-[200px]">
-              <label className="text-sm font-semibold text-white drop-shadow-sm">Postęp rabunku</label>
-              <div className="w-full bg-slate-700/50 rounded-full h-6 border border-slate-600/50 shadow-inner overflow-hidden">
+              <label className="text-sm font-semibold text-amber-50 drop-shadow-sm">Postęp rabunku</label>
+              <div className="w-full bg-amber-800/50 rounded-full h-6 border border-amber-700/50 shadow-inner overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-xs font-bold text-white transition-all duration-300 shadow-lg"
+                  className="h-full bg-gradient-to-r from-amber-600 to-amber-700 rounded-full flex items-center justify-center text-xs font-bold text-amber-50 transition-all duration-300 shadow-lg"
                   style={{ width: `${progress}%` }}
                 >
                   {progress > 10 && `${progress}%`}
@@ -153,12 +141,13 @@ export default function MapPage() {
       </footer>
 
       {/* Click to close menus when clicking outside */}
-      {(showMisjaMenu || showSiatkaMenu) && (
+      {(showMisjaMenu || showSiatkaMenu || selectedMarker) && (
         <div
           className="fixed inset-0 z-[15]"
           onClick={() => {
             setShowMisjaMenu(false);
             setShowSiatkaMenu(false);
+            setSelectedMarker(null);
           }}
         />
       )}
@@ -177,21 +166,13 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* Event Info Modal - Modern */}
+      {/* Event Info Modal - Vintage */}
       {selectedMarker && (
-        <div className="absolute top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2">
-          <div className="card bg-slate-800/95 backdrop-blur-md border-2 border-slate-700/50 shadow-2xl w-80">
+        <div className="absolute top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+          <div className="card bg-amber-100/95 backdrop-blur-md border-2 border-amber-800/50 shadow-2xl w-80 pointer-events-auto">
             <div className="card-body">
-              <h2 className="card-title text-white">Zdarzenie na mapie</h2>
-              <p className="text-slate-300 text-sm">Kliknij na znaczniki, aby zobaczyć szczegóły</p>
-              <div className="card-actions justify-end mt-4">
-                <button
-                  className="btn btn-sm btn-ghost text-white hover:bg-slate-700"
-                  onClick={() => setSelectedMarker(null)}
-                >
-                  Zamknij
-                </button>
-              </div>
+              <h2 className="card-title text-amber-900">Zdarzenie na mapie</h2>
+              <p className="text-amber-800 text-sm">Kliknij na znaczniki, aby zobaczyć szczegóły</p>
             </div>
           </div>
         </div>
