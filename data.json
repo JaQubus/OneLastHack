@@ -1,88 +1,88 @@
 {
-  "skradzione_dziela": [
+  "stolen_artworks": [
     {
-      "tytul": "Portret młodzieńca",
-      "artysta": "Rafael Santi",
-      "pochodzenie": "Namalowany ok. 1513-1514 roku. Przed wojną w zbiorach Muzeum Książąt Czartoryskich w Krakowie",
-      "okres_powstania": "ok. 1513-1514",
-      "kradziez": {
-        "data": "1944",
-        "sprawca": "Naziści (grupa Hansa Franka)",
-        "okolicznosci": "Zagrabiony po upadku Powstania Warszawskiego, wywieziony z pałacu w Krakowie do rezydencji Franka w Niemczech"
+      "title": "Portret młodzieńca",
+      "artist": "Rafael Santi",
+      "origin": "Namalowany ok. 1513-1514 roku. Przed wojną w zbiorach Muzeum Książąt Czartoryskich w Krakowie",
+      "period": "ok. 1513-1514",
+      "theft": {
+        "date": "1944",
+        "perpetrator": "Naziści (grupa Hansa Franka)",
+        "circumstances": "Zagrabiony po upadku Powstania Warszawskiego, wywieziony z pałacu w Krakowie do rezydencji Franka w Niemczech"
       },
-      "powrot": {
+      "return": {
         "status": "Nie powrócił",
-        "data": null,
-        "obecne_miejsce": "Nieznane (zaginione)",
-        "uwagi": "Ostatni raz widziany w 1945 roku w willi Franka w Schliersee. Symbolicznie najcenniejsze zaginione polskie dzieło sztuki."
+        "date": null,
+        "current_location": "Nieznane (zaginione)",
+        "notes": "Ostatni raz widziany w 1945 roku w willi Franka w Schliersee. Symbolicznie najcenniejsze zaginione polskie dzieło sztuki."
       }
     },
     {
-      "tytul": "Chrystus upadający pod krzyżem",
-      "artysta": "Peter Paul Rubens",
-      "pochodzenie": "Namalowany ok. 1602-1605 roku. Przed wojną w katedrze Wniebowzięcia NMP we Fromborku",
-      "okres_powstania": "ok. 1602-1605",
-      "kradziez": {
-        "data": "1945",
-        "sprawca": "Armia Czerwona (ZSRR)",
-        "okolicznosci": "Zrabowany pod koniec II wojny światowej w ramach tzw. 'trofiejnych akcji'"
+      "title": "Chrystus upadający pod krzyżem",
+      "artist": "Peter Paul Rubens",
+      "origin": "Namalowany ok. 1602-1605 roku. Przed wojną w katedrze Wniebowzięcia NMP we Fromborku",
+      "period": "ok. 1602-1605",
+      "theft": {
+        "date": "1945",
+        "perpetrator": "Armia Czerwona (ZSRR)",
+        "circumstances": "Zrabowany pod koniec II wojny światowej w ramach tzw. 'trofiejnych akcji'"
       },
-      "powrot": {
+      "return": {
         "status": "Powrócił",
-        "data": "2004",
-        "obecne_miejsce": "Katedra Wniebowzięcia NMP we Fromborku",
-        "uwagi": "Odnaleziony w 2001 roku w petersburskim Ermitażu, zwrócony dzięki polsko-rosyjskim negocjacjom"
+        "date": "2004",
+        "current_location": "Katedra Wniebowzięcia NMP we Fromborku",
+        "notes": "Odnaleziony w 2001 roku w petersburskim Ermitażu, zwrócony dzięki polsko-rosyjskim negocjacjom"
       }
     },
     {
-      "tytul": "Adoracja Baranka",
-      "artysta": "Nieznany (Gdańsk)",
-      "pochodzenie": "Koniec XVII wieku. Przed wojną w kościele św. Jana w Gdańsku",
-      "okres_powstania": "koniec XVII w.",
-      "kradziez": {
-        "data": "1945",
-        "sprawca": "Armia Czerwona (ZSRR)",
-        "okolicznosci": "Ewakuowany w 1944 roku do Fiszewa koło Elbląga, przejęty przez Armię Czerwoną w 1945 roku"
+      "title": "Adoracja Baranka",
+      "artist": "Nieznany (Gdańsk)",
+      "origin": "Koniec XVII wieku. Przed wojną w kościele św. Jana w Gdańsku",
+      "period": "koniec XVII w.",
+      "theft": {
+        "date": "1945",
+        "perpetrator": "Armia Czerwona (ZSRR)",
+        "circumstances": "Ewakuowany w 1944 roku do Fiszewa koło Elbląga, przejęty przez Armię Czerwoną w 1945 roku"
       },
-      "powrot": {
+      "return": {
         "status": "Powrócił",
-        "data": "2002",
-        "obecne_miejsce": "Muzeum Narodowe w Gdańsku",
-        "uwagi": "Odnaleziony w Ermitażu w Petersburgu"
+        "date": "2002",
+        "current_location": "Muzeum Narodowe w Gdańsku",
+        "notes": "Odnaleziony w Ermitażu w Petersburgu"
       }
     },
     {
-      "tytul": "Apostołowie Szymon i Juda",
-      "artysta": "Nieznany",
-      "pochodzenie": "II połowa XVII wieku. Przed wojną w kościele św. Mikołaja w Elblągu",
-      "okres_powstania": "II połowa XVII w.",
-      "kradziez": {
-        "data": "1945",
-        "sprawca": "Armia Czerwona (ZSRR)",
-        "okolicznosci": "Ewakuowany z Gdańska w 1944 roku do Fiszewa, zrabowany przez żołnierzy radzieckich w 1945 roku"
+      "title": "Apostołowie Szymon i Juda",
+      "artist": "Nieznany",
+      "origin": "II połowa XVII wieku. Przed wojną w kościele św. Mikołaja w Elblągu",
+      "period": "II połowa XVII w.",
+      "theft": {
+        "date": "1945",
+        "perpetrator": "Armia Czerwona (ZSRR)",
+        "circumstances": "Ewakuowany z Gdańska w 1944 roku do Fiszewa, zrabowany przez żołnierzy radzieckich w 1945 roku"
       },
-      "powrot": {
+      "return": {
         "status": "Powrócił",
-        "data": "2002",
-        "obecne_miejsce": "Muzeum Narodowe w Gdańsku",
-        "uwagi": "Zidentyfikowany w Muzeum Historii Religii i Ateizmu w Petersburgu"
+        "date": "2002",
+        "current_location": "Muzeum Narodowe w Gdańsku",
+        "notes": "Zidentyfikowany w Muzeum Historii Religii i Ateizmu w Petersburgu"
       }
     },
     {
-      "tytul": "Chrystus i setnik z Kafarnaum",
-      "artysta": "Nieznany (Gdańsk)",
-      "pochodzenie": "Pierwsza połowa XVII wieku. Przed wojną w kościele św. Jana w Gdańsku",
-      "okres_powstania": "1 połowa XVII w.",
-      "kradziez": {
-        "data": "1945",
-        "sprawca": "Armia Czerwona (ZSRR)",
-        "okolicznosci": "Ewakuacja do Fiszewa w 1944 roku, grabież przez Armię Czerwoną w 1945 roku"
+      "title": "Chrystus i setnik z Kafarnaum",
+      "artist": "Nieznany (Gdańsk)",
+      "origin": "Pierwsza połowa XVII wieku. Przed wojną w kościele św. Jana w Gdańsku",
+      "period": "1 połowa XVII w.",
+      "theft": {
+        "date": "1945",
+        "perpetrator": "Armia Czerwona (ZSRR)",
+        "circumstances": "Ewakuacja do Fiszewa w 1944 roku, grabież przez Armię Czerwoną w 1945 roku"
       },
-      "powrot": {
+      "return": {
         "status": "Powrócił",
-        "data": "2002",
-        "obecne_miejsce": "Muzeum Narodowe w Gdańsku",
-        "uwagi": "Odnaleziony w Muzeum w Awiło-Uspieńskim Monasterze w Rosji"
+        "date": "2002",
+        "current_location": "Muzeum Narodowe w Gdańsku",
+        "notes": "Odnaleziony w Muzeum w Awiło-Uspieńskim Monasterze w Rosji"
       }
     }
   ]
