@@ -39,7 +39,7 @@ export default function PinsList({ markers, selectedMarkerId, onMarkerClick }: P
         />
       )}
       
-      <div className="absolute top-36 right-4 z-30">
+      <div className="absolute top-36 right-6 z-30">
         {/* Collapsed/Header Container */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
