@@ -6,7 +6,8 @@
     "maxLevel": 5,
     "cost": 0,
     "unlocked": true,
-    "description": "+10% skuteczności misji"
+    "description": "+10% skuteczności misji",
+    "parentId": null
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@
     "maxLevel": 5,
     "cost": 50,
     "unlocked": false,
-    "description": "+20% skuteczności misji"
+    "description": "+20% skuteczności misji",
+    "parentId": 1
   },
   {
     "id": 3,
@@ -24,7 +26,8 @@
     "maxLevel": 5,
     "cost": 50,
     "unlocked": false,
-    "description": "+15% prędkości zbierania informacji"
+    "description": "+15% prędkości zbierania informacji",
+    "parentId": 1
   },
   {
     "id": 4,
@@ -33,7 +36,8 @@
     "maxLevel": 5,
     "cost": 100,
     "unlocked": false,
-    "description": "+30% skuteczności misji"
+    "description": "+30% skuteczności misji",
+    "parentId": 2
   },
   {
     "id": 5,
@@ -42,7 +46,8 @@
     "maxLevel": 5,
     "cost": 75,
     "unlocked": false,
-    "description": "-20% ryzyko wykrycia"
+    "description": "-20% ryzyko wykrycia",
+    "parentId": null
   }
 ]
 

@@ -29,7 +29,7 @@ export default function MapPage() {
   const [showSiatkaMenu, setShowSiatkaMenu] = useState(false);
   const [intelligencePoints, setIntelligencePoints] = useState(125);
   const [progress, setProgress] = useState(60); // Overall progress for "Postęp rabunku"
-  const [skills, setSkills] = useState<Skill[]>(skillsData);
+  const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
   
   // State for active agents in slots (start with first agent if available)
   const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
@@ -40,23 +40,14 @@ export default function MapPage() {
   // Get active agents from activeAgentIds
   const activeAgents: Agent[] = activeAgentIds
     .map(id => {
-      const agent = agentsData.find(a => a.id === id);
-      return agent ? {
-        id: agent.id,
-        name: agent.name,
-        codename: agent.codename
-      } : null;
+      const agent = (agentsData as Agent[]).find(a => a.id === id);
+      return agent || null;
     })
     .filter((agent): agent is Agent => agent !== null);
   
   // Get available agents (all agents from JSON that are not already active)
-  const availableAgents: Agent[] = agentsData
-    .filter(agent => !activeAgentIds.includes(agent.id))
-    .map(agent => ({
-      id: agent.id,
-      name: agent.name,
-      codename: agent.codename
-    }));
+  const availableAgents: Agent[] = (agentsData as Agent[])
+    .filter(agent => !activeAgentIds.includes(agent.id));
   
   // Function to add next available agent
   const addNextAgent = () => {

@@ -2,51 +2,91 @@
   {
     "id": 1,
     "name": "Jan Kowalski",
-    "codename": "Orzeł"
+    "codename": "Orzeł",
+    "photo": "/agent1.jpg",
+    "location": "Warszawa",
+    "status": "odkryty",
+    "specialization": "Infiltracja"
   },
   {
     "id": 2,
     "name": "Anna Nowak",
-    "codename": "Sowa"
+    "codename": "Sowa",
+    "photo": "/agent2.jpg",
+    "location": "Kraków",
+    "status": "odkryty",
+    "specialization": "Szyfrowanie"
   },
   {
     "id": 3,
     "name": "Piotr Wiśniewski",
-    "codename": "Wilk"
+    "codename": "Wilk",
+    "photo": "/agent3.jpg",
+    "location": "Warszawa",
+    "status": "odkryty",
+    "specialization": "Sabotaż"
   },
   {
     "id": 4,
     "name": "Maria Zielińska",
-    "codename": "Bocian"
+    "codename": "Bocian",
+    "photo": "/agent4.jpg",
+    "location": "Gdańsk",
+    "status": "ukryty",
+    "specialization": "Wywiad"
   },
   {
     "id": 5,
     "name": "Tomasz Lewandowski",
-    "codename": "Lis"
+    "codename": "Lis",
+    "photo": "/agent5.jpg",
+    "location": "Poznań",
+    "status": "ukryty",
+    "specialization": "Infiltracja"
   },
   {
     "id": 6,
     "name": "Katarzyna Wójcik",
-    "codename": "Jastrząb"
+    "codename": "Jastrząb",
+    "photo": "/agent6.jpg",
+    "location": "Wrocław",
+    "status": "ukryty",
+    "specialization": "Szyfrowanie"
   },
   {
     "id": 7,
     "name": "Michał Kamiński",
-    "codename": "Ryś"
+    "codename": "Ryś",
+    "photo": "/agent7.jpg",
+    "location": "Łódź",
+    "status": "ukryty",
+    "specialization": "Sabotaż"
   },
   {
     "id": 8,
     "name": "Agnieszka Dąbrowska",
-    "codename": "Żmija"
+    "codename": "Żmija",
+    "photo": "/agent8.jpg",
+    "location": "Katowice",
+    "status": "ukryty",
+    "specialization": "Wywiad"
   },
   {
     "id": 9,
     "name": "Paweł Kaczmarek",
-    "codename": "Kruk"
+    "codename": "Kruk",
+    "photo": "/agent9.jpg",
+    "location": "Lublin",
+    "status": "ukryty",
+    "specialization": "Infiltracja"
   },
   {
     "id": 10,
     "name": "Ewa Piotrowska",
-    "codename": "Pantera"
+    "codename": "Pantera",
+    "photo": "/agent10.jpg",
+    "location": "Białystok",
+    "status": "ukryty",
+    "specialization": "Szyfrowanie"
   }
 ]
