@@ -87,7 +87,6 @@ export default function SiatkaWywiadowczaButton({
                             {agent ? (
                               <div className="flex flex-col gap-1">
                                 <div className="text-sm font-semibold text-amber-900">{agent.name}</div>
-                                <div className="text-xs text-amber-800">Kryptonim: {agent.codename}</div>
                               </div>
                             ) : (
                               <div className="flex flex-col gap-1">

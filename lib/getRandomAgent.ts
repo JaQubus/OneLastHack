@@ -3,7 +3,6 @@ import agents from "../data/agents.json";
 export type Agent = {
   id: number;
   name: string;
-  codename?: string;
   photo?: string;
   location?: string;
   status?: string;

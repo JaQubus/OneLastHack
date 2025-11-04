@@ -1,92 +1,50 @@
 [
   {
     "id": 1,
-    "name": "Jan Kowalski",
-    "codename": "Orzeł",
-    "photo": "/agent1.jpg",
+    "name": "Witold Pilecki",
+    "photo": "/officers/witold-pilecki.png",
     "location": "Warszawa",
     "status": "odkryty",
     "specialization": "Infiltracja"
   },
   {
     "id": 2,
-    "name": "Anna Nowak",
-    "codename": "Sowa",
-    "photo": "/agent2.jpg",
+    "name": "Elżbieta Zawicka",
+    "photo": "/officers/elzbieta-zawicka.png",
     "location": "Kraków",
     "status": "odkryty",
-    "specialization": "Szyfrowanie"
+    "specialization": "Infiltracja"
   },
   {
     "id": 3,
-    "name": "Piotr Wiśniewski",
-    "codename": "Wilk",
-    "photo": "/agent3.jpg",
+    "name": "Mieczysław Słowik",
+    "photo": "/officers/mieczyslaw-slowik.png",
     "location": "Warszawa",
     "status": "odkryty",
     "specialization": "Sabotaż"
   },
   {
     "id": 4,
-    "name": "Maria Zielińska",
-    "codename": "Bocian",
-    "photo": "/agent4.jpg",
-    "location": "Gdańsk",
+    "name": "Wacław Berka",
+    "photo": "/officers/waclaw-berka.png",
+    "location": "Warszawa",
     "status": "ukryty",
     "specialization": "Wywiad"
   },
   {
     "id": 5,
-    "name": "Tomasz Lewandowski",
-    "codename": "Lis",
-    "photo": "/agent5.jpg",
+    "name": "Kazimierz Iranek-Osmecki",
+    "photo": "/officers/kazimierz-iranek-osmecki.png",
     "location": "Poznań",
-    "status": "ukryty",
-    "specialization": "Infiltracja"
-  },
-  {
-    "id": 6,
-    "name": "Katarzyna Wójcik",
-    "codename": "Jastrząb",
-    "photo": "/agent6.jpg",
-    "location": "Wrocław",
-    "status": "ukryty",
-    "specialization": "Szyfrowanie"
-  },
-  {
-    "id": 7,
-    "name": "Michał Kamiński",
-    "codename": "Ryś",
-    "photo": "/agent7.jpg",
-    "location": "Łódź",
-    "status": "ukryty",
-    "specialization": "Sabotaż"
-  },
-  {
-    "id": 8,
-    "name": "Agnieszka Dąbrowska",
-    "codename": "Żmija",
-    "photo": "/agent8.jpg",
-    "location": "Katowice",
     "status": "ukryty",
     "specialization": "Wywiad"
   },
   {
-    "id": 9,
-    "name": "Paweł Kaczmarek",
-    "codename": "Kruk",
-    "photo": "/agent9.jpg",
-    "location": "Lublin",
-    "status": "ukryty",
-    "specialization": "Infiltracja"
-  },
-  {
-    "id": 10,
-    "name": "Ewa Piotrowska",
-    "codename": "Pantera",
-    "photo": "/agent10.jpg",
-    "location": "Białystok",
-    "status": "ukryty",
-    "specialization": "Szyfrowanie"
+    "id": 6,
+    "name": "Krystyna Skarbek",
+    "photo": "/officers/krystyna-skarbek.png",
+    "location": "Warszawa",
+    "status": "odkryty",
+    "specialization": "Łączność"
   }
 ]
