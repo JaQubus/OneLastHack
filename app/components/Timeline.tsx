@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useGameTime } from './GameTimeProvider';
 
 interface TimelineProps {
   initialDate?: Date;
@@ -8,27 +9,23 @@ interface TimelineProps {
   className?: string;
 }
 
-const Timeline = ({ 
-  initialDate = new Date('1939-09-01'), 
+const Timeline = ({
+  initialDate,
   speed = 500, // 1 second = 1 day
-  className = '' 
+  className = ''
 }: TimelineProps) => {
-  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
-  const [isRunning, setIsRunning] = useState<boolean>(true);
+  const { currentDate, isRunning, toggle, reset, fastForward, setSpeed } = useGameTime();
 
   useEffect(() => {
-    if (!isRunning) return;
+    // if a speed prop is provided, apply it to global time
+    if (typeof speed === 'number') setSpeed(speed);
+  }, [speed, setSpeed]);
 
-    const interval = setInterval(() => {
-      setCurrentDate(prevDate => {
-        const newDate = new Date(prevDate);
-        newDate.setDate(newDate.getDate() + 1);
-        return newDate;
-      });
-    }, speed);
-
-    return () => clearInterval(interval);
-  }, [isRunning, speed]);
+  useEffect(() => {
+    // if an initialDate prop was passed, reset the global time to it once
+    if (initialDate) reset(initialDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const formatDate = (date: Date): string => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -37,32 +34,18 @@ const Timeline = ({
     return `${day}/${month}/${year}`;
   };
 
-  const toggleCounter = () => {
-    setIsRunning(prev => !prev);
-  };
-
-  const resetCounter = () => {
-    setCurrentDate(initialDate);
-    setIsRunning(false);
-  };
-
-  const fastForward = (days: number) => {
-    setCurrentDate(prevDate => {
-      const newDate = new Date(prevDate);
-      newDate.setDate(newDate.getDate() + days);
-      return newDate;
-    });
-  };
-
   return (
     <div className={`date-counter p-2 rounded-lg ${className}`}>
-      <div className="text-center ">  
-        <div className="text-2xl font-mono font-bold">
-          {formatDate(currentDate)}
+      <div className="text-center">
+        <div className="text-2xl font-mono font-bold">{formatDate(currentDate)}</div>
+        <div className="mt-2 flex items-center justify-center gap-2">
+          <button className="btn btn-xs" onClick={toggle}>{isRunning ? 'Pause' : 'Play'}</button>
+          <button className="btn btn-xs" onClick={() => fastForward(10)}>+10d</button>
+          <button className="btn btn-xs" onClick={() => reset()}>Reset</button>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Timeline;
