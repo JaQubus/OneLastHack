@@ -8,7 +8,7 @@ export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
   const [showMisjaMenu, setShowMisjaMenu] = useState(false);
   const [showSiatkaMenu, setShowSiatkaMenu] = useState(false);
-  const [progress, setProgress] = useState(35); // Example progress value
+  const [progress, setProgress] = useState(35);
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
