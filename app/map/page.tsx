@@ -6,6 +6,7 @@ import { useState } from "react";
 import stolenGoodsData from "../data/stolen-goods.json";
 import agentsData from "../data/agents.json";
 import skillsData from "../data/skills.json";
+import Timeline from "../components/Timeline";
 
 type StolenGood = {
   id: number;
@@ -72,9 +73,11 @@ export default function MapPage() {
           <Link href="/" className="btn btn-ghost btn-sm text-amber-50 hover:bg-amber-800/50 transition-all">
             ← Powrót
           </Link>
-          <h1 className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight">ARTiFACTS</h1>
+          <h1 className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight absolute left-1/2 transform -translate-x-1/2">
+            ARTiFACTS
+          </h1>
           <div className="text-sm font-mono text-amber-100 bg-amber-800/50 px-3 py-1 rounded-md border border-amber-700/50">
-            <span className="font-semibold">1939</span> - <span className="font-semibold">1945</span>
+            <Timeline />
           </div>
         </div>
       </header>
