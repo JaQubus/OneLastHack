@@ -7,7 +7,6 @@ import initialMarkers from "../data/map-markers.json";
 import agentsData from "../data/agents.json";
 import skillsData from "../data/skills.json";
 // start with no pre-existing markers; markers will be spawned by the game time
-import Timeline from "../components/Timeline";
 import EventModal from "../components/EventModal";
 import MapMarker from "../components/MapMarker";
 import { placeRandomMarker } from "../../lib/placeRandomMarker";
@@ -26,10 +25,8 @@ type Marker = {
 
 export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
-  const [showStolenGoodPopup, setShowStolenGoodPopup] = useState(false);
-  const [showSiatkaMenu, setShowSiatkaMenu] = useState(false);
   const [intelligencePoints, setIntelligencePoints] = useState(125);
-  const [progress, setProgress] = useState(60); // Overall progress for "Postęp rabunku"
+  
   const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
   
   // State for active agents in slots (start with first agent if available)
