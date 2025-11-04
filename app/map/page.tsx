@@ -50,8 +50,10 @@ export default function MapPage() {
   
   // Function to add next available agent
   const addNextAgent = () => {
-    if (activeAgentIds.length < 6 && availableAgents.length > 0) {
+    const agentCost = 15;
+    if (activeAgentIds.length < 5 && availableAgents.length > 0 && intelligencePoints >= agentCost) {
       const nextAgent = availableAgents[0];
+      setIntelligencePoints(prev => prev - agentCost);
       setActiveAgentIds([...activeAgentIds, nextAgent.id]);
     }
   };

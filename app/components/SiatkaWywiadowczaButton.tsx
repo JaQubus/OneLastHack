@@ -65,22 +65,22 @@ export default function SiatkaWywiadowczaButton({
             <div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
               {/* Left Column - Active Agents */}
               <div className="flex flex-col min-h-0">
-                <h4 className="font-bold text-amber-900 mb-3 flex-shrink-0">Aktywni agenci: {activeAgentIds.length}/6</h4>
-                <div className="flex-1 space-y-2 overflow-y-auto min-h-0">
+                <h4 className="font-bold text-amber-900 mb-3 flex-shrink-0">Aktywni agenci: {activeAgentIds.length}/5</h4>
+                <div className="flex-1 space-y-3 overflow-y-auto min-h-0">
                   {/* Agent Slots */}
-                  {Array.from({ length: 6 }).map((_, index) => {
+                  {Array.from({ length: 5 }).map((_, index) => {
                     const agent = activeAgents[index];
                     return (
                       <div
                         key={index}
-                        className={`p-3 rounded-lg border-2 ${
+                        className={`p-4 rounded-lg border-2 ${
                           agent
                             ? "bg-amber-200/50 border-amber-800/50"
                             : "bg-amber-200/20 border-amber-800/20 border-dashed"
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="relative w-12 h-12 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                          <div className="relative w-14 h-14 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">
                             <span className="text-amber-50 text-xl">🕵️</span>
                           </div>
                           <div className="flex-1 min-w-0">
@@ -104,25 +104,25 @@ export default function SiatkaWywiadowczaButton({
                 </div>
                 <button
                   onClick={onAddAgent}
-                  disabled={activeAgentIds.length >= 6 || availableAgents.length === 0}
+                  disabled={activeAgentIds.length >= 5 || availableAgents.length === 0 || intelligencePoints < 15}
                   className="mt-4 w-full p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 text-amber-50 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  + Nowy agent
+                  + Nowy agent (15 punktów wywiadu)
                 </button>
               </div>
 
               {/* Right Column - Intelligence Points & Upgrades */}
               <div className="flex flex-col min-h-0">
                 <h4 className="font-bold text-amber-900 mb-3 flex-shrink-0">Punkty wywiadu: {intelligencePoints}</h4>
-                <div className="flex-1 space-y-2 overflow-y-auto min-h-0">
+                <div className="flex-1 space-y-3 overflow-y-auto min-h-0">
                   {skills.map((skill: Skill) => {
                     return (
                       <div
                         key={skill.id}
-                        className="p-3 rounded-lg border-2 bg-amber-200/50 border-amber-800/50"
+                        className="p-4 rounded-lg border-2 bg-amber-200/50 border-amber-800/50"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="relative w-12 h-12 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                          <div className="relative w-14 h-14 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">
                             <span className="text-amber-50 text-xl">⚡</span>
                           </div>
                           <div className="flex-1 min-w-0">
@@ -132,6 +132,7 @@ export default function SiatkaWywiadowczaButton({
                               </div>
                               <div className="text-xs text-amber-800">
                                 Poziom: {skill.level}
+                                <span className="text-xs text-amber-900/80 italic text-right flex-shrink-0 max-w-[120px]"> {skill.description || ""} </span>
                               </div>
                             </div>
                           </div>
