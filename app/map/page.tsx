@@ -83,7 +83,7 @@ export default function MapPage() {
           src="/map.svg"
           alt="Mapa operacyjna Europy"
           fill
-          className="object-cover"
+          className="object-cover pointer-events-none"
           priority
         />
       </div>
