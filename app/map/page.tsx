@@ -6,6 +6,12 @@ import { useState } from "react";
 import stolenGoodsData from "../data/stolen-goods.json";
 import agentsData from "../data/agents.json";
 import skillsData from "../data/skills.json";
+import initialMarkers from "../data/map-markers.json";
+import Timeline from "../components/Timeline";
+import EventModal from "../components/EventModal";
+import MapMarker from "../components/MapMarker";
+import { placeRandomMarker } from "../../lib/placeRandomMarker";
+import { useEffect } from "react";
 
 type StolenGood = {
   id: number;
@@ -36,8 +42,16 @@ type Skill = {
   parentId?: number | null;
 };
 
+type Marker = {
+  id: number;
+  top: string;
+  left: string;
+  title?: string;
+  description?: string;
+};
+
 export default function MapPage() {
-  const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
+  const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
   const [showStolenGoodPopup, setShowStolenGoodPopup] = useState(false);
   const [showSiatkaMenu, setShowSiatkaMenu] = useState(false);
   const [intelligencePoints, setIntelligencePoints] = useState(125);
@@ -89,9 +103,22 @@ export default function MapPage() {
       return skill;
     }));
   };
+  const [markers, setMarkers] = useState<Marker[]>(initialMarkers as Marker[]);
 
   // Get active stolen good (first one with progress > 0)
   const activeStolenGood = stolenGoodsData.find((good: StolenGood) => good.progress > 0) || stolenGoodsData[0];
+
+  // On mount, randomly move one pin to a new position
+  useEffect(() => {
+    try {
+      const randomized = placeRandomMarker(markers);
+      setMarkers(randomized);
+    } catch (e) {
+      // If something goes wrong, just keep initial markers
+      // console.warn(e);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
@@ -357,28 +384,27 @@ export default function MapPage() {
 
       {/* Clickable markers overlay */}
       <div className="absolute inset-0 z-10 pointer-events-none">
-        <div className="pointer-events-auto">
-          {/* Example marker positions */}
-          <button
-            className="absolute top-[30%] left-[25%] btn btn-circle btn-sm btn-error animate-pulse hover:animate-none shadow-2xl hover:scale-110 transition-transform"
-            onClick={() => setSelectedMarker(1)}
-            title="Zdarzenie #1"
-          >
-            📍
-          </button>
+          <div className="pointer-events-auto">
+          {/* Example marker positions loaded from JSON */}
+          {markers.map((m) => (
+            <MapMarker
+              key={m.id}
+              id={m.id}
+              top={m.top}
+              left={m.left}
+              onClick={(id) => {
+                const found = markers.find((x) => x.id === id) || null;
+                setSelectedMarker(found);
+              }}
+              title={m.title}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Event Info Modal - Vintage */}
-      {selectedMarker && (
-        <div className="absolute top-1/2 left-1/2 z-30 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-          <div className="card bg-amber-100/95 backdrop-blur-md border-2 border-amber-800/50 shadow-2xl w-80 pointer-events-auto">
-            <div className="card-body">
-              <h2 className="card-title text-amber-900">Zdarzenie na mapie</h2>
-              <p className="text-amber-800 text-sm">Kliknij na znaczniki, aby zobaczyć szczegóły</p>
-            </div>
-          </div>
-        </div>
+      {/* Event Info Modal - moved to component */}
+      {selectedMarker != null && (
+        <EventModal marker={selectedMarker} onClose={() => setSelectedMarker(null)} />
       )}
     </div>
   );
