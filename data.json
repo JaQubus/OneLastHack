@@ -2,11 +2,12 @@
   "stolen_artworks": [
     {
       "title": "Portret młodzieńca",
+      "img": "portret_mlodzienca.webp",
       "artist": "Rafael Santi",
       "origin": "Namalowany ok. 1513-1514 roku. Przed wojną w zbiorach Muzeum Książąt Czartoryskich w Krakowie",
       "period": "ok. 1513-1514",
       "theft": {
-        "date": "1944",
+        "date": "17 września 1944",
         "perpetrator": "Naziści (grupa Hansa Franka)",
         "circumstances": "Zagrabiony po upadku Powstania Warszawskiego, wywieziony z pałacu w Krakowie do rezydencji Franka w Niemczech"
       },
@@ -19,11 +20,12 @@
     },
     {
       "title": "Chrystus upadający pod krzyżem",
+      "img": "chrystus_upadajacy_pod_krzyzem.jpg",
       "artist": "Peter Paul Rubens",
       "origin": "Namalowany ok. 1602-1605 roku. Przed wojną w katedrze Wniebowzięcia NMP we Fromborku",
       "period": "ok. 1602-1605",
       "theft": {
-        "date": "1945",
+        "date": "10 stycznia 1945",
         "perpetrator": "Armia Czerwona (ZSRR)",
         "circumstances": "Zrabowany pod koniec II wojny światowej w ramach tzw. 'trofiejnych akcji'"
       },
@@ -36,11 +38,12 @@
     },
     {
       "title": "Adoracja Baranka",
+      "img": "adoracja_baranka.jpg",
       "artist": "Nieznany (Gdańsk)",
       "origin": "Koniec XVII wieku. Przed wojną w kościele św. Jana w Gdańsku",
       "period": "koniec XVII w.",
       "theft": {
-        "date": "1945",
+        "date": "22 luty 1945",
         "perpetrator": "Armia Czerwona (ZSRR)",
         "circumstances": "Ewakuowany w 1944 roku do Fiszewa koło Elbląga, przejęty przez Armię Czerwoną w 1945 roku"
       },
@@ -53,11 +56,12 @@
     },
     {
       "title": "Apostołowie Szymon i Juda",
+      "img": "apostolowie_szymon_i_juda.jpg",
       "artist": "Nieznany",
       "origin": "II połowa XVII wieku. Przed wojną w kościele św. Mikołaja w Elblągu",
       "period": "II połowa XVII w.",
       "theft": {
-        "date": "1945",
+        "date": "19 marca 1945",
         "perpetrator": "Armia Czerwona (ZSRR)",
         "circumstances": "Ewakuowany z Gdańska w 1944 roku do Fiszewa, zrabowany przez żołnierzy radzieckich w 1945 roku"
       },
@@ -70,11 +74,12 @@
     },
     {
       "title": "Chrystus i setnik z Kafarnaum",
+      "img": "chrystus_i_setnik_z_kafarnaum.jpg",
       "artist": "Nieznany (Gdańsk)",
       "origin": "Pierwsza połowa XVII wieku. Przed wojną w kościele św. Jana w Gdańsku",
       "period": "1 połowa XVII w.",
       "theft": {
-        "date": "1945",
+        "date": "7 kwietnia 1945",
         "perpetrator": "Armia Czerwona (ZSRR)",
         "circumstances": "Ewakuacja do Fiszewa w 1944 roku, grabież przez Armię Czerwoną w 1945 roku"
       },
