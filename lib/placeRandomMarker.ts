@@ -6,12 +6,72 @@ type Marker = {
   description?: string;
 };
 
-// Constants for safe placement zones
-// Top bar is approximately 80-100px (12-15% on typical screens)
-// Bottom bar is approximately 100-120px (12-15% on typical screens)
-// Marker size is 48-64px, positioned by top-left corner, so we need extra margin
-// On a 1080p screen: 64px ≈ 6% of height, so we need at least 12% + 6% = 18% for top
-// But to be safe across all screen sizes, we'll use larger margins
+// SVG map dimensions from map.svg: viewBox="0 0 1646 1447"
+const SVG_WIDTH = 1646;
+const SVG_HEIGHT = 1447;
+
+// Define the six spawn locations from map.svg rectangles
+// Berlin: x="647.38879" y="794.15015" width="4.2229729" height="11.975099"
+// Moskwa: x="1170.4689" y="544.43744" width="19.241098" height="15.148209"
+// Fuhrermuseum: x="687.17358" y="955.79181" width="5.841177" height="5.9414663"
+// Altaussee: x="600.20392" y="989.81628" width="8.0817862" height="3.9278119"
+// Merkers: x="589.38519" y="847.62286" width="9.9166393" height="8.7934942"
+// Neuschwanstein: x="610.38757" y="968.58258" width="13.836784" height="6.2316003"
+
+interface SpawnLocation {
+  name: string;
+  centerX: number; // Center X in SVG coordinates
+  centerY: number; // Center Y in SVG coordinates
+  radiusX: number; // Half width for variance
+  radiusY: number; // Half height for variance
+}
+
+const SPAWN_LOCATIONS: SpawnLocation[] = [
+  {
+    name: 'Berlin',
+    centerX: 647.38879 + 4.2229729 / 2,
+    centerY: 794.15015 + 11.975099 / 2,
+    radiusX: 4.2229729 / 2,
+    radiusY: 11.975099 / 2,
+  },
+  {
+    name: 'Moskwa',
+    centerX: 1170.4689 + 19.241098 / 2,
+    centerY: 544.43744 + 15.148209 / 2,
+    radiusX: 19.241098 / 2,
+    radiusY: 15.148209 / 2,
+  },
+  {
+    name: 'Fuhrermuseum',
+    centerX: 687.17358 + 5.841177 / 2,
+    centerY: 955.79181 + 5.9414663 / 2,
+    radiusX: 5.841177 / 2,
+    radiusY: 5.9414663 / 2,
+  },
+  {
+    name: 'Altaussee',
+    centerX: 600.20392 + 8.0817862 / 2,
+    centerY: 989.81628 + 3.9278119 / 2,
+    radiusX: 8.0817862 / 2,
+    radiusY: 3.9278119 / 2,
+  },
+  {
+    name: 'Merkers',
+    centerX: 589.38519 + 9.9166393 / 2,
+    centerY: 847.62286 + 8.7934942 / 2,
+    radiusX: 9.9166393 / 2,
+    radiusY: 8.7934942 / 2,
+  },
+  {
+    name: 'Neuschwanstein',
+    centerX: 610.38757 + 13.836784 / 2,
+    centerY: 968.58258 + 6.2316003 / 2,
+    radiusX: 13.836784 / 2,
+    radiusY: 6.2316003 / 2,
+  },
+];
+
+// Legacy constants (kept for backwards compatibility but not used for spawn locations)
 const TOP_SAFE_ZONE = 25; // Percentage from top (covers top bar + marker height + margin)
 const BOTTOM_SAFE_ZONE = 25; // Percentage from bottom (covers bottom bar + marker height + margin)
 const SIDE_MARGIN = 5; // Percentage margin on left/right sides
@@ -66,26 +126,34 @@ export function placeRandomMarker(markers: Marker[]): Marker[] {
 
   const idx = Math.floor(Math.random() * markers.length);
 
-  // Generate random top between TOP_SAFE_ZONE and (100 - BOTTOM_SAFE_ZONE)
-  // Generate random left between SIDE_MARGIN and (100 - SIDE_MARGIN)
-  const randomTop = () => {
-    const minTop = TOP_SAFE_ZONE;
-    const maxTop = 100 - BOTTOM_SAFE_ZONE;
-    return `${Math.floor(minTop + Math.random() * (maxTop - minTop))}%`;
-  };
-  
-  const randomLeft = () => {
-    const minLeft = SIDE_MARGIN;
-    const maxLeft = 100 - SIDE_MARGIN;
-    return `${Math.floor(minLeft + Math.random() * (maxLeft - minLeft))}%`;
+  // Generate random position at one of the spawn locations
+  const getRandomSpawnPosition = () => {
+    const location = SPAWN_LOCATIONS[Math.floor(Math.random() * SPAWN_LOCATIONS.length)];
+    
+    // Add some random variance within the rectangle area
+    const varianceX = (Math.random() - 0.5) * 2 * location.radiusX;
+    const varianceY = (Math.random() - 0.5) * 2 * location.radiusY;
+    
+    const finalX = location.centerX + varianceX;
+    const finalY = location.centerY + varianceY;
+    
+    // Convert to percentages
+    const leftPercent = (finalX / SVG_WIDTH) * 100;
+    const topPercent = (finalY / SVG_HEIGHT) * 100;
+    
+    return {
+      top: `${topPercent.toFixed(2)}%`,
+      left: `${leftPercent.toFixed(2)}%`,
+    };
   };
 
   const newMarkers = markers.map((m, i) => {
     if (i !== idx) return { ...m };
+    const newPos = getRandomSpawnPosition();
     return {
       ...m,
-      top: randomTop(),
-      left: randomLeft(),
+      top: newPos.top,
+      left: newPos.left,
     };
   });
 
@@ -122,14 +190,23 @@ function isTooCloseToExistingMarkers(
 }
 
 export function getRandomPosition(): { top: string; left: string } {
-  const minTop = TOP_SAFE_ZONE;
-  const maxTop = 100 - BOTTOM_SAFE_ZONE;
-  const minLeft = SIDE_MARGIN;
-  const maxLeft = 100 - SIDE_MARGIN;
+  // Randomly select one of the three spawn locations
+  const location = SPAWN_LOCATIONS[Math.floor(Math.random() * SPAWN_LOCATIONS.length)];
+  
+  // Add some random variance within the rectangle area
+  const varianceX = (Math.random() - 0.5) * 2 * location.radiusX;
+  const varianceY = (Math.random() - 0.5) * 2 * location.radiusY;
+  
+  const finalX = location.centerX + varianceX;
+  const finalY = location.centerY + varianceY;
+  
+  // Convert to percentages
+  const leftPercent = (finalX / SVG_WIDTH) * 100;
+  const topPercent = (finalY / SVG_HEIGHT) * 100;
   
   return {
-    top: `${Math.floor(minTop + Math.random() * (maxTop - minTop))}%`,
-    left: `${Math.floor(minLeft + Math.random() * (maxLeft - minLeft))}%`,
+    top: `${topPercent.toFixed(2)}%`,
+    left: `${leftPercent.toFixed(2)}%`,
   };
 }
 
@@ -138,17 +215,26 @@ export function getRandomPositionAwayFromMarkers(
   existingMarkers: Marker[],
   maxAttempts: number = 100
 ): { top: string; left: string } | null {
-  const minTop = TOP_SAFE_ZONE;
-  const maxTop = 100 - BOTTOM_SAFE_ZONE;
-  const minLeft = SIDE_MARGIN;
-  const maxLeft = 100 - SIDE_MARGIN;
-  
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const top = `${Math.floor(minTop + Math.random() * (maxTop - minTop))}%`;
-    const left = `${Math.floor(minLeft + Math.random() * (maxLeft - minLeft))}%`;
+    // Randomly select one of the three spawn locations
+    const location = SPAWN_LOCATIONS[Math.floor(Math.random() * SPAWN_LOCATIONS.length)];
     
-    // Check if this position is safe and not too close to existing markers
-    if (isValidMarkerPosition(top, left) && !isTooCloseToExistingMarkers(top, left, existingMarkers)) {
+    // Add some random variance within the rectangle area
+    const varianceX = (Math.random() - 0.5) * 2 * location.radiusX;
+    const varianceY = (Math.random() - 0.5) * 2 * location.radiusY;
+    
+    const finalX = location.centerX + varianceX;
+    const finalY = location.centerY + varianceY;
+    
+    // Convert to percentages
+    const leftPercent = (finalX / SVG_WIDTH) * 100;
+    const topPercent = (finalY / SVG_HEIGHT) * 100;
+    
+    const top = `${topPercent.toFixed(2)}%`;
+    const left = `${leftPercent.toFixed(2)}%`;
+    
+    // Check if this position is not too close to existing markers
+    if (!isTooCloseToExistingMarkers(top, left, existingMarkers)) {
       return { top, left };
     }
   }
