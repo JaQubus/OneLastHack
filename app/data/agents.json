@@ -1,52 +1,50 @@
 [
   {
     "id": 1,
-    "name": "Jan Kowalski",
-    "codename": "Orzeł"
+    "name": "Witold Pilecki",
+    "photo": "/officers/witold-pilecki.png",
+    "location": "Warszawa",
+    "status": "odkryty",
+    "specialization": "Infiltracja"
   },
   {
     "id": 2,
-    "name": "Anna Nowak",
-    "codename": "Sowa"
+    "name": "Elżbieta Zawicka",
+    "photo": "/officers/elzbieta-zawicka.png",
+    "location": "Kraków",
+    "status": "odkryty",
+    "specialization": "Infiltracja"
   },
   {
     "id": 3,
-    "name": "Piotr Wiśniewski",
-    "codename": "Wilk"
+    "name": "Mieczysław Słowik",
+    "photo": "/officers/mieczyslaw-slowik.png",
+    "location": "Warszawa",
+    "status": "odkryty",
+    "specialization": "Sabotaż"
   },
   {
     "id": 4,
-    "name": "Maria Zielińska",
-    "codename": "Bocian"
+    "name": "Wacław Berka",
+    "photo": "/officers/waclaw-berka.png",
+    "location": "Warszawa",
+    "status": "ukryty",
+    "specialization": "Wywiad"
   },
   {
     "id": 5,
-    "name": "Tomasz Lewandowski",
-    "codename": "Lis"
+    "name": "Kazimierz Iranek-Osmecki",
+    "photo": "/officers/kazimierz-iranek-osmecki.png",
+    "location": "Poznań",
+    "status": "ukryty",
+    "specialization": "Wywiad"
   },
   {
     "id": 6,
-    "name": "Katarzyna Wójcik",
-    "codename": "Jastrząb"
-  },
-  {
-    "id": 7,
-    "name": "Michał Kamiński",
-    "codename": "Ryś"
-  },
-  {
-    "id": 8,
-    "name": "Agnieszka Dąbrowska",
-    "codename": "Żmija"
-  },
-  {
-    "id": 9,
-    "name": "Paweł Kaczmarek",
-    "codename": "Kruk"
-  },
-  {
-    "id": 10,
-    "name": "Ewa Piotrowska",
-    "codename": "Pantera"
+    "name": "Krystyna Skarbek",
+    "photo": "/officers/krystyna-skarbek.png",
+    "location": "Warszawa",
+    "status": "odkryty",
+    "specialization": "Łączność"
   }
 ]

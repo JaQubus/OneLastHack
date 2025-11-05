@@ -14,7 +14,7 @@ type Props = {
 export default function MapMarker({ id, top, left, title, onClick, className }: Props) {
   return (
     <button
-      className={`absolute text-3xl cursor-pointer pointer-events-none btn btn-circle btn-sm btn-error animate-pulse hover:animate-none shadow-2xl hover:scale-110 transition-transform ${className ?? ""}`}
+      className={`absolute text-3xl cursor-pointer btn btn-circle btn-sm btn-error animate-pulse hover:animate-none shadow-2xl hover:scale-110 transition-transform ${className ?? ""}`}
       style={{ top, left }}
       onClick={() => onClick && onClick(id)}
       title={title}
