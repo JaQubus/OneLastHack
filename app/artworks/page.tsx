@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import artworksData from "../data/artworks.json";
+import stolenGoodsData from "../data/stolen-goods.json";
 import ArtworkModal from "../components/ArtworkModal";
 
 type Artwork = {
@@ -26,23 +27,56 @@ type Artwork = {
 };
 
 const DISCOVERED_KEY = "discoveredArtworks";
+const RECOVERED_ARTWORKS_KEY = "recoveredArtworks";
 
 export default function ArtworksPage() {
   const [discoveredTitles, setDiscoveredTitles] = useState<Set<string>>(new Set());
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
 
   useEffect(() => {
-    // Load discovered artworks from localStorage
+    // Load discovered artworks from localStorage (both discovered and recovered)
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(DISCOVERED_KEY);
-      if (stored) {
+      const discoveredSet = new Set<string>();
+      
+      // Load discovered artworks
+      const discoveredStored = localStorage.getItem(DISCOVERED_KEY);
+      if (discoveredStored) {
         try {
-          const discovered = JSON.parse(stored) as string[];
-          setDiscoveredTitles(new Set(discovered));
+          const discovered = JSON.parse(discoveredStored) as string[];
+          discovered.forEach(title => discoveredSet.add(title));
         } catch (e) {
           console.error("Failed to parse discovered artworks:", e);
         }
       }
+      
+      // Load recovered artworks (from map gameplay) - these should also be shown as discovered
+      const recoveredStored = localStorage.getItem(RECOVERED_ARTWORKS_KEY);
+      if (recoveredStored) {
+        try {
+          const recoveredIds = JSON.parse(recoveredStored) as number[];
+          // Map recovered artwork IDs to titles (case-insensitive matching)
+          const stolenGoods = stolenGoodsData as any[];
+          const artworks = artworksData.stolen_artworks;
+          recoveredIds.forEach(id => {
+            const good = stolenGoods.find(g => g.id === id);
+            if (good && good.name) {
+              // Try to find matching artwork title (case-insensitive)
+              const matchingArtwork = artworks.find(a => 
+                a.title.toLowerCase() === good.name.toLowerCase()
+              );
+              if (matchingArtwork) {
+                discoveredSet.add(matchingArtwork.title); // Use exact title from artworks.json
+              } else {
+                discoveredSet.add(good.name); // Fallback to name from stolen-goods
+              }
+            }
+          });
+        } catch (e) {
+          console.error("Failed to parse recovered artworks:", e);
+        }
+      }
+      
+      setDiscoveredTitles(discoveredSet);
     }
   }, []);
 
@@ -98,7 +132,7 @@ export default function ArtworksPage() {
                   }}
                   className={`card bg-amber-100/90 border-2 ${
                     discovered
-                      ? "border-amber-800/50 shadow-xl cursor-pointer hover:shadow-2xl hover:scale-[1.02]"
+                      ? "border-amber-800/50 shadow-xl cursor-pointer hover:shadow-2xl"
                       : "border-amber-700/30 shadow-lg cursor-not-allowed opacity-75"
                   } rounded-xl overflow-hidden transition-all duration-300`}
                 >
@@ -129,90 +163,23 @@ export default function ArtworksPage() {
                     )}
                   </div>
 
-                  {/* Content */}
+                  {/* Content - Only show title, details in modal */}
                   <div className="card-body p-4 sm:p-6">
                     <h2
-                      className={`card-title text-xl sm:text-2xl mb-2 ${
+                      className={`card-title text-xl sm:text-2xl mb-2 text-center ${
                         discovered ? "text-amber-900" : "text-amber-700"
                       }`}
                     >
                       {discovered ? artwork.title : "Nieznane dzieło"}
                     </h2>
-
-                    {discovered ? (
-                      <div className="space-y-4 text-sm sm:text-base">
-                        {/* Artist */}
-                        <div>
-                          <span className="font-semibold text-amber-900">Artysta: </span>
-                          <span className="text-amber-800">{artwork.artist}</span>
-                        </div>
-
-                        {/* Period */}
-                        <div>
-                          <span className="font-semibold text-amber-900">Okres: </span>
-                          <span className="text-amber-800">{artwork.period}</span>
-                        </div>
-
-                        {/* Origin */}
-                        <div>
-                          <span className="font-semibold text-amber-900">Pochodzenie: </span>
-                          <span className="text-amber-800">{artwork.origin}</span>
-                        </div>
-
-                        {/* Theft Section */}
-                        <div className="border-t border-amber-800/30 pt-3">
-                          <h3 className="font-bold text-amber-900 mb-2">Kradzież</h3>
-                          <div className="space-y-1 text-amber-800">
-                            <div>
-                              <span className="font-semibold">Data: </span>
-                              {artwork.theft.date}
-                            </div>
-                            <div>
-                              <span className="font-semibold">Sprawca: </span>
-                              {artwork.theft.perpetrator}
-                            </div>
-                            <div>
-                              <span className="font-semibold">Okoliczności: </span>
-                              {artwork.theft.circumstances}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Return Section */}
-                        <div className="border-t border-amber-800/30 pt-3">
-                          <h3 className="font-bold text-amber-900 mb-2">Powrót</h3>
-                          <div className="space-y-1 text-amber-800">
-                            <div>
-                              <span className="font-semibold">Status: </span>
-                              <span
-                                className={
-                                  artwork.return.status === "Powrócił"
-                                    ? "text-green-700 font-bold"
-                                    : "text-red-700 font-bold"
-                                }
-                              >
-                                {artwork.return.status}
-                              </span>
-                            </div>
-                            {artwork.return.date && (
-                              <div>
-                                <span className="font-semibold">Data powrotu: </span>
-                                {artwork.return.date}
-                              </div>
-                            )}
-                            <div>
-                              <span className="font-semibold">Obecna lokalizacja: </span>
-                              {artwork.return.current_location}
-                            </div>
-                            <div className="text-amber-700 italic mt-2">
-                              {artwork.return.notes}
-                            </div>
-                          </div>
-                        </div>
+                    {discovered && (
+                      <div className="text-center text-sm text-amber-600 mt-2">
+                        Kliknij, aby zobaczyć szczegóły
                       </div>
-                    ) : (
-                      <div className="text-amber-700 italic">
-                        Odkryj to dzieło podczas misji, aby zobaczyć szczegóły.
+                    )}
+                    {!discovered && (
+                      <div className="text-center text-amber-700 italic text-sm mt-2">
+                        Odkryj to dzieło podczas misji
                       </div>
                     )}
                   </div>

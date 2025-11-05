@@ -34,7 +34,6 @@ export default function MissionManagementButton({
   };
 
   const availableAgents = getAvailableAgents();
-  const missionCount = acknowledgedMissions.length;
 
   const getMissionTask = (missionId: number): RetrievalTask | null => {
     return retrievalTasks.find(t => t.missionId === missionId) || null;
@@ -44,6 +43,26 @@ export default function MissionManagementButton({
     const task = getMissionTask(missionId);
     return task !== null && task.progress < 100;
   };
+
+  const isMissionCompleted = (mission: AcknowledgedMission): boolean => {
+    // Check if artwork is recovered
+    if (mission.artworkId) {
+      const artwork = stolenGoods.find(g => g.id === mission.artworkId);
+      if (artwork && artwork.progress === 100) {
+        return true;
+      }
+    }
+    // Check if task is completed successfully
+    const task = getMissionTask(mission.id);
+    if (task && task.progress >= 100 && !task.failed) {
+      return true;
+    }
+    return false;
+  };
+
+  // Filter out completed missions
+  const activeMissions = acknowledgedMissions.filter(mission => !isMissionCompleted(mission));
+  const missionCount = activeMissions.length;
 
   // Update position when list opens
   useEffect(() => {
@@ -63,7 +82,7 @@ export default function MissionManagementButton({
         onClick={() => {
           setShowList(!showList);
         }}
-        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-xs sm:text-sm flex items-center justify-center"
+        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center justify-center"
       >
         <div className="flex flex-col items-center gap-1">
           <span className="text-sm font-semibold text-amber-50">Zarządzanie Misjami</span>
@@ -99,13 +118,13 @@ export default function MissionManagementButton({
             </div>
 
             <div className="overflow-y-auto max-h-80">
-              {acknowledgedMissions.length === 0 ? (
+              {activeMissions.length === 0 ? (
                 <div className="text-amber-200 text-sm text-center py-8">
                   Brak zarejestrowanych misji
                 </div>
               ) : (
                 <div className="p-2 space-y-2">
-                  {acknowledgedMissions.map((mission) => {
+                  {activeMissions.map((mission) => {
                     const missionActive = isMissionActive(mission.id);
                     const task = getMissionTask(mission.id);
                     const canStart = availableAgents.length > 0 && !missionActive;
@@ -142,12 +161,15 @@ export default function MissionManagementButton({
                               {mission.description}
                             </div>
                             {missionActive && task ? (
-                              <div className="w-full bg-amber-900/50 rounded-full h-4 border border-amber-700/50 shadow-inner overflow-hidden">
+                              <div className="relative w-full bg-amber-900/50 rounded-full h-4 border border-amber-700/50 shadow-inner overflow-hidden">
                                 <div
-                                  className="h-full bg-gradient-to-r from-amber-600 to-amber-700 rounded-full flex items-center justify-center text-xs font-bold text-amber-50 transition-all duration-300 shadow-lg"
+                                  className="h-full bg-gradient-to-r from-amber-600 to-amber-700 rounded-full transition-all duration-300 shadow-lg"
                                   style={{ width: `${task.progress}%` }}
-                                >
-                                  {task.progress > 15 && `${Math.round(task.progress)}%`}
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <span className="text-xs font-bold text-amber-50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                    {Math.round(task.progress)}%
+                                  </span>
                                 </div>
                               </div>
                             ) : (

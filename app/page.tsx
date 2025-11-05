@@ -40,13 +40,13 @@ export default function Home() {
         {/* Main CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-4 sm:mt-6">
           <Link href="/map" className="mt-4 sm:mt-0">
-            <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-700 text-lg font-bold uppercase tracking-widest text-amber-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-amber-800 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl rounded-xl">
+            <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-700 text-lg font-bold uppercase tracking-widest text-amber-50 shadow-xl transition-all duration-300 hover:bg-amber-800 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl rounded-xl">
               <span className="relative z-10">Rozpocznij Misję</span>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-800 to-amber-900 opacity-0 transition-opacity group-hover:opacity-100"></div>
             </button>
           </Link>
           <Link href="/artworks" className="mt-4 sm:mt-0">
-            <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-100 text-lg font-bold uppercase tracking-widest text-amber-900 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-amber-200 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl rounded-xl">
+            <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-100 text-lg font-bold uppercase tracking-widest text-amber-900 shadow-xl transition-all duration-300 hover:bg-amber-200 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl rounded-xl">
               <span className="relative z-10">Kolekcja Dzieł</span>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-200 to-amber-300 opacity-0 transition-opacity group-hover:opacity-100"></div>
             </button>

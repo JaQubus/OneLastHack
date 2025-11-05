@@ -33,7 +33,7 @@ export default function SiatkaWywiadowczaButton({
           onClick={() => {
             setShowMenu(!showMenu);
           }}
-          className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-xs sm:text-sm flex items-center"
+          className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center"
         >
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden">
@@ -114,7 +114,7 @@ export default function SiatkaWywiadowczaButton({
                 <button
                   onClick={onAddAgent}
                   disabled={activeAgentIds.length >= 4 || availableAgents.length === 0 || intelligencePoints < 15}
-                  className="mt-4 w-full p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 text-amber-50 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="mt-4 w-full p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 text-amber-50 font-semibold transition-all active:scale-[0.98] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   + Nowy agent (15 punktów wywiadu)
                 </button>
@@ -148,7 +148,7 @@ export default function SiatkaWywiadowczaButton({
                           <button
                             onClick={() => onLevelUpSkill(skill.id)}
                             disabled={skill.level >= skill.maxLevel || intelligencePoints < skill.cost}
-                            className="w-[72px] px-3 py-1.5 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border border-amber-700/50 text-amber-50 text-xs font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex-shrink-0"
+                            className="w-[72px] px-3 py-1.5 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border border-amber-700/50 text-amber-50 text-xs font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                             title={skill.level >= skill.maxLevel ? "Maksymalny poziom" : `${skill.cost} punkty wywiadu`}
                           >
                             +1 ({skill.cost})

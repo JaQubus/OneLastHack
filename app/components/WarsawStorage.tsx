@@ -14,7 +14,7 @@ export default function WarsawStorage({ onClick }: Props) {
 
   return (
     <button
-      className="absolute cursor-pointer transition-all duration-300 hover:scale-110 z-[15]"
+      className="absolute cursor-pointer transition-all duration-300 z-[15]"
       style={{ 
         top: warsawTop, 
         left: warsawLeft,

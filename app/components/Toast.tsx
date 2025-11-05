@@ -1,10 +1,6 @@
 "use client";
 
-<<<<<<< HEAD
-import React, { useEffect, useRef, useState } from 'react';
-=======
-import React, { useEffect, useState } from 'react';
->>>>>>> bd0f805 (Refactor date handling in GameTimeProvider and MapPage for consistency, enhance ProgressBar display precision)
+import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 export type ToastType = {
@@ -12,6 +8,7 @@ export type ToastType = {
   message: string;
   title?: string;
   duration?: number;
+  type?: 'success' | 'error' | 'default';
 };
 
 interface ToastProps {
@@ -20,13 +17,35 @@ interface ToastProps {
 }
 
 function Toast({ toast, onRemove }: ToastProps) {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onRemove(toast.id);
-    }, toast.duration || 5000);
+  const [isHovered, setIsHovered] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-    return () => clearTimeout(timer);
-  }, [toast.id, toast.duration, onRemove]);
+  useEffect(() => {
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Don't start timer if hovered
+    if (isHovered) {
+      return;
+    }
+
+    // Start timer
+    const duration = toast.duration || 5000;
+    timerRef.current = setTimeout(() => {
+      onRemove(toast.id);
+    }, duration);
+
+    // Cleanup
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isHovered, toast.id, toast.duration, onRemove]);
 
   const getToastStyles = () => {
     switch (toast.type) {
@@ -62,22 +81,22 @@ function Toast({ toast, onRemove }: ToastProps) {
   };
 
   return (
-<<<<<<< HEAD
-    <div
+    <div 
       className={`${getToastStyles()} rounded-lg p-4 mb-3 min-w-[300px] max-w-[400px] transform transition-all duration-300 ease-in-out animate-[slideInRight_0.3s_ease-out] cursor-pointer`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onClick={() => {
-        // clear timer and call latest onRemove
         if (timerRef.current) {
           clearTimeout(timerRef.current);
         }
-        onRemoveRef.current(toast.id);
+        onRemove(toast.id);
       }}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           if (timerRef.current) clearTimeout(timerRef.current);
-          onRemoveRef.current(toast.id);
+          onRemove(toast.id);
         }
       }}
     >
@@ -87,15 +106,6 @@ function Toast({ toast, onRemove }: ToastProps) {
         </div>
       )}
       <div className={`${getMessageColor()} text-sm select-none`}>
-=======
-    <div className="bg-amber-900/95 backdrop-blur-md border-2 border-amber-800/50 shadow-2xl rounded-lg p-4 mb-3 min-w-[300px] max-w-[400px] transform transition-all duration-300 ease-in-out animate-[slideInRight_0.3s_ease-out]">
-      {toast.title && (
-        <div className="font-bold text-amber-50 text-sm mb-1">
-          {toast.title}
-        </div>
-      )}
-      <div className="text-amber-200 text-sm">
->>>>>>> bd0f805 (Refactor date handling in GameTimeProvider and MapPage for consistency, enhance ProgressBar display precision)
         {toast.message}
       </div>
     </div>
@@ -114,12 +124,8 @@ export default function ToastContainer({ toasts, onRemove }: ToastContainerProps
     setMounted(true);
   }, []);
 
-<<<<<<< HEAD
   // Avoid hydration mismatch by not rendering portal during SSR
   if (!mounted || typeof document === 'undefined') {
-=======
-  if (!mounted) {
->>>>>>> bd0f805 (Refactor date handling in GameTimeProvider and MapPage for consistency, enhance ProgressBar display precision)
     return null;
   }
 

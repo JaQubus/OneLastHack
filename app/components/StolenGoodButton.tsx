@@ -18,7 +18,7 @@ export default function StolenGoodButton({ stolenGood }: StolenGoodButtonProps) 
         onClick={() => {
           setShowPopup(!showPopup);
         }}
-        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-xs sm:text-sm flex items-center"
+        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center"
       >
         <div className="flex items-center gap-3">
          <div className="relative w-10 h-10 flex-shrink-0 border-2 border-amber-700/50 overflow-hidden">

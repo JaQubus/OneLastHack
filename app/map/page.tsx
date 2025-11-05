@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import stolenGoodsData from "../data/stolen-goods.json";
 import initialMarkers from "../data/map-markers.json";
 import agentsData from "../data/agents.json";
@@ -14,11 +14,10 @@ import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
 import ToastContainer, { ToastType } from "../components/Toast";
-import ToastContainer, { ToastType } from "../components/Toast";
 import ArtGalleryModal from "../components/ArtGalleryModal";
 import MissionDetailModal from "../components/MissionDetailModal";
+import StartClockModal from "../components/StartClockModal";
 import type { StolenGood, Agent, Skill, AcknowledgedMission, RetrievalTask } from "../types";
-import agents from "../data/agents.json";
 
 type Marker = {
   id: number;
@@ -29,6 +28,8 @@ type Marker = {
   artworkId?: number;
 };
 
+const RECOVERED_ARTWORKS_KEY = "recoveredArtworks";
+
 export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
   const [intelligencePoints, setIntelligencePoints] = useState(125);
@@ -37,18 +38,27 @@ export default function MapPage() {
   const [highlightedMarkerId, setHighlightedMarkerId] = useState<number | null>(null);
   const [acknowledgedMissions, setAcknowledgedMissions] = useState<AcknowledgedMission[]>([]);
   const [retrievalTasks, setRetrievalTasks] = useState<RetrievalTask[]>([]);
-  const [stolenGoods, setStolenGoods] = useState<StolenGood[]>(stolenGoodsData as StolenGood[]);
+  // Track artworks recovered in current session (not from localStorage)
+  const [recoveredInSession, setRecoveredInSession] = useState<Set<number>>(new Set());
+  const [stolenGoods, setStolenGoods] = useState<StolenGood[]>(() => {
+    // Don't load from localStorage on mount - start fresh for each session
+    return stolenGoodsData as StolenGood[];
+  });
   const [showArtGallery, setShowArtGallery] = useState(false);
   const [selectedMission, setSelectedMission] = useState<AcknowledgedMission | null>(null);
   const [hasInitialBubble, setHasInitialBubble] = useState(false);
   const [toasts, setToasts] = useState<ToastType[]>([]);
+  const [showStartClockModal, setShowStartClockModal] = useState(true);
   
-  // Reset and start timer when map page loads
+  // Memoized function to remove toast
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+  
+  // Reset timer when map page loads
   useEffect(() => {
     // Reset game time to start date
     reset();
-    // Start the timer automatically
-    start();
   }, []); // Empty deps - only run on mount
 
   // State for active agents in slots (start with first agent)
@@ -81,12 +91,13 @@ export default function MapPage() {
     .filter(agent => !activeAgentIds.includes(agent.id))
     .map(agent => agent as Agent);
 
-  // Function to add next available agent
+  // Function to add next available agent (random, no duplicates)
   const addNextAgent = () => {
     const agentCost = 15;
     if (activeAgentIds.length < 4 && availableAgents.length > 0 && intelligencePoints >= agentCost) {
-    if (activeAgentIds.length < 4 && availableAgents.length > 0 && intelligencePoints >= agentCost) {
-      const nextAgent = availableAgents[0];
+      // Pick a random agent from available agents
+      const randomIndex = Math.floor(Math.random() * availableAgents.length);
+      const nextAgent = availableAgents[randomIndex];
       setIntelligencePoints(prev => prev - agentCost);
       setActiveAgentIds([...activeAgentIds, nextAgent.id]);
     }
@@ -111,24 +122,30 @@ export default function MapPage() {
     );
   };
   const { scheduleEvery, cancelScheduled, isRunning, currentDate, reset, start } = useGameTime();
-  const { scheduleEvery, cancelScheduled, isRunning, currentDate, reset, start } = useGameTime();
 
-  // Track marker creation time for 20 second auto-removal
+  // Track marker creation time for 20 second auto-removal (in game time seconds)
   const [markerCreationTimes, setMarkerCreationTimes] = useState<Map<number, number>>(new Map());
+  const gameStartTimeRef = useRef<number | null>(null); // Game time in seconds when game started
+  const gameTimeSecondsRef = useRef<number>(0); // Current game time in seconds
+  const [usedArtworkIds, setUsedArtworkIds] = useState<Set<number>>(new Set());
 
   // Start with empty markers - will be populated on client side
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const markersRef = useRef<Marker[]>(markers);
+  const acknowledgedMissionsRef = useRef<AcknowledgedMission[]>([]);
   useEffect(() => {
     markersRef.current = markers;
   }, [markers]);
+  useEffect(() => {
+    acknowledgedMissionsRef.current = acknowledgedMissions;
+  }, [acknowledgedMissions]);
 
   // Initialize with one bubble at game start (client-side only to avoid hydration mismatch)
   useEffect(() => {
     if (!isInitialized && typeof window !== 'undefined') {
-      // Get first available artwork that hasn't been used
-      const availableArtworks = (stolenGoodsData as StolenGood[]).filter((good) => good.progress < 100 && !usedArtworkIds.has(good.id));
+      // Use stolenGoods from state (not stolenGoodsData) to respect current session state
+      const availableArtworks = stolenGoods.filter((good) => good.progress < 100 && !usedArtworkIds.has(good.id));
       if (availableArtworks.length > 0) {
         const artwork = availableArtworks[0];
         const initialMarkerId = Date.now();
@@ -145,17 +162,16 @@ export default function MapPage() {
           setMarkers([initialMarker]);
           setMarkerCreationTimes((prev) => {
             const newMap = new Map(prev);
-            newMap.set(initialMarkerId, Date.now());
+            newMap.set(initialMarkerId, gameTimeSecondsRef.current);
             return newMap;
           });
           setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
           setHasInitialBubble(true);
         }
-      } else {
-        setIsInitialized(true);
       }
+      setIsInitialized(true);
     }
-  }, [isInitialized]);
+  }, [isInitialized, stolenGoods, usedArtworkIds]);
 
   // Calculate progress based on game time (from 1939-09-01 to 1945-05-08)
   // Use same date normalization as GameTimeProvider for perfect sync
@@ -173,23 +189,64 @@ export default function MapPage() {
     setProgress(newProgress);
   }, [currentDate]);
 
-  // Auto-remove markers after 20 seconds
+  // Track game time in seconds (only when game is running)
   useEffect(() => {
+    if (!isRunning) {
+      return; // Don't count time when game is paused
+    }
+
+    // Initialize game start time on first run
+    if (gameStartTimeRef.current === null) {
+      gameStartTimeRef.current = gameTimeSecondsRef.current;
+    }
+
     const interval = setInterval(() => {
-      const now = Date.now();
+      gameTimeSecondsRef.current += 1; // Increment game time by 1 second
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isRunning]);
+
+  // Auto-remove markers after 20 seconds (in game time)
+  useEffect(() => {
+    if (!isRunning) {
+      return; // Don't check timers when game is paused
+    }
+
+    const interval = setInterval(() => {
+      const currentGameTime = gameTimeSecondsRef.current;
       setMarkers((prev) => {
-        return prev.filter((m) => {
+        const removedMarkers: Marker[] = [];
+        const filtered = prev.filter((m) => {
           if (m.id === WARSAW_STORAGE.id) return true; // Keep storage
           const createdAt = markerCreationTimes.get(m.id);
           if (!createdAt) return true; // Keep if no timestamp
-          return now - createdAt < 20000; // Remove after 20 seconds
+          const shouldKeep = currentGameTime - createdAt < 20; // Remove after 20 seconds of game time
+          if (!shouldKeep) {
+            // Check if marker was collected (has corresponding mission) - use ref for stable reference
+            const wasCollected = acknowledgedMissionsRef.current.some(mission => mission.markerId === m.id);
+            if (!wasCollected) {
+              removedMarkers.push(m); // Track uncollected markers
+            }
+          }
+          return shouldKeep;
         });
+        
+        // Increase progress by 0.5% for each uncollected marker that expired
+        if (removedMarkers.length > 0) {
+          setProgress((prev) => {
+            const increase = removedMarkers.length * 0.5;
+            return Math.min(100, prev + increase);
+          });
+        }
+        
+        return filtered;
       });
       // Clean up old timestamps
       setMarkerCreationTimes((prev) => {
         const newMap = new Map(prev);
         prev.forEach((createdAt, id) => {
-          if (now - createdAt >= 20000) {
+          if (currentGameTime - createdAt >= 20) {
             newMap.delete(id);
           }
         });
@@ -197,7 +254,7 @@ export default function MapPage() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [markerCreationTimes]);
+  }, [markerCreationTimes, isRunning]);
 
   // Update retrieval tasks progress
   useEffect(() => {
@@ -240,6 +297,26 @@ export default function MapPage() {
                   good.id === task.artworkId ? { ...good, progress: 100 } : good
                 )
               );
+              // Track artwork as recovered in current session
+              setRecoveredInSession((prev) => new Set(prev).add(task.artworkId));
+              // Decrease overall progress by 3% when mission succeeds (or reset to 0 if < 3%)
+              setProgress((prev) => {
+                const newProgress = prev >= 3 ? prev - 3 : 0;
+                return Math.max(0, newProgress);
+              });
+              // Save recovered artwork to localStorage
+              if (typeof window !== "undefined") {
+                try {
+                  const stored = localStorage.getItem(RECOVERED_ARTWORKS_KEY);
+                  const recoveredIds = stored ? JSON.parse(stored) as number[] : [];
+                  if (!recoveredIds.includes(task.artworkId)) {
+                    recoveredIds.push(task.artworkId);
+                    localStorage.setItem(RECOVERED_ARTWORKS_KEY, JSON.stringify(recoveredIds));
+                  }
+                } catch (e) {
+                  console.error("Failed to save recovered artwork:", e);
+                }
+              }
             }
           }
 
@@ -317,7 +394,24 @@ export default function MapPage() {
   // Collect marker when clicked - gives intelligence points and adds to missions
   const collectMarker = (marker: Marker) => {
     // Check if already collected
-    if (acknowledgedMissions.some(m => m.markerId === marker.id)) return;
+    if (acknowledgedMissions.some(m => m.markerId === marker.id)) {
+      return;
+    }
+
+    // Check if artwork is already recovered
+    if (marker.artworkId) {
+      const artwork = stolenGoods.find(g => g.id === marker.artworkId);
+      if (artwork && artwork.progress === 100) {
+        // Still remove the marker from map but don't create mission
+        setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
+        setMarkerCreationTimes((prev) => {
+          const newMap = new Map(prev);
+          newMap.delete(marker.id);
+          return newMap;
+        });
+        return;
+      }
+    }
 
     // Give intelligence points for collecting
     setIntelligencePoints((prev) => prev + 10); // 10 points for collecting a bubble
@@ -340,18 +434,6 @@ export default function MapPage() {
     };
 
     setAcknowledgedMissions((prev) => [...prev, newMission]);
-
-    // Show toast notification for new mission
-    const toastId = `toast-${Date.now()}`;
-    setToasts((prev) => [
-      ...prev,
-      {
-        id: toastId,
-        title: "Nowa Misja!",
-        message: newMission.title,
-        duration: 5000,
-      },
-    ]);
 
     // Show toast notification for new mission
     const toastId = `toast-${Date.now()}`;
@@ -434,6 +516,26 @@ export default function MapPage() {
                   good.id === task.artworkId ? { ...good, progress: 100 } : good
                 )
               );
+              // Track artwork as recovered in current session
+              setRecoveredInSession((prev) => new Set(prev).add(task.artworkId));
+              // Decrease overall progress by 3% when mission succeeds (or reset to 0 if < 3%)
+              setProgress((prev) => {
+                const newProgress = prev >= 3 ? prev - 3 : 0;
+                return Math.max(0, newProgress);
+              });
+              // Save recovered artwork to localStorage
+              if (typeof window !== "undefined") {
+                try {
+                  const stored = localStorage.getItem(RECOVERED_ARTWORKS_KEY);
+                  const recoveredIds = stored ? JSON.parse(stored) as number[] : [];
+                  if (!recoveredIds.includes(task.artworkId)) {
+                    recoveredIds.push(task.artworkId);
+                    localStorage.setItem(RECOVERED_ARTWORKS_KEY, JSON.stringify(recoveredIds));
+                  }
+                } catch (e) {
+                  console.error("Failed to save recovered artwork:", e);
+                }
+              }
             } else {
               // Failure - show red toast
               const artwork = stolenGoods.find(g => g.id === task.artworkId);
@@ -502,7 +604,7 @@ export default function MapPage() {
           setMarkers((prev) => [...prev, newMarker]);
           setMarkerCreationTimes((prev) => {
             const newMap = new Map(prev);
-            newMap.set(markerId, Date.now());
+            newMap.set(markerId, gameTimeSecondsRef.current);
             return newMap;
           });
           setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
@@ -543,7 +645,7 @@ export default function MapPage() {
           setMarkers((prev) => [...prev, newMarker]);
           setMarkerCreationTimes((prev) => {
             const newMap = new Map(prev);
-            newMap.set(markerId, Date.now());
+            newMap.set(markerId, gameTimeSecondsRef.current);
             return newMap;
           });
           setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
@@ -566,10 +668,10 @@ export default function MapPage() {
           artworkId: artwork.id,
         };
         setMarkers((prev) => [...prev, newMarker]);
-        // Track creation time for 20 second timer
+        // Track creation time for 20 second timer (in game time)
         setMarkerCreationTimes((prev) => {
           const newMap = new Map(prev);
-          newMap.set(markerId, Date.now());
+          newMap.set(markerId, gameTimeSecondsRef.current);
           return newMap;
         });
         setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
@@ -598,11 +700,7 @@ export default function MapPage() {
       {/* Toast Notifications */}
       <ToastContainer
         toasts={toasts}
-        onRemove={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
-      {/* Toast Notifications */}
-      <ToastContainer
-        toasts={toasts}
-        onRemove={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
+        onRemove={removeToast}
       />
 
       {/* Top Bar */}
@@ -610,7 +708,7 @@ export default function MapPage() {
 
       {/* Warsaw Storage Marker - smaller, no blinking */}
       <div
-        className="absolute z-20 cursor-pointer transition-all duration-300 hover:scale-110"
+        className="absolute z-20 cursor-pointer transition-all duration-300"
         style={{
           top: WARSAW_STORAGE.top, // 59%
           left: WARSAW_STORAGE.left,
@@ -729,7 +827,7 @@ export default function MapPage() {
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <div className="relative animate-pulse">
+            <div className="relative">
               {/* Show artwork image when mission is active */}
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-amber-600 shadow-2xl overflow-hidden">
                 <Image
@@ -739,8 +837,6 @@ export default function MapPage() {
                   className="object-cover"
                   unoptimized
                 />
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600 animate-ping"></div>
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600"></div>
               </div>
             </div>
           </div>
@@ -754,7 +850,6 @@ export default function MapPage() {
         const isReturningWithArtwork = task.progress >= 100 && !task.failed;
         const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
         const agentImageSrc = agentsData.find(a => a.id === task.agentId)?.photo || "/officers/witold-pilecki.png";
-        console.log(agentImageSrc);
 
         return (
           <div
@@ -767,9 +862,6 @@ export default function MapPage() {
             }}
           >
             <div className="relative">
-              {/* <div className={`text-3xl ${ task.failed ? 'animate-bounce' : 'animate-pulse' } `}>
-                {task.failed ? '😞' : '🚶'}
-              </div> */}
               <div className="relative w-12 h-12 rounded-full flex-shrink-0 border-2 border-amber-700/50 overflow-hidden">
                 <Image
                   src={agentImageSrc}
@@ -818,15 +910,20 @@ export default function MapPage() {
 
       {/* Event Info Modal - removed, markers are collected immediately on click */}
 
-      {/* Art Gallery Modal */}
+      {/* Art Gallery Modal - Show only artworks recovered in current session */}
       {showArtGallery && (
         <ArtGalleryModal
-          stolenGoods={stolenGoods.filter((good) => good.progress === 100)}
+          stolenGoods={stolenGoods.filter((good) => recoveredInSession.has(good.id))}
           onClose={() => setShowArtGallery(false)}
         />
       )}
 
 
+
+      {/* Start Clock Modal */}
+      {showStartClockModal && !isRunning && (
+        <StartClockModal onClose={() => setShowStartClockModal(false)} />
+      )}
 
       {/* Mission Detail Modal */}
       {selectedMission && (() => {

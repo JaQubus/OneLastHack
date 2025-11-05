@@ -17,7 +17,6 @@ type Props = {
 
 export default function MapMarker({ id, top, left, title, onClick, className, isAnimating = false, imageSrc }: Props) {
   const [isClicking, setIsClicking] = useState(false);
-  const [shouldPulse, setShouldPulse] = useState(true);
   const [safePosition, setSafePosition] = useState({ top, left });
 
   // Clamp position on client side only to avoid hydration mismatch
@@ -31,10 +30,8 @@ export default function MapMarker({ id, top, left, title, onClick, className, is
   useEffect(() => {
     if (isAnimating) {
       setIsClicking(true);
-      setShouldPulse(false);
       const timer = setTimeout(() => {
         setIsClicking(false);
-        setShouldPulse(true);
       }, 1000);
       return () => clearTimeout(timer);
     }
@@ -42,11 +39,10 @@ export default function MapMarker({ id, top, left, title, onClick, className, is
 
   const handleClick = () => {
     setIsClicking(true);
-    setShouldPulse(false);
+    // Call onClick immediately, don't delay it
+    if (onClick) onClick(id);
     setTimeout(() => {
       setIsClicking(false);
-      setShouldPulse(true);
-      if (onClick) onClick(id);
     }, 300);
   };
 
@@ -63,7 +59,7 @@ export default function MapMarker({ id, top, left, title, onClick, className, is
       title={title}
       aria-label={title || `Marker ${id}`}
     >
-      <div className={`relative w-12 h-12 sm:w-16 sm:h-16 ${shouldPulse ? 'animate-pulse' : ''}`}>
+      <div className="relative w-12 h-12 sm:w-16 sm:h-16">
         <Image
           src={imageSrc || "/dama.jpg"}
           alt={title || `Marker ${id}`}
@@ -78,7 +74,7 @@ export default function MapMarker({ id, top, left, title, onClick, className, is
         />
         {/* Glow effect when clicked */}
         {isClicking && (
-          <div className="absolute inset-0 rounded-full bg-amber-400/30 animate-ping" />
+          <div className="absolute inset-0 rounded-full bg-amber-400/30" />
         )}
       </div>
     </button>

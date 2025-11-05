@@ -15,7 +15,7 @@ export default function TopBar() {
         </Link>
         <div className="flex items-center gap-3">
           <button 
-            className={`aspect-square w-14 h-14 flex items-center justify-center text-amber-50 text-sm font-semibold rounded border border-amber-600/50 shadow-md transition-all hover:scale-105 active:scale-95 ${
+            className={`aspect-square w-14 h-14 flex items-center justify-center text-amber-50 text-sm font-semibold rounded border border-amber-600/50 shadow-md transition-all active:scale-95 ${
               isRunning 
                 ? 'bg-amber-800/50 hover:bg-amber-800/70' 
                 : 'bg-amber-700/80 hover:bg-amber-700'

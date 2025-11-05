@@ -114,17 +114,20 @@ export default function MissionDetailModal({
 
               {/* Mission Status */}
               {isMissionActive ? (
-                <div className="bg-blue-100/60 rounded-lg p-4 border-2 border-blue-700/30">
-                  <h4 className="text-lg font-semibold text-blue-900 mb-3">Postęp Misji</h4>
-                  <div className="w-full bg-blue-300/50 rounded-full h-10 border-2 border-blue-700/50 shadow-inner overflow-hidden">
+                <div className="bg-amber-100/60 rounded-lg p-4 border-2 border-amber-700/30">
+                  <h4 className="text-lg font-semibold text-amber-900 mb-3">Postęp Misji</h4>
+                  <div className="relative w-full bg-amber-800/50 rounded-full h-8 border border-amber-700/50 shadow-inner overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-base font-bold text-white transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-amber-600 to-amber-700 rounded-full transition-all duration-300 shadow-lg"
                       style={{ width: `${progress}%` }}
-                    >
-                      {Math.round(progress)}%
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-amber-50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                        {Math.round(progress)}%
+                      </span>
                     </div>
                   </div>
-                  <p className="text-sm text-blue-800 mt-2 text-center font-semibold">
+                  <p className="text-sm text-amber-800 mt-2 text-center font-semibold">
                     Agent w trakcie wykonywania misji...
                   </p>
                 </div>
@@ -136,7 +139,7 @@ export default function MissionDetailModal({
                         onStartMission(mission.id);
                         onClose();
                       }}
-                      className="w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-xl font-bold rounded-lg shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-amber-900"
+                      className="w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-amber-50 text-xl font-bold uppercase tracking-widest rounded-lg shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-amber-900"
                     >
                       Rozpocznij Misję
                     </button>
