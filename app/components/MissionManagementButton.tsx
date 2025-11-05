@@ -82,21 +82,20 @@ export default function MissionManagementButton({
         onClick={() => {
           setShowList(!showList);
         }}
-        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex flex-row  items-center justify-start cursor-pointer"
+        className="w-full h-full min-h-[50px] p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] flex flex-row items-center justify-start cursor-pointer"
       >
-        <div className="flex flex-row gap-3">
-
-          <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden">
+        <div className="flex flex-row gap-4 items-center">
+          <div className="relative w-14 h-14 flex-shrink-0 overflow-hidden rounded-md">
             <Image
               src="/dama.jpg"
-              alt={"Wywiad"}
+              alt={"Misje"}
               fill
               className="object-cover"
             />
           </div>
-          <div className="flex flex-col items-start gap-1">
-            <span className="text-sm font-semibold text-amber-50">Zarządzanie Misjami</span>
-            <span className="text-xs text-amber-200">({missionCount} misji)</span>
+          <div className="flex flex-col items-start gap-0.5">
+            <span className="text-base font-bold text-amber-50">Zarządzanie Misjami</span>
+            <span className="text-sm text-amber-200 font-semibold">({missionCount} misji)</span>
           </div>
         </div>
       </button>

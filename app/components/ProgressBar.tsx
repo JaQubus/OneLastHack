@@ -14,16 +14,16 @@ const ProgressBar = ({
   const displayProgress = Math.round(clampedProgress * 10) / 10; // Round to 1 decimal
 
   return (
-    <div className="rounded-lg p-4" style={{ width: '20%' }}>
+    <div className="rounded-lg p-3" style={{ width: '20%' }}>
       {/* Label centered at top */}
-      <div className="text-center mb-3">
-        <label className="text-sm font-bold text-amber-50">
+      <div className="text-center mb-2">
+        <label className="text-base font-bold text-amber-50">
           {label}
         </label>
       </div>
       
       {/* Progress bar container */}
-      <div className="relative bg-amber-800 h-10 rounded-lg overflow-hidden">
+      <div className="relative bg-amber-800 h-8 rounded-lg overflow-hidden">
         {/* Fill portion - solid color, no gradient */}
         <div
           className="absolute inset-0 h-full bg-amber-700 transition-all duration-300"
@@ -32,7 +32,7 @@ const ProgressBar = ({
         
         {/* Percentage text centered over entire bar */}
         <div className="absolute inset-0 h-full flex items-center justify-center">
-          <span className="text-base font-bold text-yellow-500">
+          <span className="text-lg font-bold text-yellow-500 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             {displayProgress.toFixed(1)}%
           </span>
         </div>

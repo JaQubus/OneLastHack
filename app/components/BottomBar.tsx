@@ -38,7 +38,7 @@ export default function BottomBar({
 }: BottomBarProps) {
   return (
     <footer className="absolute bottom-0 left-0 right-0 z-20 bg-amber-900/50 backdrop-blur-sm border-t-2 border-amber-800/50 shadow-lg">
-      <div className="container mx-auto px-4 py-4 sm:px-6">
+      <div className="container mx-auto px-4 py-2 sm:px-6">
         <div className="flex items-stretch justify-between gap-4">
           <MissionManagementButton
             acknowledgedMissions={acknowledgedMissions}

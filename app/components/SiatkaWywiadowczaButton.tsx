@@ -33,10 +33,10 @@ export default function SiatkaWywiadowczaButton({
           onClick={() => {
             setShowMenu(!showMenu);
           }}
-          className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center cursor-pointer"
+          className="w-full h-full min-h-[50px] p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] flex items-center cursor-pointer"
         >
-          <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden">
+          <div className="flex items-center gap-4">
+            <div className="relative w-14 h-14 flex-shrink-0 overflow-hidden rounded-md">
               <Image
                 src="/Logo_Agencji_Wywiadu.png"
                 alt={"Wywiad"}
@@ -45,8 +45,8 @@ export default function SiatkaWywiadowczaButton({
               />
             </div>
             <div className="flex-1 text-left">
-              <div className="text-sm font-semibold text-amber-50">Siatka Wywiadowcza</div>
-              <div className="text-xs text-amber-200 mt-1">Punkty: {intelligencePoints}</div>
+              <div className="text-base font-bold text-amber-50">Siatka Wywiadowcza</div>
+              <div className="text-sm text-amber-200 font-semibold mt-0.5">Punkty: {intelligencePoints}</div>
             </div>
           </div>
         </button>
