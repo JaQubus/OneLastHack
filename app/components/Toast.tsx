@@ -8,6 +8,7 @@ export type ToastType = {
   message: string;
   title?: string;
   duration?: number;
+  type?: 'success' | 'error' | 'info';
 };
 
 interface ToastProps {

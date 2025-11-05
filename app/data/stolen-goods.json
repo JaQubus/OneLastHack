@@ -5,8 +5,8 @@
     "artist": "Rafael",
     "year": "1513-1514",
     "description": "Jeden z najcenniejszych obrazów z kolekcji księcia Czartoryskiego. Zrabowany przez nazistów w 1939 roku z Muzeum Narodowego w Warszawie.",
-    "image": "/placeholder-art.jpg",
-    "progress": 45,
+    "image": "/artworks/portret_mlodzienca.webp",
+    "progress": 0,
     "estimatedTime": "12h 30m",
     "location": "Warszawa"
   },
@@ -16,8 +16,8 @@
     "artist": "Leonardo da Vinci",
     "year": "1489-1490",
     "description": "Słynny portret Cecylii Gallerani, znany również jako Dama z łasiczką. Zrabowany z Muzeum Czartoryskich w Krakowie.",
-    "image": "/placeholder-art.jpg",
-    "progress": 28,
+    "image": "/artworks/dama_z_gronostajem.jpg",
+    "progress": 0,
     "estimatedTime": "18h 45m",
     "location": "Kraków"
   },
@@ -27,10 +27,130 @@
     "artist": "Rembrandt",
     "year": "1638",
     "description": "Jedno z najważniejszych dzieł Rembrandta w polskich zbiorach. Zaginione podczas II wojny światowej.",
-    "image": "/placeholder-art.jpg",
-    "progress": 15,
+    "image": "/artworks/krajobraz_z_milosiernym_samarytaninem.jpg",
+    "progress": 0,
     "estimatedTime": "24h 10m",
+    "location": "Warszawa"
+  },
+  {
+    "id": 4,
+    "name": "Bitwa pod Grunwaldem",
+    "artist": "Jan Matejko",
+    "year": "1878",
+    "description": "Słynne dzieło przedstawiające bitwę pod Grunwaldem. Zrabowane podczas II wojny światowej.",
+    "image": "/artworks/bitwa_pod_grunwaldem.jpg",
+    "progress": 0,
+    "estimatedTime": "15h 20m",
+    "location": "Warszawa"
+  },
+  {
+    "id": 5,
+    "name": "Adoracja Baranka",
+    "artist": "Jan van Eyck",
+    "year": "1432",
+    "description": "Część Ołtarza Gandawskiego. Jedno z najcenniejszych dzieł w historii sztuki.",
+    "image": "/artworks/adoracja_baranka.jpg",
+    "progress": 0,
+    "estimatedTime": "20h 00m",
+    "location": "Gandawa"
+  },
+  {
+    "id": 6,
+    "name": "Apostołowie Szymon i Juda",
+    "artist": "Rafael",
+    "year": "1513-1514",
+    "description": "Obraz z kolekcji Czartoryskich. Zrabowany podczas okupacji.",
+    "image": "/artworks/apostolowie_szymon_i_juda.jpg",
+    "progress": 0,
+    "estimatedTime": "14h 15m",
+    "location": "Kraków"
+  },
+  {
+    "id": 7,
+    "name": "Babie Lato",
+    "artist": "Józef Chełmoński",
+    "year": "1875",
+    "description": "Słynny obraz polskiego malarza. Zaginiony podczas wojny.",
+    "image": "/artworks/babie_lato.jpg",
+    "progress": 0,
+    "estimatedTime": "10h 30m",
+    "location": "Warszawa"
+  },
+  {
+    "id": 8,
+    "name": "Chrystus i setnik z Kafarnaum",
+    "artist": "Paolo Veronese",
+    "year": "1571",
+    "description": "Dzieło z kolekcji Czartoryskich. Zrabowane przez nazistów.",
+    "image": "/artworks/chrystus_i_setnik_z_kafarnaum.jpg",
+    "progress": 0,
+    "estimatedTime": "16h 45m",
+    "location": "Kraków"
+  },
+  {
+    "id": 9,
+    "name": "Chrystus upadający pod krzyżem",
+    "artist": "Rafael",
+    "year": "1516-1517",
+    "description": "Obraz z kolekcji Czartoryskich. Zaginiony podczas II wojny światowej.",
+    "image": "/artworks/chrystus_upadajacy_pod_krzyzem.jpg",
+    "progress": 0,
+    "estimatedTime": "13h 20m",
+    "location": "Kraków"
+  },
+  {
+    "id": 10,
+    "name": "Czaty",
+    "artist": "Józef Chełmoński",
+    "year": "1873",
+    "description": "Dzieło polskiego malarza. Zrabowane podczas okupacji.",
+    "image": "/artworks/czaty.jpg",
+    "progress": 0,
+    "estimatedTime": "11h 00m",
+    "location": "Warszawa"
+  },
+  {
+    "id": 11,
+    "name": "Dziewczyna w ramie obrazu",
+    "artist": "Rembrandt",
+    "year": "1641",
+    "description": "Portret z kolekcji Czartoryskich. Zaginiony podczas wojny.",
+    "image": "/artworks/dziewczyna_w_ramie_obrazu.jpg",
+    "progress": 0,
+    "estimatedTime": "17h 30m",
+    "location": "Kraków"
+  },
+  {
+    "id": 12,
+    "name": "Madonna z dzieciątkiem",
+    "artist": "Leonardo da Vinci",
+    "year": "1490-1491",
+    "description": "Dzieło z kolekcji Czartoryskich. Zrabowane przez nazistów.",
+    "image": "/artworks/madonna_z_dzieciatkiem.jpg",
+    "progress": 0,
+    "estimatedTime": "19h 10m",
+    "location": "Kraków"
+  },
+  {
+    "id": 13,
+    "name": "Polowanie na jelenia",
+    "artist": "Paolo Veronese",
+    "year": "1570-1580",
+    "description": "Obraz z kolekcji Czartoryskich. Zaginiony podczas II wojny światowej.",
+    "image": "/artworks/polowanie_na_jelenia.jpg",
+    "progress": 0,
+    "estimatedTime": "15h 45m",
+    "location": "Kraków"
+  },
+  {
+    "id": 14,
+    "name": "Żydówka z pomarańczami",
+    "artist": "Aleksander Gierymski",
+    "year": "1880-1881",
+    "description": "Słynny obraz polskiego malarza. Zrabowany podczas okupacji.",
+    "image": "/artworks/zydowka_z_pomaranczami.jpg",
+    "progress": 0,
+    "estimatedTime": "12h 00m",
     "location": "Warszawa"
   }
 ]
-

@@ -12,9 +12,10 @@ type Props = {
   onClick?: (id: number) => void;
   className?: string;
   isAnimating?: boolean; // Trigger animation from parent
+  imageSrc?: string; // Optional image source for artwork
 };
 
-export default function MapMarker({ id, top, left, title, onClick, className, isAnimating = false }: Props) {
+export default function MapMarker({ id, top, left, title, onClick, className, isAnimating = false, imageSrc }: Props) {
   const [isClicking, setIsClicking] = useState(false);
   const [shouldPulse, setShouldPulse] = useState(true);
   const [safePosition, setSafePosition] = useState({ top, left });
@@ -64,15 +65,16 @@ export default function MapMarker({ id, top, left, title, onClick, className, is
     >
       <div className={`relative w-12 h-12 sm:w-16 sm:h-16 ${shouldPulse ? 'animate-pulse' : ''}`}>
         <Image
-          src="/dama.jpg"
+          src={imageSrc || "/dama.jpg"}
           alt={title || `Marker ${id}`}
           fill
-          className="object-cover border-2 border-amber-800 shadow-2xl hover:shadow-amber-500/50 transition-all"
+          className="object-cover border-2 border-amber-800 shadow-2xl hover:shadow-amber-500/50 transition-all rounded-full"
           style={{
             boxShadow: isClicking
               ? '0 0 20px rgba(251, 191, 36, 0.8), 0 0 40px rgba(251, 191, 36, 0.6)'
               : '0 4px 12px rgba(0, 0, 0, 0.3)',
           }}
+          unoptimized
         />
         {/* Glow effect when clicked */}
         {isClicking && (

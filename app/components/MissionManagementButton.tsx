@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import type { AcknowledgedMission, Agent, RetrievalTask, StolenGood } from "../types";
 
 interface MissionManagementButtonProps {
@@ -108,13 +109,31 @@ export default function MissionManagementButton({
                     const missionActive = isMissionActive(mission.id);
                     const task = getMissionTask(mission.id);
                     const canStart = availableAgents.length > 0 && !missionActive;
+                    const artwork = mission.artworkId
+                      ? stolenGoods.find(g => g.id === mission.artworkId)
+                      : null;
+                    const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
                     
                     return (
-                      <div
+                      <button
                         key={mission.id}
-                        className="w-full p-3 rounded-lg border-2 border-amber-700/50 bg-amber-800/50 hover:bg-amber-800/70 transition-all"
+                        onClick={() => {
+                          onMissionClick(mission);
+                          setShowList(false);
+                        }}
+                        className="w-full p-3 rounded-lg border-2 border-amber-700/50 bg-amber-800/50 hover:bg-amber-800/70 transition-all text-left"
                       >
                         <div className="flex items-start justify-between gap-3">
+                          {/* Artwork Image */}
+                          <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 border-amber-600/50">
+                            <Image
+                              src={imageSrc}
+                              alt={artwork?.name || mission.title}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </div>
                           <div className="flex-1 min-w-0">
                             <div className="font-semibold text-amber-50 text-sm mb-1 truncate">
                               {mission.title}
@@ -132,24 +151,13 @@ export default function MissionManagementButton({
                                 </div>
                               </div>
                             ) : (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onMissionClick(mission);
-                                  setShowList(false);
-                                }}
-                                className={`mt-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                                  canStart
-                                    ? "bg-amber-700 hover:bg-amber-600 text-amber-50 shadow-md hover:shadow-lg active:scale-95"
-                                    : "bg-amber-900/50 text-amber-400 cursor-not-allowed"
-                                }`}
-                              >
-                                {canStart ? "Zobacz szczegóły misji" : "Brak dostępnych agentów"}
-                              </button>
+                              <div className="text-xs text-amber-300 mt-2">
+                                {canStart ? "Kliknij aby zobaczyć szczegóły" : "Brak dostępnych agentów"}
+                              </div>
                             )}
                           </div>
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>

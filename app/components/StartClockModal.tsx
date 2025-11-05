@@ -37,14 +37,25 @@ export default function StartClockModal({ onClose }: StartClockModalProps) {
       >
         <div className="text-center space-y-6">
           <div className="text-6xl mb-4">⏰</div>
-          <h2 className="text-4xl font-bold text-amber-900 mb-2">
-            Rozpocznij Grę
+          <h2 className="text-4xl font-bold text-amber-900 mb-4">
+            ARTiFACTS - Operacja Odzyskania
           </h2>
-          <p className="text-xl text-amber-800 leading-relaxed">
-            Kliknij przycisk poniżej, aby rozpocząć zegar gry. 
-            <br />
-            Bąbelki z dziełami sztuki będą pojawiać się na mapie podczas gry.
-          </p>
+          <div className="text-left space-y-4 mb-6">
+            <p className="text-lg text-amber-800 leading-relaxed">
+              <strong className="text-amber-900">Witaj w grze strategiczno-detektywistycznej!</strong>
+            </p>
+            <p className="text-base text-amber-700 leading-relaxed">
+              Twoim zadaniem jest odzyskać skradzione podczas II wojny światowej dzieła sztuki. 
+              Bąbelki z lokalizacjami dzieł będą pojawiać się na mapie - kliknij je, aby zebrać informacje wywiadowcze.
+            </p>
+            <p className="text-base text-amber-700 leading-relaxed">
+              Wysyłaj swoich agentów na misje, aby odzyskać dzieła. Każda misja ma 30% szansy na niepowodzenie - 
+              ulepszaj umiejętności agentów, aby zmniejszyć to ryzyko do minimum 5%.
+            </p>
+            <p className="text-base text-amber-700 leading-relaxed">
+              <strong className="text-amber-900">Uwaga:</strong> Bąbelki znikają po 20 sekundach, jeśli ich nie zbierzesz!
+            </p>
+          </div>
           <div className="pt-4">
             <button
               onClick={handleStart}

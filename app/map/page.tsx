@@ -16,6 +16,7 @@ import BottomBar from "../components/BottomBar";
 import ToastContainer, { ToastType } from "../components/Toast";
 import ArtGalleryModal from "../components/ArtGalleryModal";
 import MissionDetailModal from "../components/MissionDetailModal";
+import StartClockModal from "../components/StartClockModal";
 import type { StolenGood, Agent, Skill, AcknowledgedMission, RetrievalTask } from "../types";
 
 type Marker = {
@@ -40,13 +41,14 @@ export default function MapPage() {
   const [selectedMission, setSelectedMission] = useState<AcknowledgedMission | null>(null);
   const [hasInitialBubble, setHasInitialBubble] = useState(false);
   const [toasts, setToasts] = useState<ToastType[]>([]);
-  
-  // Reset and start timer when map page loads
+  const [usedArtworkIds, setUsedArtworkIds] = useState<Set<number>>(new Set());
+  const [showStartClockModal, setShowStartClockModal] = useState(true);
+
+  // Reset timer when map page loads (but don't start it)
   useEffect(() => {
     // Reset game time to start date
     reset();
-    // Start the timer automatically
-    start();
+    // Timer will be started by user via StartClockModal
   }, []); // Empty deps - only run on mount
 
   // State for active agents in slots (start with first 2 agents)
@@ -123,8 +125,8 @@ export default function MapPage() {
   // Initialize with one bubble at game start (client-side only to avoid hydration mismatch)
   useEffect(() => {
     if (!isInitialized && typeof window !== 'undefined') {
-      // Get first available artwork
-      const availableArtworks = (stolenGoodsData as StolenGood[]).filter((good) => good.progress < 100);
+      // Get first available artwork that hasn't been used
+      const availableArtworks = (stolenGoodsData as StolenGood[]).filter((good) => good.progress < 100 && !usedArtworkIds.has(good.id));
       if (availableArtworks.length > 0) {
         const artwork = availableArtworks[0];
         const initialMarkerId = Date.now();
@@ -144,13 +146,13 @@ export default function MapPage() {
             newMap.set(initialMarkerId, Date.now());
             return newMap;
           });
-          setIsInitialized(true);
+          setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
+          setHasInitialBubble(true);
         }
-      } else {
-        setIsInitialized(true);
       }
+      setIsInitialized(true);
     }
-  }, [isInitialized]);
+  }, [isInitialized, usedArtworkIds]);
 
   // Calculate progress based on game time (from 1939-09-01 to 1945-05-08)
   // Use same date normalization as GameTimeProvider for perfect sync
@@ -159,12 +161,12 @@ export default function MapPage() {
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(1945, 4, 8); // Month is 0-indexed, so 4 = May
     endDate.setHours(0, 0, 0, 0);
-    
+
     // Use dayNumber-like calculation for consistency
     const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000);
     const currentDays = Math.floor((currentDate.getTime() - startDate.getTime()) / 86400000);
     const newProgress = Math.min(100, Math.max(0, (currentDays / totalDays) * 100));
-    
+
     setProgress(newProgress);
   }, [currentDate]);
 
@@ -368,8 +370,8 @@ export default function MapPage() {
 
           let currentTop: number;
           let currentLeft: number;
-          const startTop = 60; // Warsaw storage at 60%
-          const startLeft = 50;
+          const startTop = WARSAW_START_TOP; // Warsaw storage
+          const startLeft = WARSAW_START_LEFT;
           const targetTop = parseFloat(task.targetTop.replace('%', ''));
           const targetLeft = parseFloat(task.targetLeft.replace('%', ''));
 
@@ -390,14 +392,52 @@ export default function MapPage() {
             currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
           }
 
+          // Check if mission just completed
           if (newProgress >= 100 && task.progress < 100) {
             if (!task.failed) {
+              // Success - show green toast
+              const artwork = stolenGoods.find(g => g.id === task.artworkId);
+              const agent = activeAgents.find(a => a.id === task.agentId);
+              const toastId = `toast-success-${Date.now()}`;
+              setToasts((prev) => [
+                ...prev,
+                {
+                  id: toastId,
+                  title: "✅ Misja Zakończona Sukcesem!",
+                  message: artwork && agent
+                    ? `Agent ${agent.name} odzyskał "${artwork.name}"!`
+                    : artwork
+                      ? `Dzieło "${artwork.name}" zostało odzyskane!`
+                      : "Dzieło sztuki zostało odzyskane!",
+                  duration: 5000,
+                  type: 'success' as const,
+                },
+              ]);
               setIntelligencePoints((prev) => prev + 25);
               setStolenGoods((prev) =>
                 prev.map((good) =>
                   good.id === task.artworkId ? { ...good, progress: 100 } : good
                 )
               );
+            } else {
+              // Failure - show red toast
+              const artwork = stolenGoods.find(g => g.id === task.artworkId);
+              const agent = activeAgents.find(a => a.id === task.agentId);
+              const toastId = `toast-error-${Date.now()}`;
+              setToasts((prev) => [
+                ...prev,
+                {
+                  id: toastId,
+                  title: "❌ Misja Nieudana",
+                  message: artwork && agent
+                    ? `Agent ${agent.name} nie zdołał odzyskać "${artwork.name}". Agent wraca do bazy.`
+                    : agent
+                      ? `Agent ${agent.name} nie zdołał ukończyć misji. Agent wraca do bazy.`
+                      : "Misja nie powiodła się. Agent wraca do bazy.",
+                  duration: 5000,
+                  type: 'error' as const,
+                },
+              ]);
             }
           }
 
@@ -416,12 +456,18 @@ export default function MapPage() {
       });
     }, 100);
     return () => clearInterval(interval);
-  }, []);
+  }, [stolenGoods, activeAgents]);
 
-  // Spawn initial bubble when clock starts for the first time
+  // Spawn initial bubble when clock starts for the first time (only if not already spawned on mount)
   useEffect(() => {
-    if (isRunning && !hasInitialBubble) {
-      const availableArtworks = stolenGoods.filter((good) => good.progress < 100);
+    if (isRunning && !hasInitialBubble && isInitialized) {
+      // Check if we already have a marker (from initial spawn)
+      if (markers.length > 0) {
+        setHasInitialBubble(true);
+        return;
+      }
+
+      const availableArtworks = stolenGoods.filter((good) => good.progress < 100 && !usedArtworkIds.has(good.id));
 
       if (availableArtworks.length > 0) {
         const artwork = availableArtworks[0];
@@ -444,21 +490,28 @@ export default function MapPage() {
             newMap.set(markerId, Date.now());
             return newMap;
           });
+          setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
           setHasInitialBubble(true);
         }
       }
     }
-  }, [isRunning, hasInitialBubble, stolenGoods]);
+  }, [isRunning, hasInitialBubble, stolenGoods, usedArtworkIds, isInitialized, markers.length]);
 
   // Schedule an event every 90 in-game days to spawn a new marker (3x slower)
   useEffect(() => {
     const id = scheduleEvery(90, () => {
-      // Pick a random stolen good that hasn't been fully recovered
-      const availableArtworks = stolenGoods.filter((good) => good.progress < 100);
+      // Pick a random stolen good that hasn't been fully recovered and hasn't been used yet
+      const availableArtworks = stolenGoods.filter((good) => good.progress < 100 && !usedArtworkIds.has(good.id));
 
       if (availableArtworks.length === 0) {
-        const pool = initialMarkers as { id: number; top: string; left: string; title: string; description: string }[];
-        const tpl = pool[Math.floor(Math.random() * pool.length)] || {};
+        // If all artworks are used or recovered, reset used artworks and continue
+        setUsedArtworkIds(new Set());
+        const resetAvailableArtworks = stolenGoods.filter((good) => good.progress < 100);
+        if (resetAvailableArtworks.length === 0) {
+          // No artworks available at all
+          return;
+        }
+        const artwork = resetAvailableArtworks[Math.floor(Math.random() * resetAvailableArtworks.length)];
         const currentMarkers = markersRef.current;
         const newPosition = getRandomPositionAwayFromMarkers(currentMarkers);
 
@@ -468,16 +521,17 @@ export default function MapPage() {
             id: markerId,
             top: newPosition.top,
             left: newPosition.left,
-            title: tpl.title ?? `Wydarzenie`,
-            description: tpl.description ?? "Nowe zdarzenie wykryte przez siatkę wywiadowczą.",
+            title: artwork.name,
+            description: `Lokalizacja: ${artwork.location}. ${artwork.description}`,
+            artworkId: artwork.id,
           };
           setMarkers((prev) => [...prev, newMarker]);
-          // Track creation time for 20 second timer
           setMarkerCreationTimes((prev) => {
             const newMap = new Map(prev);
             newMap.set(markerId, Date.now());
             return newMap;
           });
+          setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
         }
         return;
       }
@@ -503,13 +557,14 @@ export default function MapPage() {
           newMap.set(markerId, Date.now());
           return newMap;
         });
+        setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
       }
     });
 
     return () => cancelScheduled(id);
     // scheduleEvery/cancelScheduled are stable from provider; eslint disabled to avoid frequent reschedule
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [usedArtworkIds]);
 
 
   return (
@@ -573,24 +628,30 @@ export default function MapPage() {
       <div className="absolute inset-0 z-10 pointer-events-none">
         <div className="pointer-events-auto">
           {/* Example marker positions loaded from JSON */}
-          {markers.map((m) => (
-            <MapMarker
-              key={m.id}
-              id={m.id}
-              top={m.top}
-              left={m.left}
-              onClick={(id) => {
-                const found = markers.find((x) => x.id === id) || null;
-                if (found && found.id !== WARSAW_STORAGE.id) {
-                  // Collect the bubble - gives points and adds to missions
-                  collectMarker(found);
-                  setSelectedMarker(null); // Close modal immediately
-                }
-              }}
-              title={m.title}
-              isAnimating={highlightedMarkerId === m.id}
-            />
-          ))}
+          {markers.map((m) => {
+            const artwork = m.artworkId ? stolenGoods.find(g => g.id === m.artworkId) : null;
+            const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
+
+            return (
+              <MapMarker
+                key={m.id}
+                id={m.id}
+                top={m.top}
+                left={m.left}
+                onClick={(id) => {
+                  const found = markers.find((x) => x.id === id) || null;
+                  if (found && found.id !== WARSAW_STORAGE.id) {
+                    // Collect the bubble - gives points and adds to missions
+                    collectMarker(found);
+                    setSelectedMarker(null); // Close modal immediately
+                  }
+                }}
+                title={m.title}
+                isAnimating={highlightedMarkerId === m.id}
+                imageSrc={imageSrc}
+              />
+            );
+          })}
         </div>
       </div>
 
@@ -670,6 +731,10 @@ export default function MapPage() {
       {/* Agent Icons on Map (during retrieval) */}
       {retrievalTasks.map((task) => {
         const agent = activeAgents.find((a) => a.id === task.agentId);
+        const artwork = task.artworkId ? stolenGoods.find(g => g.id === task.artworkId) : null;
+        const isReturningWithArtwork = task.progress >= 100 && !task.failed;
+        const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
+
         return (
           <div
             key={task.id}
@@ -680,8 +745,28 @@ export default function MapPage() {
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <div className={`text-3xl ${task.failed ? 'animate-bounce' : 'animate-pulse'}`}>
-              {task.failed ? '😞' : '🚶'}
+            <div className="relative">
+              <div className={`text-3xl ${task.failed ? 'animate-bounce' : 'animate-pulse'}`}>
+                {task.failed ? '😞' : '🚶'}
+              </div>
+              {/* Show artwork following agent after successful retrieval */}
+              {isReturningWithArtwork && (
+                <div
+                  className="absolute -top-8 left-1/2 -translate-x-1/2 z-16"
+                  style={{ transform: 'translateX(-50%)' }}
+                >
+                  <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-green-600 shadow-xl overflow-hidden bg-green-100">
+                    <Image
+                      src={imageSrc}
+                      alt={artwork?.name || "Odzyskane dzieło"}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border border-green-600"></div>
+                  </div>
+                </div>
+              )}
             </div>
             {task.progress >= 50 && task.failed && !task.isReturning && (
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-red-800/90 text-red-50 px-2 py-1 rounded whitespace-nowrap">
@@ -693,7 +778,7 @@ export default function MapPage() {
                 Powrót do Bazy
               </div>
             )}
-            {task.progress >= 100 && !task.failed && (
+            {isReturningWithArtwork && (
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-green-800/90 text-green-50 px-2 py-1 rounded whitespace-nowrap">
                 ✓ Odzyskano
               </div>
@@ -707,11 +792,20 @@ export default function MapPage() {
       {/* Art Gallery Modal */}
       {showArtGallery && (
         <ArtGalleryModal
-          stolenGoods={stolenGoods}
+          stolenGoods={stolenGoods.filter((good) => good.progress === 100)}
           onClose={() => setShowArtGallery(false)}
         />
       )}
 
+
+      {/* Start Clock Modal */}
+      {showStartClockModal && !isRunning && (
+        <StartClockModal
+          onClose={() => {
+            setShowStartClockModal(false);
+          }}
+        />
+      )}
 
       {/* Mission Detail Modal */}
       {selectedMission && (() => {

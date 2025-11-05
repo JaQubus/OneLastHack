@@ -29,9 +29,15 @@ export default function ArtGalleryModal({ stolenGoods, onClose }: Props) {
             </button>
           </div>
           
-          <div className="flex-1 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {stolenGoods.map((good) => (
+          <div className="flex-1 overflow-y-auto p-4">
+            {stolenGoods.length === 0 ? (
+              <div className="text-center text-amber-700 text-lg py-10">
+                <p className="mb-2">Brak odzyskanych dzieł sztuki.</p>
+                <p className="text-base">Rozpocznij misje, aby odzyskać dzieła sztuki!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {stolenGoods.map((good) => (
                 <div
                   key={good.id}
                   className="bg-amber-200/80 rounded-lg border-2 border-amber-800/30 p-4 shadow-lg hover:shadow-xl transition-all"
@@ -56,8 +62,9 @@ export default function ArtGalleryModal({ stolenGoods, onClose }: Props) {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </>,
