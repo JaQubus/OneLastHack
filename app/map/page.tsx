@@ -316,55 +316,20 @@ export default function MapPage() {
     setMapPosition(constrained);
   };
 
-<<<<<<< HEAD
-  // Schedule an event every 30 in-game days to spawn a new marker and open its modal
->>>>>>> e129016 (map rework,k a and added museums)
-  useEffect(() => {
-    if (!isInitialized && typeof window !== 'undefined') {
-      // Get first available artwork
-      const availableArtworks = (stolenGoodsData as StolenGood[]).filter((good) => good.progress < 100);
-      if (availableArtworks.length > 0) {
-        const artwork = availableArtworks[0];
-        const initialMarkerId = Date.now();
-        const initialPosition = getRandomPositionAwayFromMarkers([]);
-        if (initialPosition) {
-          const initialMarker: Marker = {
-            id: initialMarkerId,
-            top: initialPosition.top,
-            left: initialPosition.left,
-            title: artwork.name,
-            description: `Lokalizacja: ${artwork.location}. ${artwork.description}`,
-            artworkId: artwork.id,
-          };
-          setMarkers([initialMarker]);
-          setMarkerCreationTimes((prev) => {
-            const newMap = new Map(prev);
-            newMap.set(initialMarkerId, Date.now());
-            return newMap;
-          });
-          setIsInitialized(true);
-        }
-      } else {
-        setIsInitialized(true);
+  // Calculate failure chance
+  const calculateFailureChance = (): number => {
+    const baseFailureChance = 30;
+    let totalReduction = 0;
+    skills.forEach((skill) => {
+      if (skill.description.includes("skuteczności misji") || skill.description.includes("ryzyko")) {
+        const reductionPerLevel = skill.description.includes("skuteczności misji")
+          ? (skill.description.includes("+10%") ? 2 : skill.description.includes("+20%") ? 4 : skill.description.includes("+30%") ? 6 : 2)
+          : (skill.description.includes("-20%") ? 4 : 2);
+        totalReduction += skill.level * reductionPerLevel;
       }
-    }
-  }, [isInitialized]);
-
-  // Calculate progress based on game time (from 1939-09-01 to 1945-05-08)
-  // Use same date normalization as GameTimeProvider for perfect sync
-  useEffect(() => {
-    const startDate = new Date(1939, 8, 1); // Month is 0-indexed, so 8 = September
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(1945, 4, 8); // Month is 0-indexed, so 4 = May
-    endDate.setHours(0, 0, 0, 0);
-    
-    // Use dayNumber-like calculation for consistency
-    const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000);
-    const currentDays = Math.floor((currentDate.getTime() - startDate.getTime()) / 86400000);
-    const newProgress = Math.min(100, Math.max(0, (currentDays / totalDays) * 100));
-    
-    setProgress(newProgress);
-  }, [currentDate]);
+    });
+    return Math.max(5, baseFailureChance - totalReduction);
+  };
 
   // Auto-remove markers after 20 seconds
   useEffect(() => {
@@ -452,23 +417,6 @@ export default function MapPage() {
     }, 100);
     return () => clearInterval(interval);
   }, []);
-
-=======
->>>>>>> bc0675f (merging)
-  // Calculate failure chance
-  const calculateFailureChance = (): number => {
-    const baseFailureChance = 30;
-    let totalReduction = 0;
-    skills.forEach((skill) => {
-      if (skill.description.includes("skuteczności misji") || skill.description.includes("ryzyko")) {
-        const reductionPerLevel = skill.description.includes("skuteczności misji")
-          ? (skill.description.includes("+10%") ? 2 : skill.description.includes("+20%") ? 4 : skill.description.includes("+30%") ? 6 : 2)
-          : (skill.description.includes("-20%") ? 4 : 2);
-        totalReduction += skill.level * reductionPerLevel;
-      }
-    });
-    return Math.max(5, baseFailureChance - totalReduction);
-  };
 
   // Start mission from mission management
   const startMission = (missionId: number) => {
@@ -853,16 +801,6 @@ export default function MapPage() {
         />
       )}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-      {/* Start Clock Modal */}
-      {showStartClockModal && !isRunning && (
-        <StartClockModal onClose={() => setShowStartClockModal(false)} />
-      )}
->>>>>>> 352936a (map rework,k a and added museums)
-
       {/* Mission Detail Modal */}
       {selectedMission && (() => {
         const task = retrievalTasks.find(t => t.missionId === selectedMission.id) || null;
@@ -887,9 +825,7 @@ export default function MapPage() {
           />
         );
       })()}
-=======
-=======
->>>>>>> bc0675f (merging)
+
       {/* Museum Modal */}
       {selectedMuseum != null && (
         <MuseumModal
