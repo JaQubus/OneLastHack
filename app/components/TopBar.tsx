@@ -10,7 +10,9 @@ export default function TopBar() {
   return (
     <header className="absolute top-0 left-0 right-0 z-20 bg-amber-900/50 backdrop-blur-sm border-b-2 border-amber-800/50 shadow-lg">
       <div className="container mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
-        <h1 className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight">Wojna o kulturę</h1>
+        <Link href="/" className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight hover:text-amber-100 transition-colors cursor-pointer">
+          Wojna o kulturę
+        </Link>
         <div className="flex items-center gap-3">
           <button 
             className={`aspect-square w-14 h-14 flex items-center justify-center text-amber-50 text-sm font-semibold rounded border border-amber-600/50 shadow-md transition-all hover:scale-105 active:scale-95 ${
