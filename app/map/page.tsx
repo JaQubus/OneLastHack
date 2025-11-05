@@ -13,10 +13,9 @@ import { placeRandomMarker, clampMarkerPosition, getRandomPositionAwayFromMarker
 import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
-import PinsList from "../components/PinsList";
+import ToastContainer, { ToastType } from "../components/Toast";
 import ArtGalleryModal from "../components/ArtGalleryModal";
 import MissionDetailModal from "../components/MissionDetailModal";
-import StartClockModal from "../components/StartClockModal";
 import type { StolenGood, Agent, Skill, AcknowledgedMission, RetrievalTask } from "../types";
 
 type Marker = {
@@ -39,8 +38,16 @@ export default function MapPage() {
   const [stolenGoods, setStolenGoods] = useState<StolenGood[]>(stolenGoodsData as StolenGood[]);
   const [showArtGallery, setShowArtGallery] = useState(false);
   const [selectedMission, setSelectedMission] = useState<AcknowledgedMission | null>(null);
-  const [showStartClockModal, setShowStartClockModal] = useState(true);
   const [hasInitialBubble, setHasInitialBubble] = useState(false);
+  const [toasts, setToasts] = useState<ToastType[]>([]);
+  
+  // Reset and start timer when map page loads
+  useEffect(() => {
+    // Reset game time to start date
+    reset();
+    // Start the timer automatically
+    start();
+  }, []); // Empty deps - only run on mount
 
   // State for active agents in slots (start with first 2 agents)
   const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
@@ -75,7 +82,7 @@ export default function MapPage() {
   // Function to add next available agent
   const addNextAgent = () => {
     const agentCost = 15;
-    if (activeAgentIds.length < 5 && availableAgents.length > 0 && intelligencePoints >= agentCost) {
+    if (activeAgentIds.length < 4 && availableAgents.length > 0 && intelligencePoints >= agentCost) {
       const nextAgent = availableAgents[0];
       setIntelligencePoints(prev => prev - agentCost);
       setActiveAgentIds([...activeAgentIds, nextAgent.id]);
@@ -100,7 +107,7 @@ export default function MapPage() {
       )
     );
   };
-  const { scheduleEvery, cancelScheduled, isRunning } = useGameTime();
+  const { scheduleEvery, cancelScheduled, isRunning, currentDate, reset, start } = useGameTime();
 
   // Track marker creation time for 20 second auto-removal
   const [markerCreationTimes, setMarkerCreationTimes] = useState<Map<number, number>>(new Map());
@@ -144,6 +151,22 @@ export default function MapPage() {
       }
     }
   }, [isInitialized]);
+
+  // Calculate progress based on game time (from 1939-09-01 to 1945-05-08)
+  // Use same date normalization as GameTimeProvider for perfect sync
+  useEffect(() => {
+    const startDate = new Date(1939, 8, 1); // Month is 0-indexed, so 8 = September
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(1945, 4, 8); // Month is 0-indexed, so 4 = May
+    endDate.setHours(0, 0, 0, 0);
+    
+    // Use dayNumber-like calculation for consistency
+    const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000);
+    const currentDays = Math.floor((currentDate.getTime() - startDate.getTime()) / 86400000);
+    const newProgress = Math.min(100, Math.max(0, (currentDays / totalDays) * 100));
+    
+    setProgress(newProgress);
+  }, [currentDate]);
 
   // Auto-remove markers after 20 seconds
   useEffect(() => {
@@ -312,6 +335,18 @@ export default function MapPage() {
     };
 
     setAcknowledgedMissions((prev) => [...prev, newMission]);
+
+    // Show toast notification for new mission
+    const toastId = `toast-${Date.now()}`;
+    setToasts((prev) => [
+      ...prev,
+      {
+        id: toastId,
+        title: "Nowa Misja!",
+        message: newMission.title,
+        duration: 5000,
+      },
+    ]);
 
     // Remove marker from map after collection
     setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
@@ -490,12 +525,10 @@ export default function MapPage() {
         />
       </div>
 
-      {/* Pins List - Left Side */}
-      <PinsList
-        markers={markers}
-        selectedMarkerId={selectedMarker?.id || null}
-        onMarkerClick={(marker) => setSelectedMarker(marker)}
-        onMarkerHighlight={setHighlightedMarkerId}
+      {/* Toast Notifications */}
+      <ToastContainer
+        toasts={toasts}
+        onRemove={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
       />
 
       {/* Top Bar */}
@@ -679,10 +712,6 @@ export default function MapPage() {
         />
       )}
 
-      {/* Start Clock Modal */}
-      {showStartClockModal && !isRunning && (
-        <StartClockModal onClose={() => setShowStartClockModal(false)} />
-      )}
 
       {/* Mission Detail Modal */}
       {selectedMission && (() => {

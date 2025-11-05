@@ -227,9 +227,6 @@ export default function MissionDetailModal({
                 <div>
                   <h4 className="text-lg font-semibold text-amber-900 mb-2">Agent</h4>
                   <p className="text-base text-amber-800">{agent.name}</p>
-                  {agent.codename && (
-                    <p className="text-sm text-amber-700">Kryptonim: {agent.codename}</p>
-                  )}
                 </div>
               )}
 

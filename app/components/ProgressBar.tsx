@@ -9,21 +9,32 @@ const ProgressBar = ({
   progress,
   label = "Postęp rabunku"
 }: ProgressBarProps) => {
-  const roundedProgress = Math.round(progress);
+  // Clamp progress to 0-100 for safety
+  const clampedProgress = Math.min(Math.max(progress, 0), 100);
+  const displayProgress = Math.round(clampedProgress * 10) / 10; // Round to 1 decimal
 
   return (
-    <div className="flex flex-row items-center gap-3" style={{ width: '20%' }}>
-      <label className="text-sm font-semibold text-amber-50 drop-shadow-sm whitespace-nowrap flex-shrink-0">
-        {label}
-      </label>
-      <div className="relative bg-amber-800/50 h-6 flex-1 rounded-full border border-amber-700/50 shadow-inner overflow-hidden">
+    <div className="rounded-lg p-4" style={{ width: '20%' }}>
+      {/* Label centered at top */}
+      <div className="text-center mb-3">
+        <label className="text-sm font-bold text-amber-50">
+          {label}
+        </label>
+      </div>
+      
+      {/* Progress bar container */}
+      <div className="relative bg-amber-800 h-10 rounded-lg overflow-hidden">
+        {/* Fill portion - solid color, no gradient */}
         <div
-          className="absolute inset-0 h-full bg-gradient-to-r from-amber-600 to-amber-700 rounded-full transition-all duration-300 shadow-lg flex items-center justify-center"
-          style={{ width: `${progress}%` }}
-        >
-          {progress > 10 && (
-            <span className="text-xs font-bold text-amber-50">{roundedProgress}%</span>
-          )}
+          className="absolute inset-0 h-full bg-amber-700 transition-all duration-300"
+          style={{ width: `${clampedProgress}%` }}
+        />
+        
+        {/* Percentage text centered over entire bar */}
+        <div className="absolute inset-0 h-full flex items-center justify-center">
+          <span className="text-base font-bold text-yellow-500">
+            {displayProgress.toFixed(1)}%
+          </span>
         </div>
       </div>
     </div>

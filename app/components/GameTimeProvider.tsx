@@ -53,10 +53,11 @@ function dayNumber(d: Date) {
 let globalIdCounter = 1;
 
 export function GameTimeProvider({ children }: { children: React.ReactNode }) {
-  const defaultDate = useMemo(() => startOfDay(new Date("1939-09-01")), []);
+  // Use explicit date constructor to avoid timezone issues - month is 0-indexed
+  const defaultDate = useMemo(() => startOfDay(new Date(1939, 8, 1)), []);
   const [currentDate, setCurrentDate] = useState<Date>(defaultDate);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [speed, setSpeedState] = useState<number>(500);
+  const [speed, setSpeedState] = useState<number>(500); // 1 second = 1 day
 
   const onceRef = useRef<ScheduledOnce[]>([]);
   const everyRef = useRef<ScheduledEvery[]>([]);

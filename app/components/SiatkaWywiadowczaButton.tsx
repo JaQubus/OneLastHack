@@ -70,47 +70,50 @@ export default function SiatkaWywiadowczaButton({
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
-              {/* Left Column - Active Agents */}
+            <div className="grid grid-cols-[1fr_2fr] gap-6 flex-1 min-h-0">
+              {/* Left Column - Active Agents (narrower) */}
               <div className="flex flex-col min-h-0">
-                <h4 className="font-bold text-amber-900 mb-3 flex-shrink-0">Aktywni agenci: {activeAgentIds.length}/5</h4>
-                <div className="flex-1 space-y-3 overflow-y-auto min-h-0">
-                  {/* Agent Slots */}
-                  {Array.from({ length: 5 }).map((_, index) => {
-                    const agent = activeAgents[index];
-                    return (
-                      <div
-                        key={index}
-                        className={`p-4 rounded-lg border-2 ${agent
-                          ? "bg-amber-200/50 border-amber-800/50"
-                          : "bg-amber-200/20 border-amber-800/20 border-dashed"
-                          }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="relative w-14 h-14 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                            <span className="text-amber-50 text-xl">🕵️</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-amber-900 mb-3 flex-shrink-0">Aktywni agenci: {activeAgentIds.length}/4</h4>
+                <div className="flex-1 overflow-hidden min-h-0">
+                  {/* Agent Slots - 2x2 Grid with portrait-oriented items filling vertical space */}
+                  <div className="grid grid-cols-2 grid-rows-2 gap-4 h-full">
+                    {Array.from({ length: 4 }).map((_, index) => {
+                      const agent = activeAgents[index];
+                      return (
+                        <div
+                          key={index}
+                          className={`rounded-lg border-2 flex flex-col items-center justify-center gap-2 p-2 ${agent
+                            ? "bg-amber-200/50 border-amber-800/50"
+                            : "bg-amber-200/20 border-amber-800/20 border-dashed"
+                            }`}
+                        >
+                          <div className="relative w-full aspect-[4/6] bg-amber-700 rounded-lg border-2 border-amber-800/50 overflow-hidden">
                             {agent ? (
-                              <div className="flex flex-col gap-1">
-                                <div className="text-sm font-semibold text-amber-900">{agent.name}</div>
-                              </div>
+                              <Image
+                                src={agent.photo}
+                                alt={agent.name}
+                                fill
+                                className="object-cover"
+                              />
                             ) : (
-                              <div className="flex flex-col gap-1">
-                                <div className="text-sm font-semibold text-amber-600/50">Pusty slot</div>
-                                <div className="text-xs text-amber-600/30">-</div>
+                              <div className="w-full h-full flex items-center justify-center">
+                                <span className="text-amber-50 text-4xl">🕵️</span>
                               </div>
                             )}
                           </div>
-                          <div className="w-[72px] flex-shrink-0"></div>
+                          {agent ? (
+                            <div className="text-xs font-semibold text-amber-900 text-center line-clamp-1">{agent.name}</div>
+                          ) : (
+                            <div className="text-xs font-semibold text-amber-600/50 text-center">Pusty slot</div>
+                          )}
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
                 <button
                   onClick={onAddAgent}
-                  disabled={activeAgentIds.length >= 5 || availableAgents.length === 0 || intelligencePoints < 15}
+                  disabled={activeAgentIds.length >= 4 || availableAgents.length === 0 || intelligencePoints < 15}
                   className="mt-4 w-full p-3 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 text-amber-50 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   + Nowy agent (15 punktów wywiadu)
