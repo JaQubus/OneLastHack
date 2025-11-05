@@ -5,7 +5,7 @@ interface ProgressBarProps {
   onComplete?: () => void;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ 
+const ProgressBar = ({ 
   duration = 480,
   onComplete = () => {}
 }) => {
