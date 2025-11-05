@@ -48,14 +48,16 @@ export default function MapPage() {
     return firstTwoAgents.map(a => a.id);
   });
 
-  // Warsaw storage location (center of map)
+  // Warsaw storage location (center of map, 59% from top)
   const WARSAW_STORAGE: Marker = {
     id: -1,
-    top: "50%",
+    top: "59%",
     left: "50%",
     title: "Magazyn - Warszawa",
     description: "Centralny magazyn odzyskanych dzieł sztuki",
   };
+  const WARSAW_START_TOP = 59; // Starting position for agents
+  const WARSAW_START_LEFT = 50;
 
   // Get active agents from activeAgentIds
   const activeAgents: Agent[] = activeAgentIds
@@ -111,6 +113,124 @@ export default function MapPage() {
     markersRef.current = markers;
   }, [markers]);
 
+  // Initialize with one bubble at game start (client-side only to avoid hydration mismatch)
+  useEffect(() => {
+    if (!isInitialized && typeof window !== 'undefined') {
+      // Get first available artwork
+      const availableArtworks = (stolenGoodsData as StolenGood[]).filter((good) => good.progress < 100);
+      if (availableArtworks.length > 0) {
+        const artwork = availableArtworks[0];
+        const initialMarkerId = Date.now();
+        const initialPosition = getRandomPositionAwayFromMarkers([]);
+        if (initialPosition) {
+          const initialMarker: Marker = {
+            id: initialMarkerId,
+            top: initialPosition.top,
+            left: initialPosition.left,
+            title: artwork.name,
+            description: `Lokalizacja: ${artwork.location}. ${artwork.description}`,
+            artworkId: artwork.id,
+          };
+          setMarkers([initialMarker]);
+          setMarkerCreationTimes((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(initialMarkerId, Date.now());
+            return newMap;
+          });
+          setIsInitialized(true);
+        }
+      } else {
+        setIsInitialized(true);
+      }
+    }
+  }, [isInitialized]);
+
+  // Auto-remove markers after 20 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setMarkers((prev) => {
+        return prev.filter((m) => {
+          if (m.id === WARSAW_STORAGE.id) return true; // Keep storage
+          const createdAt = markerCreationTimes.get(m.id);
+          if (!createdAt) return true; // Keep if no timestamp
+          return now - createdAt < 20000; // Remove after 20 seconds
+        });
+      });
+      // Clean up old timestamps
+      setMarkerCreationTimes((prev) => {
+        const newMap = new Map(prev);
+        prev.forEach((createdAt, id) => {
+          if (now - createdAt >= 20000) {
+            newMap.delete(id);
+          }
+        });
+        return newMap;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [markerCreationTimes]);
+
+  // Update retrieval tasks progress
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRetrievalTasks((prev) => {
+        const now = Date.now();
+        return prev.map((task) => {
+          const elapsed = now - task.startTime;
+          const newProgress = Math.min(100, (elapsed / task.duration) * 100);
+
+          let currentTop: number;
+          let currentLeft: number;
+          const startTop = WARSAW_START_TOP; // Start from Warsaw
+          const startLeft = WARSAW_START_LEFT;
+          const targetTop = parseFloat(task.targetTop.replace('%', ''));
+          const targetLeft = parseFloat(task.targetLeft.replace('%', ''));
+
+          let isReturning = task.isReturning || false;
+
+          if (task.failed && newProgress >= 50) {
+            if (!isReturning) isReturning = true;
+            const returnProgress = (newProgress - 50) / 50;
+            currentTop = targetTop + (startTop - targetTop) * returnProgress;
+            currentLeft = targetLeft + (startLeft - targetLeft) * returnProgress;
+          } else if (task.failed) {
+            const progressRatio = newProgress / 50;
+            currentTop = startTop + (targetTop - startTop) * progressRatio;
+            currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
+          } else {
+            const progressRatio = newProgress / 100;
+            currentTop = startTop + (targetTop - startTop) * progressRatio;
+            currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
+          }
+
+          if (newProgress >= 100 && task.progress < 100) {
+            if (!task.failed) {
+              setIntelligencePoints((prev) => prev + 25);
+              setStolenGoods((prev) =>
+                prev.map((good) =>
+                  good.id === task.artworkId ? { ...good, progress: 100 } : good
+                )
+              );
+            }
+          }
+
+          return {
+            ...task,
+            progress: newProgress,
+            currentTop: `${currentTop}%`,
+            currentLeft: `${currentLeft}%`,
+            isReturning: isReturning,
+          };
+        }).filter((task) => {
+          if (task.progress < 100) return true;
+          const completedTime = Date.now() - (task.startTime + task.duration);
+          return completedTime < 2000;
+        });
+      });
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   // Calculate failure chance
   const calculateFailureChance = (): number => {
@@ -156,8 +276,8 @@ export default function MapPage() {
       progress: 0,
       targetTop: mission.top,
       targetLeft: mission.left,
-      currentTop: "60%",
-      currentLeft: "50%",
+      currentTop: `${WARSAW_START_TOP}%`,
+      currentLeft: `${WARSAW_START_LEFT}%`,
       failed: willFail,
       failureChance: failureChance,
       isReturning: false,
@@ -381,84 +501,11 @@ export default function MapPage() {
       {/* Top Bar */}
       <TopBar />
 
-      {/* Path Lines from Storage to Mission Points - Only show for active missions */}
-      <svg className="absolute inset-0 z-5 pointer-events-none" style={{ width: '100%', height: '100%' }}>
-        {acknowledgedMissions.map((mission) => {
-          const task = retrievalTasks.find(t => t.missionId === mission.id);
-          const isActive = task && task.progress < 100;
-          // Only show path for active missions
-          if (!isActive) return null;
-
-          const startX = parseFloat(WARSAW_STORAGE.left.replace('%', ''));
-          const startY = 60; // Warsaw storage at 60%
-          const endX = parseFloat(mission.left.replace('%', ''));
-          const endY = parseFloat(mission.top.replace('%', ''));
-
-          return (
-            <line
-              key={`path-${mission.id}`}
-              x1={`${startX}%`}
-              y1={`${startY}%`}
-              x2={`${endX}%`}
-              y2={`${endY}%`}
-              stroke="rgba(251, 191, 36, 0.6)"
-              strokeWidth="3"
-              strokeDasharray="6,2"
-            />
-          );
-        })}
-      </svg>
-
-      {/* Mission Point Markers on Map - Only show artwork when mission is active */}
-      {acknowledgedMissions.map((mission) => {
-        const task = retrievalTasks.find(t => t.missionId === mission.id);
-        const isActive = task && task.progress < 100;
-
-        // Only show marker when mission is active
-        if (!isActive) return null;
-
-        const artwork = mission.artworkId
-          ? stolenGoods.find(g => g.id === mission.artworkId)
-          : null;
-        // Always default to dama.jpg if no artwork image
-        let imageSrc = "/dama.jpg";
-        if (artwork?.image && artwork.image.trim() !== "") {
-          imageSrc = artwork.image;
-        }
-
-        return (
-          <div
-            key={`mission-${mission.id}`}
-            className="absolute z-12 pointer-events-none"
-            style={{
-              top: mission.top,
-              left: mission.left,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <div className="relative animate-pulse">
-              {/* Show artwork image when mission is active */}
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-amber-600 shadow-2xl overflow-hidden">
-                <Image
-                  src={imageSrc}
-                  alt={artwork?.name || mission.title || "dama.jpg"}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600 animate-ping"></div>
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600"></div>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* Warsaw Storage Marker - 10% lower, smaller, no blinking */}
+      {/* Warsaw Storage Marker - smaller, no blinking */}
       <div
         className="absolute z-20 cursor-pointer transition-all duration-300 hover:scale-110"
         style={{
-          top: "60%", // 10% more down (was 50%)
+          top: WARSAW_STORAGE.top, // 59%
           left: WARSAW_STORAGE.left,
           transform: 'translate(-50%, -50%)',
         }}
@@ -513,6 +560,79 @@ export default function MapPage() {
           ))}
         </div>
       </div>
+
+      {/* Path Lines from Storage to Mission Points - Only show for active missions */}
+      <svg className="absolute inset-0 z-5 pointer-events-none" style={{ width: '100%', height: '100%' }}>
+        {acknowledgedMissions.map((mission) => {
+          const task = retrievalTasks.find(t => t.missionId === mission.id);
+          const isActive = task && task.progress < 100;
+          // Only show path for active missions
+          if (!isActive) return null;
+
+          const startX = parseFloat(WARSAW_STORAGE.left.replace('%', ''));
+          const startY = parseFloat(WARSAW_STORAGE.top.replace('%', ''));
+          const endX = parseFloat(mission.left.replace('%', ''));
+          const endY = parseFloat(mission.top.replace('%', ''));
+
+          return (
+            <line
+              key={`path-${mission.id}`}
+              x1={`${startX}%`}
+              y1={`${startY}%`}
+              x2={`${endX}%`}
+              y2={`${endY}%`}
+              stroke="rgba(251, 191, 36, 0.6)"
+              strokeWidth="3"
+              strokeDasharray="6,2"
+            />
+          );
+        })}
+      </svg>
+
+      {/* Mission Point Markers on Map - Only show artwork when mission is active */}
+      {acknowledgedMissions.map((mission) => {
+        const task = retrievalTasks.find(t => t.missionId === mission.id);
+        const isActive = task && task.progress < 100;
+
+        // Only show marker when mission is active
+        if (!isActive) return null;
+
+        const artwork = mission.artworkId
+          ? stolenGoods.find(g => g.id === mission.artworkId)
+          : null;
+        // Always default to dama.jpg if no artwork image
+        let imageSrc = "/dama.jpg";
+        if (artwork?.image && artwork.image.trim() !== "") {
+          imageSrc = artwork.image;
+        }
+
+        return (
+          <div
+            key={`mission-${mission.id}`}
+            className="absolute z-12 pointer-events-none"
+            style={{
+              top: mission.top,
+              left: mission.left,
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <div className="relative animate-pulse">
+              {/* Show artwork image when mission is active */}
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-amber-600 shadow-2xl overflow-hidden">
+                <Image
+                  src={imageSrc}
+                  alt={artwork?.name || mission.title || "Dzieło sztuki"}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600 animate-ping"></div>
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600"></div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
 
       {/* Agent Icons on Map (during retrieval) */}
       {retrievalTasks.map((task) => {

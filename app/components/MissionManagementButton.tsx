@@ -110,13 +110,9 @@ export default function MissionManagementButton({
                     const canStart = availableAgents.length > 0 && !missionActive;
                     
                     return (
-                      <button
+                      <div
                         key={mission.id}
-                        onClick={() => {
-                          onMissionClick(mission);
-                          setShowList(false);
-                        }}
-                        className="w-full p-3 rounded-lg border-2 border-amber-700/50 bg-amber-800/50 hover:bg-amber-800/70 transition-all text-left"
+                        className="w-full p-3 rounded-lg border-2 border-amber-700/50 bg-amber-800/50 hover:bg-amber-800/70 transition-all"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
@@ -136,13 +132,24 @@ export default function MissionManagementButton({
                                 </div>
                               </div>
                             ) : (
-                              <div className="text-xs text-amber-300">
-                                {canStart ? "Kliknij aby zobaczyć szczegóły" : "Brak dostępnych agentów"}
-                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onMissionClick(mission);
+                                  setShowList(false);
+                                }}
+                                className={`mt-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                                  canStart
+                                    ? "bg-amber-700 hover:bg-amber-600 text-amber-50 shadow-md hover:shadow-lg active:scale-95"
+                                    : "bg-amber-900/50 text-amber-400 cursor-not-allowed"
+                                }`}
+                              >
+                                {canStart ? "Zobacz szczegóły misji" : "Brak dostępnych agentów"}
+                              </button>
                             )}
                           </div>
                         </div>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
