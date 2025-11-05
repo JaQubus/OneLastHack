@@ -14,7 +14,10 @@ import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
 import PinsList from "../components/PinsList";
-import type { StolenGood, Agent, Skill } from "../types";
+import ArtGalleryModal from "../components/ArtGalleryModal";
+import MissionDetailModal from "../components/MissionDetailModal";
+import StartClockModal from "../components/StartClockModal";
+import type { StolenGood, Agent, Skill, AcknowledgedMission, RetrievalTask } from "../types";
 
 type Marker = {
   id: number;
@@ -22,6 +25,7 @@ type Marker = {
   left: string;
   title?: string;
   description?: string;
+  artworkId?: number;
 };
 
 export default function MapPage() {
@@ -30,25 +34,42 @@ export default function MapPage() {
   const [progress, setProgress] = useState(0);
   const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
   const [highlightedMarkerId, setHighlightedMarkerId] = useState<number | null>(null);
-  
-  // State for active agents in slots (start with first agent if available)
+  const [acknowledgedMissions, setAcknowledgedMissions] = useState<AcknowledgedMission[]>([]);
+  const [retrievalTasks, setRetrievalTasks] = useState<RetrievalTask[]>([]);
+  const [stolenGoods, setStolenGoods] = useState<StolenGood[]>(stolenGoodsData as StolenGood[]);
+  const [showArtGallery, setShowArtGallery] = useState(false);
+  const [selectedMission, setSelectedMission] = useState<AcknowledgedMission | null>(null);
+  const [showStartClockModal, setShowStartClockModal] = useState(true);
+  const [hasInitialBubble, setHasInitialBubble] = useState(false);
+
+  // State for active agents in slots (start with first 2 agents)
   const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
-    const firstAgent = agentsData[0];
-    return firstAgent ? [firstAgent.id] : [];
+    const firstTwoAgents = agentsData.slice(0, 2);
+    return firstTwoAgents.map(a => a.id);
   });
-  
+
+  // Warsaw storage location (center of map)
+  const WARSAW_STORAGE: Marker = {
+    id: -1,
+    top: "50%",
+    left: "50%",
+    title: "Magazyn - Warszawa",
+    description: "Centralny magazyn odzyskanych dzieł sztuki",
+  };
+
   // Get active agents from activeAgentIds
   const activeAgents: Agent[] = activeAgentIds
     .map(id => {
-      const agent = (agentsData as Agent[]).find(a => a.id === id);
-      return agent || null;
+      const agent = agentsData.find(a => a.id === id);
+      return agent ? agent as Agent : null;
     })
     .filter((agent): agent is Agent => agent !== null);
-  
+
   // Get available agents (all agents from JSON that are not already active)
-  const availableAgents: Agent[] = (agentsData as Agent[])
-    .filter(agent => !activeAgentIds.includes(agent.id));
-  
+  const availableAgents: Agent[] = agentsData
+    .filter(agent => !activeAgentIds.includes(agent.id))
+    .map(agent => agent as Agent);
+
   // Function to add next available agent
   const addNextAgent = () => {
     const agentCost = 15;
@@ -66,86 +87,268 @@ export default function MapPage() {
     if (!skill || skill.level >= skill.maxLevel || intelligencePoints < skill.cost) {
       return; // Can't upgrade
     }
-    
+
     // Deduct points
     setIntelligencePoints(prev => prev - skill.cost);
-    
+
     // Update skill level
-    setSkills(prevSkills => 
-      prevSkills.map(s => 
+    setSkills(prevSkills =>
+      prevSkills.map(s =>
         s.id === skillId ? { ...s, level: s.level + 1 } : s
       )
     );
   };
-  // start with empty markers; the scheduled job will spawn markers over time
+  const { scheduleEvery, cancelScheduled, isRunning } = useGameTime();
+
+  // Track marker creation time for 20 second auto-removal
+  const [markerCreationTimes, setMarkerCreationTimes] = useState<Map<number, number>>(new Map());
+
+  // Start with empty markers - will be populated on client side
   const [markers, setMarkers] = useState<Marker[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
   const markersRef = useRef<Marker[]>(markers);
   useEffect(() => {
     markersRef.current = markers;
   }, [markers]);
 
-  const { scheduleEvery, cancelScheduled, start, stop, reset, currentDate } = useGameTime();
-  
-  // Calculate progress based on game time (from 1939-09-01 to 1945-05-08 = ~2190 days)
-  useEffect(() => {
-    const startDate = new Date("1939-09-01");
-    const endDate = new Date("1945-05-08");
-    const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const currentDays = Math.floor((currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const newProgress = Math.min(100, Math.max(0, (currentDays / totalDays) * 100));
-    setProgress(newProgress);
-  }, [currentDate]);
 
-  // Reset progress and start timer when map page is entered, stop when leaving
-  useEffect(() => {
-    // Reset all progress-related state
-    setProgress(0);
-    setIntelligencePoints(125);
-    setMarkers([]);
-    setSelectedMarker(null);
-    setActiveAgentIds(() => {
-      const firstAgent = agentsData[0];
-      return firstAgent ? [firstAgent.id] : [];
+  // Calculate failure chance
+  const calculateFailureChance = (): number => {
+    const baseFailureChance = 30;
+    let totalReduction = 0;
+    skills.forEach((skill) => {
+      if (skill.description.includes("skuteczności misji") || skill.description.includes("ryzyko")) {
+        const reductionPerLevel = skill.description.includes("skuteczności misji")
+          ? (skill.description.includes("+10%") ? 2 : skill.description.includes("+20%") ? 4 : skill.description.includes("+30%") ? 6 : 2)
+          : (skill.description.includes("-20%") ? 4 : 2);
+        totalReduction += skill.level * reductionPerLevel;
+      }
     });
-    setSkills(skillsData as Skill[]);
-    
-    // Reset game time to initial date
-    reset();
-    
-    // Start the timer
-    start();
-    
-    return () => {
-      stop();
-    };
-  }, [start, stop, reset]);
+    return Math.max(5, baseFailureChance - totalReduction);
+  };
 
-  // Schedule an event every 30 in-game days to spawn a new marker and open its modal
+  // Start mission from mission management
+  const startMission = (missionId: number) => {
+    const mission = acknowledgedMissions.find(m => m.id === missionId);
+    if (!mission) {
+      console.error("Mission not found:", missionId);
+      return;
+    }
+
+    const busyAgentIds = retrievalTasks.filter(t => t.progress < 100).map(t => t.agentId);
+    const availableAgent = activeAgents.find(a => !busyAgentIds.includes(a.id));
+
+    if (!availableAgent) {
+      alert("Brak dostępnych agentów!");
+      return;
+    }
+
+    const failureChance = calculateFailureChance();
+    const willFail = Math.random() * 100 < failureChance;
+
+    const newTask: RetrievalTask = {
+      id: Date.now(),
+      missionId: mission.id,
+      agentId: availableAgent.id,
+      artworkId: mission.artworkId || 0,
+      startTime: Date.now(),
+      duration: 90000, // 90 seconds
+      progress: 0,
+      targetTop: mission.top,
+      targetLeft: mission.left,
+      currentTop: "60%",
+      currentLeft: "50%",
+      failed: willFail,
+      failureChance: failureChance,
+      isReturning: false,
+    };
+
+    setRetrievalTasks((prev) => [...prev, newTask]);
+  };
+
+  // Collect marker when clicked - gives intelligence points and adds to missions
+  const collectMarker = (marker: Marker) => {
+    // Check if already collected
+    if (acknowledgedMissions.some(m => m.markerId === marker.id)) return;
+
+    // Give intelligence points for collecting
+    setIntelligencePoints((prev) => prev + 10); // 10 points for collecting a bubble
+
+    // Find artwork if marker has artworkId
+    const artwork = marker.artworkId
+      ? stolenGoods.find(g => g.id === marker.artworkId)
+      : null;
+
+    // Add to acknowledged missions (possible missions)
+    const newMission: AcknowledgedMission = {
+      id: Date.now(),
+      markerId: marker.id,
+      title: marker.title || `Misja #${marker.id}`,
+      description: marker.description || "Nowa misja odkryta",
+      top: marker.top,
+      left: marker.left,
+      artworkId: marker.artworkId,
+      acknowledgedAt: Date.now(),
+    };
+
+    setAcknowledgedMissions((prev) => [...prev, newMission]);
+
+    // Remove marker from map after collection
+    setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
+    setMarkerCreationTimes((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(marker.id);
+      return newMap;
+    });
+  };
+
+  // Update retrieval tasks progress and agent position in real-time
   useEffect(() => {
-    const id = scheduleEvery(30, () => {
-      // pick a random template from the JSON titles/descriptions
-      const pool = initialMarkers as { id: number; top: string; left: string; title: string; description: string }[];
-      const tpl = pool[Math.floor(Math.random() * pool.length)] || {};
-      
-      // Get current markers to check distance
+    const interval = setInterval(() => {
+      setRetrievalTasks((prev) => {
+        const now = Date.now();
+        return prev.map((task) => {
+          const elapsed = now - task.startTime;
+          const newProgress = Math.min(100, (elapsed / task.duration) * 100);
+
+          let currentTop: number;
+          let currentLeft: number;
+          const startTop = 60; // Warsaw storage at 60%
+          const startLeft = 50;
+          const targetTop = parseFloat(task.targetTop.replace('%', ''));
+          const targetLeft = parseFloat(task.targetLeft.replace('%', ''));
+
+          let isReturning = task.isReturning || false;
+
+          if (task.failed && newProgress >= 50) {
+            if (!isReturning) isReturning = true;
+            const returnProgress = (newProgress - 50) / 50;
+            currentTop = targetTop + (startTop - targetTop) * returnProgress;
+            currentLeft = targetLeft + (startLeft - targetLeft) * returnProgress;
+          } else if (task.failed) {
+            const progressRatio = newProgress / 50;
+            currentTop = startTop + (targetTop - startTop) * progressRatio;
+            currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
+          } else {
+            const progressRatio = newProgress / 100;
+            currentTop = startTop + (targetTop - startTop) * progressRatio;
+            currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
+          }
+
+          if (newProgress >= 100 && task.progress < 100) {
+            if (!task.failed) {
+              setIntelligencePoints((prev) => prev + 25);
+              setStolenGoods((prev) =>
+                prev.map((good) =>
+                  good.id === task.artworkId ? { ...good, progress: 100 } : good
+                )
+              );
+            }
+          }
+
+          return {
+            ...task,
+            progress: newProgress,
+            currentTop: `${currentTop}%`,
+            currentLeft: `${currentLeft}%`,
+            isReturning: isReturning,
+          };
+        }).filter((task) => {
+          if (task.progress < 100) return true;
+          const completedTime = Date.now() - (task.startTime + task.duration);
+          return completedTime < 2000;
+        });
+      });
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Spawn initial bubble when clock starts for the first time
+  useEffect(() => {
+    if (isRunning && !hasInitialBubble) {
+      const availableArtworks = stolenGoods.filter((good) => good.progress < 100);
+
+      if (availableArtworks.length > 0) {
+        const artwork = availableArtworks[0];
+        const currentMarkers = markersRef.current;
+        const newPosition = getRandomPositionAwayFromMarkers(currentMarkers);
+
+        if (newPosition) {
+          const markerId = Date.now();
+          const newMarker: Marker = {
+            id: markerId,
+            top: newPosition.top,
+            left: newPosition.left,
+            title: artwork.name,
+            description: `Lokalizacja: ${artwork.location}. ${artwork.description}`,
+            artworkId: artwork.id,
+          };
+          setMarkers((prev) => [...prev, newMarker]);
+          setMarkerCreationTimes((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(markerId, Date.now());
+            return newMap;
+          });
+          setHasInitialBubble(true);
+        }
+      }
+    }
+  }, [isRunning, hasInitialBubble, stolenGoods]);
+
+  // Schedule an event every 90 in-game days to spawn a new marker (3x slower)
+  useEffect(() => {
+    const id = scheduleEvery(90, () => {
+      // Pick a random stolen good that hasn't been fully recovered
+      const availableArtworks = stolenGoods.filter((good) => good.progress < 100);
+
+      if (availableArtworks.length === 0) {
+        const pool = initialMarkers as { id: number; top: string; left: string; title: string; description: string }[];
+        const tpl = pool[Math.floor(Math.random() * pool.length)] || {};
+        const currentMarkers = markersRef.current;
+        const newPosition = getRandomPositionAwayFromMarkers(currentMarkers);
+
+        if (newPosition) {
+          const markerId = Date.now();
+          const newMarker: Marker = {
+            id: markerId,
+            top: newPosition.top,
+            left: newPosition.left,
+            title: tpl.title ?? `Wydarzenie`,
+            description: tpl.description ?? "Nowe zdarzenie wykryte przez siatkę wywiadowczą.",
+          };
+          setMarkers((prev) => [...prev, newMarker]);
+          // Track creation time for 20 second timer
+          setMarkerCreationTimes((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(markerId, Date.now());
+            return newMap;
+          });
+        }
+        return;
+      }
+
+      const artwork = availableArtworks[Math.floor(Math.random() * availableArtworks.length)];
       const currentMarkers = markersRef.current;
-      
-      // Find a position that's not too close to existing markers
       const newPosition = getRandomPositionAwayFromMarkers(currentMarkers);
-      
+
       if (newPosition) {
+        const markerId = Date.now();
         const newMarker: Marker = {
-          id: Date.now(),
+          id: markerId,
           top: newPosition.top,
           left: newPosition.left,
-          title: tpl.title ?? `Wydarzenie`,
-          description: tpl.description ?? "Nowe zdarzenie wykryte przez siatkę wywiadowczą.",
+          title: artwork.name,
+          description: `Lokalizacja: ${artwork.location}. ${artwork.description}`,
+          artworkId: artwork.id,
         };
-
-        // add marker (do NOT open modal automatically)
         setMarkers((prev) => [...prev, newMarker]);
+        // Track creation time for 20 second timer
+        setMarkerCreationTimes((prev) => {
+          const newMap = new Map(prev);
+          newMap.set(markerId, Date.now());
+          return newMap;
+        });
       }
-      // If we couldn't find a valid position, skip this spawn (prevents infinite loops)
     });
 
     return () => cancelScheduled(id);
@@ -153,8 +356,6 @@ export default function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Get active stolen good (first one with progress > 0)
-  const activeStolenGood = (stolenGoodsData as StolenGood[]).find((good: StolenGood) => good.progress > 0) || stolenGoodsData[0] as StolenGood;
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
@@ -180,22 +381,117 @@ export default function MapPage() {
       {/* Top Bar */}
       <TopBar />
 
+      {/* Path Lines from Storage to Mission Points - Only show for active missions */}
+      <svg className="absolute inset-0 z-5 pointer-events-none" style={{ width: '100%', height: '100%' }}>
+        {acknowledgedMissions.map((mission) => {
+          const task = retrievalTasks.find(t => t.missionId === mission.id);
+          const isActive = task && task.progress < 100;
+          // Only show path for active missions
+          if (!isActive) return null;
+
+          const startX = parseFloat(WARSAW_STORAGE.left.replace('%', ''));
+          const startY = 60; // Warsaw storage at 60%
+          const endX = parseFloat(mission.left.replace('%', ''));
+          const endY = parseFloat(mission.top.replace('%', ''));
+
+          return (
+            <line
+              key={`path-${mission.id}`}
+              x1={`${startX}%`}
+              y1={`${startY}%`}
+              x2={`${endX}%`}
+              y2={`${endY}%`}
+              stroke="rgba(251, 191, 36, 0.6)"
+              strokeWidth="3"
+              strokeDasharray="6,2"
+            />
+          );
+        })}
+      </svg>
+
+      {/* Mission Point Markers on Map - Only show artwork when mission is active */}
+      {acknowledgedMissions.map((mission) => {
+        const task = retrievalTasks.find(t => t.missionId === mission.id);
+        const isActive = task && task.progress < 100;
+
+        // Only show marker when mission is active
+        if (!isActive) return null;
+
+        const artwork = mission.artworkId
+          ? stolenGoods.find(g => g.id === mission.artworkId)
+          : null;
+        // Always default to dama.jpg if no artwork image
+        let imageSrc = "/dama.jpg";
+        if (artwork?.image && artwork.image.trim() !== "") {
+          imageSrc = artwork.image;
+        }
+
+        return (
+          <div
+            key={`mission-${mission.id}`}
+            className="absolute z-12 pointer-events-none"
+            style={{
+              top: mission.top,
+              left: mission.left,
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <div className="relative animate-pulse">
+              {/* Show artwork image when mission is active */}
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-amber-600 shadow-2xl overflow-hidden">
+                <Image
+                  src={imageSrc}
+                  alt={artwork?.name || mission.title || "dama.jpg"}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600 animate-ping"></div>
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600"></div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Warsaw Storage Marker - 10% lower, smaller, no blinking */}
+      <div
+        className="absolute z-20 cursor-pointer transition-all duration-300 hover:scale-110"
+        style={{
+          top: "60%", // 10% more down (was 50%)
+          left: WARSAW_STORAGE.left,
+          transform: 'translate(-50%, -50%)',
+        }}
+        onClick={() => setShowArtGallery(true)}
+        title={WARSAW_STORAGE.title}
+      >
+        <div className="relative w-12 h-12 sm:w-14 sm:h-14">
+          <div className="absolute inset-0 bg-amber-800 rounded-full border-2 border-amber-600 shadow-2xl flex items-center justify-center">
+            <span className="text-xl sm:text-2xl">🏛️</span>
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Bar */}
       <BottomBar
-        activeStolenGood={activeStolenGood}
-        intelligencePoints={intelligencePoints}
+        acknowledgedMissions={acknowledgedMissions}
         activeAgents={activeAgents}
+        retrievalTasks={retrievalTasks}
+        stolenGoods={stolenGoods}
+        intelligencePoints={intelligencePoints}
         activeAgentIds={activeAgentIds}
         availableAgents={availableAgents}
         skills={skills}
         overallProgress={progress}
         onAddAgent={addNextAgent}
         onLevelUpSkill={levelUpSkill}
+        onStartMission={startMission}
+        onMissionClick={setSelectedMission}
       />
 
       {/* Clickable markers overlay */}
       <div className="absolute inset-0 z-10 pointer-events-none">
-          <div className="pointer-events-auto">
+        <div className="pointer-events-auto">
           {/* Example marker positions loaded from JSON */}
           {markers.map((m) => (
             <MapMarker
@@ -205,7 +501,11 @@ export default function MapPage() {
               left={m.left}
               onClick={(id) => {
                 const found = markers.find((x) => x.id === id) || null;
-                setSelectedMarker(found);
+                if (found && found.id !== WARSAW_STORAGE.id) {
+                  // Collect the bubble - gives points and adds to missions
+                  collectMarker(found);
+                  setSelectedMarker(null); // Close modal immediately
+                }
               }}
               title={m.title}
               isAnimating={highlightedMarkerId === m.id}
@@ -214,18 +514,80 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* Event Info Modal - moved to component */}
-      {selectedMarker != null && (
-        <EventModal
-          marker={selectedMarker}
-          onClose={() => {
-            if (selectedMarker) {
-              setMarkers((prev) => prev.filter((m) => m.id !== selectedMarker.id));
-            }
-            setSelectedMarker(null);
-          }}
+      {/* Agent Icons on Map (during retrieval) */}
+      {retrievalTasks.map((task) => {
+        const agent = activeAgents.find((a) => a.id === task.agentId);
+        return (
+          <div
+            key={task.id}
+            className="absolute z-15 transition-all duration-100"
+            style={{
+              top: task.currentTop,
+              left: task.currentLeft,
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <div className={`text-3xl ${task.failed ? 'animate-bounce' : 'animate-pulse'}`}>
+              {task.failed ? '😞' : '🚶'}
+            </div>
+            {task.progress >= 50 && task.failed && !task.isReturning && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-red-800/90 text-red-50 px-2 py-1 rounded whitespace-nowrap">
+                ❌ Misja Nieudana
+              </div>
+            )}
+            {task.progress >= 100 && task.failed && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-amber-800/90 text-amber-50 px-2 py-1 rounded whitespace-nowrap">
+                Powrót do Bazy
+              </div>
+            )}
+            {task.progress >= 100 && !task.failed && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-green-800/90 text-green-50 px-2 py-1 rounded whitespace-nowrap">
+                ✓ Odzyskano
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Event Info Modal - removed, markers are collected immediately on click */}
+
+      {/* Art Gallery Modal */}
+      {showArtGallery && (
+        <ArtGalleryModal
+          stolenGoods={stolenGoods}
+          onClose={() => setShowArtGallery(false)}
         />
       )}
+
+      {/* Start Clock Modal */}
+      {showStartClockModal && !isRunning && (
+        <StartClockModal onClose={() => setShowStartClockModal(false)} />
+      )}
+
+      {/* Mission Detail Modal */}
+      {selectedMission && (() => {
+        const task = retrievalTasks.find(t => t.missionId === selectedMission.id) || null;
+        const agent = task ? activeAgents.find(a => a.id === task.agentId) || null : null;
+        const artwork = selectedMission.artworkId
+          ? stolenGoods.find(g => g.id === selectedMission.artworkId) || null
+          : null;
+        const busyAgentIds = retrievalTasks.filter(t => t.progress < 100).map(t => t.agentId);
+        const availableAgentsForMission = activeAgents.filter(a => !busyAgentIds.includes(a.id));
+        const canStart = availableAgentsForMission.length > 0 && !task;
+
+        return (
+          <MissionDetailModal
+            mission={selectedMission}
+            onClose={() => setSelectedMission(null)}
+            retrievalTask={task}
+            agent={agent}
+            artwork={artwork}
+            onStartMission={startMission}
+            availableAgents={availableAgentsForMission}
+            canStart={canStart}
+          />
+        );
+      })()}
     </div>
   );
 }

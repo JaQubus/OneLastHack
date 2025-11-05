@@ -15,10 +15,16 @@ type Props = {
 };
 
 export default function MapMarker({ id, top, left, title, onClick, className, isAnimating = false }: Props) {
-  // Clamp position to ensure marker is always in safe zone
-  const safePosition = clampMarkerPosition(top, left);
   const [isClicking, setIsClicking] = useState(false);
   const [shouldPulse, setShouldPulse] = useState(true);
+  const [safePosition, setSafePosition] = useState({ top, left });
+
+  // Clamp position on client side only to avoid hydration mismatch
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSafePosition(clampMarkerPosition(top, left));
+    }
+  }, [top, left]);
 
   // Handle external animation trigger (from PinsList click)
   useEffect(() => {
@@ -46,8 +52,8 @@ export default function MapMarker({ id, top, left, title, onClick, className, is
   return (
     <button
       className={`absolute cursor-pointer transition-all duration-300 ${className ?? ""}`}
-      style={{ 
-        top: safePosition.top, 
+      style={{
+        top: safePosition.top,
         left: safePosition.left,
         transform: isClicking ? 'scale(1.5)' : 'scale(1)',
         filter: isClicking ? 'brightness(1.3)' : 'brightness(1)',
@@ -63,8 +69,8 @@ export default function MapMarker({ id, top, left, title, onClick, className, is
           fill
           className="object-cover border-2 border-amber-800 shadow-2xl hover:shadow-amber-500/50 transition-all"
           style={{
-            boxShadow: isClicking 
-              ? '0 0 20px rgba(251, 191, 36, 0.8), 0 0 40px rgba(251, 191, 36, 0.6)' 
+            boxShadow: isClicking
+              ? '0 0 20px rgba(251, 191, 36, 0.8), 0 0 40px rgba(251, 191, 36, 0.6)'
               : '0 4px 12px rgba(0, 0, 0, 0.3)',
           }}
         />

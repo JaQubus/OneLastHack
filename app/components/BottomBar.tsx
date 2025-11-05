@@ -1,38 +1,53 @@
 "use client";
 
-import StolenGoodButton from "./StolenGoodButton";
+import MissionManagementButton from "./MissionManagementButton";
 import SiatkaWywiadowczaButton from "./SiatkaWywiadowczaButton";
 import ProgressBar from "./ProgressBar";
-import type { StolenGood, Agent, Skill } from "../types";
+import type { Agent, Skill, AcknowledgedMission, RetrievalTask, StolenGood } from "../types";
 
 interface BottomBarProps {
-  activeStolenGood: StolenGood;
-  intelligencePoints: number;
+  acknowledgedMissions: AcknowledgedMission[];
   activeAgents: Agent[];
+  retrievalTasks: RetrievalTask[];
+  stolenGoods: StolenGood[];
+  intelligencePoints: number;
   activeAgentIds: number[];
   availableAgents: Agent[];
   skills: Skill[];
   overallProgress: number;
   onAddAgent: () => void;
   onLevelUpSkill: (skillId: number) => void;
+  onStartMission: (missionId: number) => void;
+  onMissionClick: (mission: AcknowledgedMission) => void;
 }
 
 export default function BottomBar({
-  activeStolenGood,
-  intelligencePoints,
+  acknowledgedMissions,
   activeAgents,
+  retrievalTasks,
+  stolenGoods,
+  intelligencePoints,
   activeAgentIds,
   availableAgents,
   skills,
   overallProgress,
   onAddAgent,
   onLevelUpSkill,
+  onStartMission,
+  onMissionClick,
 }: BottomBarProps) {
   return (
     <footer className="absolute bottom-0 left-0 right-0 z-20 bg-amber-900/50 backdrop-blur-sm border-t-2 border-amber-800/50 shadow-lg">
       <div className="container mx-auto px-4 py-4 sm:px-6">
         <div className="flex items-stretch justify-between gap-4">
-          <StolenGoodButton stolenGood={activeStolenGood} />
+          <MissionManagementButton
+            acknowledgedMissions={acknowledgedMissions}
+            activeAgents={activeAgents}
+            retrievalTasks={retrievalTasks}
+            stolenGoods={stolenGoods}
+            onStartMission={onStartMission}
+            onMissionClick={onMissionClick}
+          />
           
           <SiatkaWywiadowczaButton
             intelligencePoints={intelligencePoints}
@@ -53,4 +68,3 @@ export default function BottomBar({
     </footer>
   );
 }
-
