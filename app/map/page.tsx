@@ -32,7 +32,7 @@ const RECOVERED_ARTWORKS_KEY = "recoveredArtworks";
 
 export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
-  const [intelligencePoints, setIntelligencePoints] = useState(125);
+  const [intelligencePoints, setIntelligencePoints] = useState(50);
   const [progress, setProgress] = useState(0);
   const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
   const [highlightedMarkerId, setHighlightedMarkerId] = useState<number | null>(null);
@@ -64,10 +64,12 @@ export default function MapPage() {
     reset();
   }, []); // Empty deps - only run on mount
 
-  // State for active agents in slots (start with first agent)
+  // State for active agents in slots (start with random agent)
   const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
-    const firstAgent = agentsData.slice(0, 1);
-    return firstAgent.map(a => a.id);
+    // Pick a random agent to start with
+    const randomIndex = Math.floor(Math.random() * agentsData.length);
+    const randomAgent = agentsData[randomIndex];
+    return [randomAgent.id];
   });
 
   // Warsaw storage location (center of map, 59% from top)
@@ -231,7 +233,9 @@ export default function MapPage() {
       // Use stolenGoods from state (not stolenGoodsData) to respect current session state
       const availableArtworks = stolenGoods.filter((good) => good.progress < 100 && !usedArtworkIds.has(good.id));
       if (availableArtworks.length > 0) {
-        const artwork = availableArtworks[0];
+        // Pick a random artwork for initial bubble
+        const randomIndex = Math.floor(Math.random() * availableArtworks.length);
+        const artwork = availableArtworks[randomIndex];
         const initialMarkerId = Date.now();
         const initialPosition = getRandomPositionAwayFromMarkers([]);
         if (initialPosition) {
@@ -340,87 +344,6 @@ export default function MapPage() {
     return () => clearInterval(interval);
   }, [markerCreationTimes, isRunning]);
 
-  // Update retrieval tasks progress
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRetrievalTasks((prev) => {
-        const now = Date.now();
-        return prev.map((task) => {
-          const elapsed = now - task.startTime;
-          const newProgress = Math.min(100, (elapsed / task.duration) * 100);
-
-          let currentTop: number;
-          let currentLeft: number;
-          const startTop = WARSAW_START_TOP; // Start from Warsaw
-          const startLeft = WARSAW_START_LEFT;
-          const targetTop = parseFloat(task.targetTop.replace('%', ''));
-          const targetLeft = parseFloat(task.targetLeft.replace('%', ''));
-
-          let isReturning = task.isReturning || false;
-
-          if (task.failed && newProgress >= 50) {
-            if (!isReturning) isReturning = true;
-            const returnProgress = (newProgress - 50) / 50;
-            currentTop = targetTop + (startTop - targetTop) * returnProgress;
-            currentLeft = targetLeft + (startLeft - targetLeft) * returnProgress;
-          } else if (task.failed) {
-            const progressRatio = newProgress / 50;
-            currentTop = startTop + (targetTop - startTop) * progressRatio;
-            currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
-          } else {
-            const progressRatio = newProgress / 100;
-            currentTop = startTop + (targetTop - startTop) * progressRatio;
-            currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
-          }
-
-          if (newProgress >= 100 && task.progress < 100) {
-            if (!task.failed) {
-              setIntelligencePoints((prev) => prev + 25);
-              setStolenGoods((prev) =>
-                prev.map((good) =>
-                  good.id === task.artworkId ? { ...good, progress: 100 } : good
-                )
-              );
-              // Track artwork as recovered in current session
-              setRecoveredInSession((prev) => new Set(prev).add(task.artworkId));
-              // Decrease overall progress by 3% when mission succeeds (or reset to 0 if < 3%)
-              setProgress((prev) => {
-                const newProgress = prev >= 3 ? prev - 3 : 0;
-                return Math.max(0, newProgress);
-              });
-              // Save recovered artwork to localStorage
-              if (typeof window !== "undefined") {
-                try {
-                  const stored = localStorage.getItem(RECOVERED_ARTWORKS_KEY);
-                  const recoveredIds = stored ? JSON.parse(stored) as number[] : [];
-                  if (!recoveredIds.includes(task.artworkId)) {
-                    recoveredIds.push(task.artworkId);
-                    localStorage.setItem(RECOVERED_ARTWORKS_KEY, JSON.stringify(recoveredIds));
-                  }
-                } catch (e) {
-                  console.error("Failed to save recovered artwork:", e);
-                }
-              }
-            }
-          }
-
-          return {
-            ...task,
-            progress: newProgress,
-            currentTop: `${currentTop}%`,
-            currentLeft: `${currentLeft}%`,
-            isReturning: isReturning,
-          };
-        }).filter((task) => {
-          if (task.progress < 100) return true;
-          const completedTime = Date.now() - (task.startTime + task.duration);
-          return completedTime < 2000;
-        });
-      });
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
-
   // Calculate failure chance
   const calculateFailureChance = (): number => {
     const baseFailureChance = 30;
@@ -461,7 +384,7 @@ export default function MapPage() {
       agentId: availableAgent.id,
       artworkId: mission.artworkId || 0,
       startTime: Date.now(),
-      duration: 90000, // 90 seconds
+      duration: Math.floor(45000 + Math.random() * 30000), // Random 45-75 seconds (1.5x faster, but randomized)
       progress: 0,
       targetTop: mission.top,
       targetLeft: mission.left,
@@ -486,13 +409,15 @@ export default function MapPage() {
     if (marker.artworkId) {
       const artwork = stolenGoods.find(g => g.id === marker.artworkId);
       if (artwork && artwork.progress === 100) {
-        // Still remove the marker from map but don't create mission
-        setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
-        setMarkerCreationTimes((prev) => {
-          const newMap = new Map(prev);
-          newMap.delete(marker.id);
-          return newMap;
-        });
+        // Delay removal to allow animation to play
+        setTimeout(() => {
+          setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
+          setMarkerCreationTimes((prev) => {
+            const newMap = new Map(prev);
+            newMap.delete(marker.id);
+            return newMap;
+          });
+        }, 800); // Wait for animation to complete
         return;
       }
     }
@@ -532,13 +457,15 @@ export default function MapPage() {
       },
     ]);
 
-    // Remove marker from map after collection
-    setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
-    setMarkerCreationTimes((prev) => {
-      const newMap = new Map(prev);
-      newMap.delete(marker.id);
-      return newMap;
-    });
+    // Delay removal to allow pop animation to complete (800ms)
+    setTimeout(() => {
+      setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
+      setMarkerCreationTimes((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(marker.id);
+        return newMap;
+      });
+    }, 800);
   };
 
   // Update retrieval tasks progress and agent position in real-time
@@ -560,13 +487,14 @@ export default function MapPage() {
           let isReturning = task.isReturning || false;
 
           // Simple linear movement: A to B (0-50%), then B to A (50-100%)
+          // This applies to both successful and failed missions
           if (newProgress <= 50) {
-            // Going from A (start) to B (target) - pure linear interpolation
+            // Going from A (start/Warsaw) to B (target/mission location) - pure linear interpolation
             const t = newProgress / 50;
             currentTop = startTop + (targetTop - startTop) * t;
             currentLeft = startLeft + (targetLeft - startLeft) * t;
           } else {
-            // Returning from B (target) to A (start) - pure linear interpolation
+            // Returning from B (target/mission location) to A (start/Warsaw) - pure linear interpolation
             isReturning = true;
             const t = (newProgress - 50) / 50;
             currentTop = targetTop + (startTop - targetTop) * t;
@@ -622,7 +550,21 @@ export default function MapPage() {
               if (typeof window !== "undefined") {
                 try {
                   const stored = localStorage.getItem(RECOVERED_ARTWORKS_KEY);
-                  const recoveredIds = stored ? JSON.parse(stored) as number[] : [];
+                  let recoveredIds: number[] = [];
+                  if (stored) {
+                    try {
+                      recoveredIds = JSON.parse(stored) as number[];
+                      // Validate that it's actually an array
+                      if (!Array.isArray(recoveredIds)) {
+                        recoveredIds = [];
+                      }
+                    } catch (parseError) {
+                      // If parse fails, clear corrupted data and start fresh
+                      console.warn("Corrupted localStorage data, clearing:", parseError);
+                      localStorage.removeItem(RECOVERED_ARTWORKS_KEY);
+                      recoveredIds = [];
+                    }
+                  }
                   if (!recoveredIds.includes(task.artworkId)) {
                     recoveredIds.push(task.artworkId);
                     localStorage.setItem(RECOVERED_ARTWORKS_KEY, JSON.stringify(recoveredIds));
@@ -695,7 +637,9 @@ export default function MapPage() {
       const availableArtworks = stolenGoods.filter((good) => good.progress < 100 && !usedArtworkIds.has(good.id));
 
       if (availableArtworks.length > 0) {
-        const artwork = availableArtworks[0];
+        // Pick a random artwork for initial bubble
+        const randomIndex = Math.floor(Math.random() * availableArtworks.length);
+        const artwork = availableArtworks[randomIndex];
         const currentMarkers = markersRef.current;
         const newPosition = getRandomPositionAwayFromMarkers(currentMarkers);
 
@@ -930,13 +874,16 @@ export default function MapPage() {
         })}
       </svg>
 
-      {/* Mission Point Markers on Map - Only show artwork when mission is active */}
+      {/* Mission Point Markers on Map - Only show artwork when mission is active and agent hasn't retrieved it yet */}
       {acknowledgedMissions.map((mission) => {
         const task = retrievalTasks.find(t => t.missionId === mission.id);
         const isActive = task && task.progress < 100;
 
-        // Only show marker when mission is active
-        if (!isActive) return null;
+        // Only show marker when mission is active AND agent hasn't retrieved the artwork yet
+        // Hide the mission point marker when agent is returning with artwork (after 50% for successful missions)
+        const isReturningWithArtwork = task && !task.failed && task.progress >= 50 && task.isReturning;
+
+        if (!isActive || isReturningWithArtwork) return null;
 
         const artwork = mission.artworkId
           ? stolenGoods.find(g => g.id === mission.artworkId)
@@ -958,7 +905,7 @@ export default function MapPage() {
             }}
           >
             <div className="relative">
-              {/* Show artwork image when mission is active */}
+              {/* Show artwork image when mission is active and agent is going to get it */}
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-amber-600 shadow-2xl overflow-hidden">
                 <Image
                   src={imageSrc}
