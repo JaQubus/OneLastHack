@@ -77,7 +77,7 @@ export default function StartClockModal({ onClose }: StartClockModalProps) {
           <div className="pt-4">
             <button
               onClick={handleStart}
-              className="px-8 py-4 bg-amber-700 hover:bg-amber-800 text-amber-50 text-2xl font-bold uppercase tracking-wider rounded-lg shadow-xl transition-all duration-300 active:scale-95 border-2 border-amber-600"
+              className="px-8 py-4 bg-amber-700 hover:bg-amber-800 text-amber-50 text-2xl font-bold uppercase tracking-wider rounded-lg shadow-xl transition-all duration-300 active:scale-95 border-2 border-amber-600 cursor-pointer"
             >
               ▶ Rozpocznij Grę
             </button>

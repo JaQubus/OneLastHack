@@ -33,7 +33,7 @@ export default function SiatkaWywiadowczaButton({
           onClick={() => {
             setShowMenu(!showMenu);
           }}
-          className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center"
+          className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center cursor-pointer"
         >
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden">
@@ -64,7 +64,7 @@ export default function SiatkaWywiadowczaButton({
               <h3 className="font-bold text-amber-900 text-xl">Siatka Wywiadowcza</h3>
               <button
                 onClick={() => setShowMenu(false)}
-                className="btn btn-sm btn-ghost text-amber-900 hover:bg-amber-200/50"
+                className="btn btn-sm btn-ghost text-amber-900 hover:bg-amber-200/50 cursor-pointer"
               >
                 ✕
               </button>

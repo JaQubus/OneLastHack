@@ -82,7 +82,7 @@ export default function MissionManagementButton({
         onClick={() => {
           setShowList(!showList);
         }}
-        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center justify-center"
+        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center justify-center cursor-pointer"
       >
         <div className="flex flex-col items-center gap-1">
           <span className="text-sm font-semibold text-amber-50">Zarządzanie Misjami</span>
@@ -111,7 +111,7 @@ export default function MissionManagementButton({
               <h3 className="font-bold text-amber-50 text-lg">Zarządzanie Misjami</h3>
               <button
                 onClick={() => setShowList(false)}
-                className="btn btn-sm btn-ghost text-amber-50 hover:bg-amber-800/50"
+                className="btn btn-sm btn-ghost text-amber-50 hover:bg-amber-800/50 cursor-pointer"
               >
                 ✕
               </button>
@@ -140,7 +140,7 @@ export default function MissionManagementButton({
                           onMissionClick(mission);
                           setShowList(false);
                         }}
-                        className="w-full p-3 rounded-lg border-2 border-amber-700/50 bg-amber-800/50 hover:bg-amber-800/70 transition-all text-left"
+                        className="w-full p-3 rounded-lg border-2 border-amber-700/50 bg-amber-800/50 hover:bg-amber-800/70 transition-all text-left cursor-pointer"
                       >
                         <div className="flex items-start justify-between gap-3">
                           {/* Artwork Image */}

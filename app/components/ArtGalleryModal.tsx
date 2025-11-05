@@ -29,7 +29,7 @@ export default function ArtGalleryModal({ stolenGoods, onClose }: Props) {
             <h3 className="font-bold text-amber-900 text-2xl">Magazyn - Warszawa</h3>
             <button
               onClick={onClose}
-              className="btn btn-sm btn-ghost text-amber-900 hover:bg-amber-200/50"
+              className="btn btn-sm btn-ghost text-amber-900 hover:bg-amber-200/50 cursor-pointer cursor-pointer"
             >
               ✕
             </button>

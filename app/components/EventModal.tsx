@@ -33,7 +33,7 @@ export default function EventModal({ marker, onClose }: Props) {
             <h3 className="font-bold text-amber-900 text-xl">{marker.title ?? "Zdarzenie na mapie"}</h3>
             <button
               onClick={onClose}
-              className="btn btn-sm btn-ghost text-amber-900 hover:bg-amber-200/50"
+              className="btn btn-sm btn-ghost text-amber-900 hover:bg-amber-200/50 cursor-pointer"
             >
               ✕
             </button>

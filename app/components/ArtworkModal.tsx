@@ -69,7 +69,7 @@ export default function ArtworkModal({ artwork, onClose }: Props) {
             <h2 className="font-bold text-amber-900 text-2xl sm:text-3xl">{artwork.title}</h2>
             <button
               onClick={onClose}
-              className="btn btn-sm btn-circle btn-ghost text-amber-900 hover:bg-amber-200/50 text-xl"
+              className="btn btn-sm btn-circle btn-ghost text-amber-900 hover:bg-amber-200/50 text-xl cursor-pointer"
             >
               ✕
             </button>

@@ -64,7 +64,7 @@ export default function MissionDetailModal({
             <h3 className="font-bold text-amber-900 text-3xl">{mission.title}</h3>
             <button
               onClick={onClose}
-              className="text-amber-900 hover:text-amber-700 text-4xl font-bold leading-none"
+              className="text-amber-900 hover:text-amber-700 text-4xl font-bold leading-none cursor-pointer"
             >
               ×
             </button>
