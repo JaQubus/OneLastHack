@@ -30,12 +30,8 @@ export default function MissionDetailModal({
 
   const isMissionActive = retrievalTask !== null && retrievalTask.progress < 100;
   const [currentProgress, setCurrentProgress] = useState(retrievalTask?.progress || 0);
-  const [agentPosition, setAgentPosition] = useState(retrievalTask ? {
-    top: parseFloat(retrievalTask.currentTop.replace('%', '')),
-    left: parseFloat(retrievalTask.currentLeft.replace('%', '')),
-  } : null);
 
-  // Update agent position in real-time
+  // Update mission progress in real-time
   useEffect(() => {
     if (!isMissionActive || !retrievalTask) return;
 
@@ -44,31 +40,7 @@ export default function MissionDetailModal({
       const elapsed = now - retrievalTask.startTime;
       const newProgress = Math.min(100, (elapsed / retrievalTask.duration) * 100);
 
-      // Calculate agent position
-      const startTop = 59;
-      const startLeft = 50;
-      const targetTop = parseFloat(retrievalTask.targetTop.replace('%', ''));
-      const targetLeft = parseFloat(retrievalTask.targetLeft.replace('%', ''));
-
-      let currentTop: number;
-      let currentLeft: number;
-
-      if (retrievalTask.failed && newProgress >= 50) {
-        const returnProgress = (newProgress - 50) / 50;
-        currentTop = targetTop + (startTop - targetTop) * returnProgress;
-        currentLeft = targetLeft + (startLeft - targetLeft) * returnProgress;
-      } else if (retrievalTask.failed) {
-        const progressRatio = newProgress / 50;
-        currentTop = startTop + (targetTop - startTop) * progressRatio;
-        currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
-      } else {
-        const progressRatio = newProgress / 100;
-        currentTop = startTop + (targetTop - startTop) * progressRatio;
-        currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
-      }
-
       setCurrentProgress(newProgress);
-      setAgentPosition({ top: currentTop, left: currentLeft });
     }, 100);
 
     return () => clearInterval(interval);
@@ -76,173 +48,83 @@ export default function MissionDetailModal({
 
   const progress = currentProgress;
 
-  // Calculate path from Warsaw (59%, 50%) to mission location
-  const startTop = 59;
-  const startLeft = 50;
-  const targetTop = parseFloat(mission.top.replace('%', ''));
-  const targetLeft = parseFloat(mission.left.replace('%', ''));
-
   return (
     typeof window !== 'undefined' && createPortal(
       <>
         <div
-          className="fixed inset-0 z-[50] bg-black/20"
+          className="fixed inset-0 z-[50] bg-black/60"
           onClick={onClose}
         />
         <div
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] h-[85vh] max-w-[90vw] max-h-[90vh] bg-amber-100/95 backdrop-blur-md rounded-lg shadow-2xl border-2 border-amber-800/50 p-4 sm:p-6 z-[60] pointer-events-auto flex flex-col overflow-hidden"
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-5xl bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl shadow-2xl border-4 border-amber-800 p-6 z-[60] pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between mb-4 flex-shrink-0">
-            <h3 className="font-bold text-amber-900 text-2xl">{mission.title}</h3>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-bold text-amber-900 text-3xl">{mission.title}</h3>
             <button
               onClick={onClose}
-              className="btn btn-sm btn-ghost text-amber-900 hover:bg-amber-200/50"
+              className="text-amber-900 hover:text-amber-700 text-4xl font-bold leading-none"
             >
-              ✕
+              ×
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
-            {/* Top Row: Map and Artwork Photo side by side */}
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              {/* Left: Mission Location Map */}
-              <div>
-                <h4 className="text-lg font-semibold text-amber-900 mb-3">Trasa Misji</h4>
-                <div className="relative w-full aspect-square bg-amber-200 rounded-lg border-2 border-amber-800/30 overflow-hidden shadow-xl">
-                  {/* Mini map showing path */}
-                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    {/* Path line from Warsaw to mission */}
-                    <line
-                      x1={startLeft}
-                      y1={startTop}
-                      x2={targetLeft}
-                      y2={targetTop}
-                      stroke="rgba(251, 191, 36, 0.6)"
-                      strokeWidth="1"
-                      strokeDasharray="2,2"
-                    />
-                    {/* Warsaw marker */}
-                    <circle
-                      cx={startLeft}
-                      cy={startTop}
-                      r="3"
-                      fill="rgba(180, 83, 9, 0.9)"
-                      stroke="rgba(154, 52, 18, 1)"
-                      strokeWidth="0.5"
-                    />
-                    <text x={startLeft} y={startTop - 4} fontSize="3" fill="rgba(154, 52, 18, 1)" textAnchor="middle" fontWeight="bold">🏛️</text>
-                    {/* Mission location marker */}
-                    <circle
-                      cx={targetLeft}
-                      cy={targetTop}
-                      r="4"
-                      fill="rgba(217, 119, 6, 0.9)"
-                      stroke="rgba(180, 83, 9, 1)"
-                      strokeWidth="0.5"
-                    />
-                    <text x={targetLeft} y={targetTop - 5} fontSize="4" fill="rgba(180, 83, 9, 1)" textAnchor="middle" fontWeight="bold">📍</text>
-                    {/* Agent position if mission active */}
-                    {isMissionActive && agentPosition && (
-                      <>
-                        <circle
-                          cx={agentPosition.left}
-                          cy={agentPosition.top}
-                          r="2.5"
-                          fill="rgba(34, 197, 94, 0.9)"
-                          stroke="rgba(22, 163, 74, 1)"
-                          strokeWidth="0.5"
-                        />
-                        <text
-                          x={agentPosition.left}
-                          y={agentPosition.top - 3.5}
-                          fontSize="3"
-                          fill="rgba(22, 163, 74, 1)"
-                          textAnchor="middle"
-                          fontWeight="bold"
-                        >
-                          🚶
-                        </text>
-                      </>
-                    )}
-                  </svg>
-                  {/* Legend */}
-                  <div className="absolute bottom-2 left-2 bg-amber-800/90 text-amber-50 text-xs p-2 rounded space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">🏛️</span>
-                      <span>Warszawa (Start)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">📍</span>
-                      <span>Cel Misji</span>
-                    </div>
-                    {isMissionActive && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">🚶</span>
-                        <span>Agent</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right: Artwork Photo */}
-              <div>
-                <h4 className="text-lg font-semibold text-amber-900 mb-3">Dzieło Sztuki</h4>
-                <div className="relative w-full aspect-square bg-amber-200 rounded-lg border-2 border-amber-800/30 overflow-hidden shadow-xl">
-                  <Image
-                    src={artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg"}
-                    alt={artwork?.name || "dama.jpg"}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom: Details and Start Button */}
-            <div className="space-y-6">
+          {/* Main Content: Left side info, Right side artwork */}
+          <div className="grid grid-cols-2 gap-8 items-start">
+            {/* Left Column: Mission Info */}
+            <div className="space-y-6 flex flex-col justify-between" style={{ minHeight: '550px' }}>
               {/* Description */}
               <div>
-                <h4 className="text-lg font-semibold text-amber-900 mb-2">Opis Misji</h4>
+                <h4 className="text-xl font-semibold text-amber-900 mb-3">Opis Misji</h4>
                 <p className="text-base text-amber-800 leading-relaxed">{mission.description}</p>
               </div>
 
               {/* Artwork Info */}
               {artwork && (
-                <div>
-                  <h4 className="text-lg font-semibold text-amber-900 mb-2">Szczegóły Dzieła</h4>
-                  <div className="space-y-2">
-                    <p className="text-xl font-bold text-amber-900">{artwork.name}</p>
-                    <p className="text-lg text-amber-800">{artwork.artist}</p>
-                    <p className="text-base text-amber-700">{artwork.year}</p>
-                    <p className="text-sm text-amber-700">Lokalizacja: {artwork.location}</p>
+                <div className="bg-amber-200/40 rounded-lg p-4 border-2 border-amber-700/30">
+                  <p className="text-2xl font-bold text-amber-900 mb-3">{artwork.name}</p>
+                  <div className="flex items-center gap-4 text-amber-800">
+                    <span className="text-base font-semibold">{artwork.artist}</span>
+                    <span className="text-amber-600">•</span>
+                    <span className="text-base">{artwork.year}</span>
+                    <span className="text-amber-600">•</span>
+                    <span className="text-sm">{artwork.location}</span>
                   </div>
                 </div>
               )}
 
               {/* Agent Info */}
               {agent && (
-                <div>
-                  <h4 className="text-lg font-semibold text-amber-900 mb-2">Agent</h4>
-                  <p className="text-base text-amber-800">{agent.name}</p>
+                <div className="bg-green-100/60 rounded-lg p-4 border-2 border-green-700/30">
+                  <h4 className="text-lg font-semibold text-green-900 mb-3">Agent</h4>
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-green-700 shadow-lg flex-shrink-0">
+                      <Image
+                        src={agent.photo}
+                        alt={agent.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <p className="text-base text-green-800 font-semibold">{agent.name}</p>
+                  </div>
                 </div>
               )}
 
               {/* Mission Status */}
               {isMissionActive ? (
-                <div>
-                  <h4 className="text-lg font-semibold text-amber-900 mb-3">Postęp Misji</h4>
-                  <div className="w-full bg-amber-800/50 rounded-full h-8 border border-amber-700/50 shadow-inner overflow-hidden">
+                <div className="bg-blue-100/60 rounded-lg p-4 border-2 border-blue-700/30">
+                  <h4 className="text-lg font-semibold text-blue-900 mb-3">Postęp Misji</h4>
+                  <div className="w-full bg-blue-300/50 rounded-full h-10 border-2 border-blue-700/50 shadow-inner overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-amber-600 to-amber-700 rounded-full flex items-center justify-center text-sm font-bold text-amber-50 transition-all duration-300 shadow-lg"
+                      className="h-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center text-base font-bold text-white transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     >
-                      {progress > 10 && `${Math.round(progress)}%`}
+                      {Math.round(progress)}%
                     </div>
                   </div>
-                  <p className="text-sm text-amber-700 mt-2 text-center">
+                  <p className="text-sm text-blue-800 mt-2 text-center font-semibold">
                     Agent w trakcie wykonywania misji...
                   </p>
                 </div>
@@ -254,18 +136,32 @@ export default function MissionDetailModal({
                         onStartMission(mission.id);
                         onClose();
                       }}
-                      className="w-full btn btn-lg bg-amber-700 hover:bg-amber-800 text-amber-50 font-bold uppercase tracking-widest shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+                      className="w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-xl font-bold rounded-lg shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-amber-900"
                     >
-                      ▶ Rozpocznij Misję
+                      Rozpocznij Misję
                     </button>
                   ) : (
-                    <div className="text-amber-700 text-center p-4 bg-amber-200/50 rounded-lg">
-                      <p className="font-semibold">Brak dostępnych agentów</p>
-                      <p className="text-sm">Wszyscy agenci są obecnie w trakcie misji.</p>
+                    <div className="text-red-900 text-center p-4 bg-red-100/60 rounded-lg border-2 border-red-700/30">
+                      <p className="font-bold text-lg">Brak dostępnych agentów</p>
+                      <p className="text-sm mt-1">Wszyscy agenci są obecnie w trakcie misji.</p>
                     </div>
                   )}
                 </div>
               )}
+            </div>
+
+            {/* Right Column: Artwork Image */}
+            <div>
+              <h4 className="text-xl font-semibold text-amber-900 mb-3">Dzieło Sztuki</h4>
+              <div className="relative w-full bg-amber-900 rounded-lg border-4 border-amber-800 overflow-hidden shadow-2xl" style={{ height: '550px' }}>
+                <Image
+                  src={artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg"}
+                  alt={artwork?.name || "Dzieło sztuki"}
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
             </div>
           </div>
         </div>
