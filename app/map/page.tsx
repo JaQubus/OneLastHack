@@ -49,13 +49,16 @@ export default function MapPage() {
   const [hasInitialBubble, setHasInitialBubble] = useState(false);
   const [toasts, setToasts] = useState<ToastType[]>([]);
   const [showStartClockModal, setShowStartClockModal] = useState(true);
-  
+
   // Memoized function to remove toast
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
-  
+
   // Reset timer when map page loads
+  const toastIdCounterRef = useRef(0);
+
+  // Reset timer when map page loads (but don't start it)
   useEffect(() => {
     // Reset game time to start date
     reset();
@@ -180,12 +183,12 @@ export default function MapPage() {
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(1945, 4, 8); // Month is 0-indexed, so 4 = May
     endDate.setHours(0, 0, 0, 0);
-    
+
     // Use dayNumber-like calculation for consistency
     const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000);
     const currentDays = Math.floor((currentDate.getTime() - startDate.getTime()) / 86400000);
     const newProgress = Math.min(100, Math.max(0, (currentDays / totalDays) * 100));
-    
+
     setProgress(newProgress);
   }, [currentDate]);
 
@@ -231,7 +234,7 @@ export default function MapPage() {
           }
           return shouldKeep;
         });
-        
+
         // Increase progress by 0.5% for each uncollected marker that expired
         if (removedMarkers.length > 0) {
           setProgress((prev) => {
@@ -239,7 +242,7 @@ export default function MapPage() {
             return Math.min(100, prev + increase);
           });
         }
-        
+
         return filtered;
       });
       // Clean up old timestamps
@@ -436,7 +439,8 @@ export default function MapPage() {
     setAcknowledgedMissions((prev) => [...prev, newMission]);
 
     // Show toast notification for new mission
-    const toastId = `toast-${Date.now()}`;
+    toastIdCounterRef.current += 1;
+    const toastId = `toast-${Date.now()}-${toastIdCounterRef.current}-${Math.random().toString(36).substr(2, 9)}`;
     setToasts((prev) => [
       ...prev,
       {
@@ -474,43 +478,53 @@ export default function MapPage() {
 
           let isReturning = task.isReturning || false;
 
-          if (task.failed && newProgress >= 50) {
-            if (!isReturning) isReturning = true;
-            const returnProgress = (newProgress - 50) / 50;
-            currentTop = targetTop + (startTop - targetTop) * returnProgress;
-            currentLeft = targetLeft + (startLeft - targetLeft) * returnProgress;
-          } else if (task.failed) {
-            const progressRatio = newProgress / 50;
-            currentTop = startTop + (targetTop - startTop) * progressRatio;
-            currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
+          // Simple linear movement: A to B (0-50%), then B to A (50-100%)
+          if (newProgress <= 50) {
+            // Going from A (start) to B (target) - pure linear interpolation
+            const t = newProgress / 50;
+            currentTop = startTop + (targetTop - startTop) * t;
+            currentLeft = startLeft + (targetLeft - startLeft) * t;
           } else {
-            const progressRatio = newProgress / 100;
-            currentTop = startTop + (targetTop - startTop) * progressRatio;
-            currentLeft = startLeft + (targetLeft - startLeft) * progressRatio;
+            // Returning from B (target) to A (start) - pure linear interpolation
+            isReturning = true;
+            const t = (newProgress - 50) / 50;
+            currentTop = targetTop + (startTop - targetTop) * t;
+            currentLeft = targetLeft + (startLeft - targetLeft) * t;
           }
 
           // Check if mission just completed
           if (newProgress >= 100 && task.progress < 100) {
             if (!task.failed) {
-              // Success - show green toast
+              // Success - show green toast, remove mission, award points
               const artwork = stolenGoods.find(g => g.id === task.artworkId);
               const agent = activeAgents.find(a => a.id === task.agentId);
-              const toastId = `toast-success-${Date.now()}`;
-              setToasts((prev) => [
-                ...prev,
-                {
-                  id: toastId,
-                  title: "✅ Misja Zakończona Sukcesem!",
-                  message: artwork && agent
-                    ? `Agent ${agent.name} odzyskał "${artwork.name}"!`
-                    : artwork
-                      ? `Dzieło "${artwork.name}" zostało odzyskane!`
-                      : "Dzieło sztuki zostało odzyskane!",
-                  duration: 5000,
-                  type: 'success' as const,
-                },
-              ]);
+              toastIdCounterRef.current += 1;
+              const toastId = `toast-success-${Date.now()}-${toastIdCounterRef.current}-${Math.random().toString(36).substr(2, 9)}`;
+              setToasts((prev) => {
+                // Prevent duplicate toasts for the same mission
+                if (prev.some(t => t.id.startsWith(`toast-success-`) && t.message.includes(artwork?.name || 'Dzieło'))) {
+                  return prev;
+                }
+                return [
+                  ...prev,
+                  {
+                    id: toastId,
+                    title: "✅ Misja Zakończona Sukcesem!",
+                    message: artwork && agent
+                      ? `Agent ${agent.name} odzyskał "${artwork.name}"!`
+                      : artwork
+                        ? `Dzieło "${artwork.name}" zostało odzyskane!`
+                        : "Dzieło sztuki zostało odzyskane!",
+                    duration: 5000,
+                    type: 'success' as const,
+                  },
+                ];
+              });
+              // Remove mission from acknowledged missions
+              setAcknowledgedMissions((prev) => prev.filter(m => m.id !== task.missionId));
+              // Award intelligence points
               setIntelligencePoints((prev) => prev + 25);
+              // Mark artwork as recovered
               setStolenGoods((prev) =>
                 prev.map((good) =>
                   good.id === task.artworkId ? { ...good, progress: 100 } : good
@@ -540,21 +554,28 @@ export default function MapPage() {
               // Failure - show red toast
               const artwork = stolenGoods.find(g => g.id === task.artworkId);
               const agent = activeAgents.find(a => a.id === task.agentId);
-              const toastId = `toast-error-${Date.now()}`;
-              setToasts((prev) => [
-                ...prev,
-                {
-                  id: toastId,
-                  title: "❌ Misja Nieudana",
-                  message: artwork && agent
-                    ? `Agent ${agent.name} nie zdołał odzyskać "${artwork.name}". Agent wraca do bazy.`
-                    : agent
-                      ? `Agent ${agent.name} nie zdołał ukończyć misji. Agent wraca do bazy.`
-                      : "Misja nie powiodła się. Agent wraca do bazy.",
-                  duration: 5000,
-                  type: 'error' as const,
-                },
-              ]);
+              toastIdCounterRef.current += 1;
+              const toastId = `toast-error-${Date.now()}-${toastIdCounterRef.current}-${Math.random().toString(36).substr(2, 9)}`;
+              setToasts((prev) => {
+                // Prevent duplicate toasts for the same mission
+                if (prev.some(t => t.id.startsWith(`toast-error-`) && t.message.includes(artwork?.name || 'Dzieło'))) {
+                  return prev;
+                }
+                return [
+                  ...prev,
+                  {
+                    id: toastId,
+                    title: "❌ Misja Nieudana",
+                    message: artwork && agent
+                      ? `Agent ${agent.name} nie zdołał odzyskać "${artwork.name}". Agent wraca do bazy.`
+                      : agent
+                        ? `Agent ${agent.name} nie zdołał ukończyć misji. Agent wraca do bazy.`
+                        : "Misja nie powiodła się. Agent wraca do bazy.",
+                    duration: 5000,
+                    type: 'error' as const,
+                  },
+                ];
+              });
             }
           }
 
@@ -566,9 +587,15 @@ export default function MapPage() {
             isReturning: isReturning,
           };
         }).filter((task) => {
+          // Keep tasks that are in progress
           if (task.progress < 100) return true;
+          // For completed tasks, keep them visible briefly
           const completedTime = Date.now() - (task.startTime + task.duration);
-          return completedTime < 2000;
+          // Keep successful missions longer so artwork can be seen following agent home
+          if (!task.failed) {
+            return completedTime < 3000; // Keep successful missions visible for 3 seconds
+          }
+          return completedTime < 2000; // Keep failed missions for 2 seconds
         });
       });
     }, 100);
@@ -847,7 +874,8 @@ export default function MapPage() {
       {retrievalTasks.map((task) => {
         const agent = activeAgents.find((a) => a.id === task.agentId);
         const artwork = task.artworkId ? stolenGoods.find(g => g.id === task.artworkId) : null;
-        const isReturningWithArtwork = task.progress >= 100 && !task.failed;
+        // Show artwork following agent when returning home after successful retrieval (after 50% progress)
+        const isReturningWithArtwork = !task.failed && task.progress >= 50 && task.isReturning;
         const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
         const agentImageSrc = agentsData.find(a => a.id === task.agentId)?.photo || "/officers/witold-pilecki.png";
 
