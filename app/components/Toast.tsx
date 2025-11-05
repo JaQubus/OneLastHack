@@ -1,6 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
 import React, { useEffect, useRef, useState } from 'react';
+=======
+import React, { useEffect, useState } from 'react';
+>>>>>>> bd0f805 (Refactor date handling in GameTimeProvider and MapPage for consistency, enhance ProgressBar display precision)
 import { createPortal } from 'react-dom';
 
 export type ToastType = {
@@ -8,7 +12,6 @@ export type ToastType = {
   message: string;
   title?: string;
   duration?: number;
-  type?: 'success' | 'error' | 'info';
 };
 
 interface ToastProps {
@@ -17,28 +20,13 @@ interface ToastProps {
 }
 
 function Toast({ toast, onRemove }: ToastProps) {
-  // Keep latest onRemove in a ref so parent re-renders (changing the
-  // onRemove function identity) don't reset the timeout.
-  const onRemoveRef = useRef(onRemove);
-  // hold timer id so we can clear it on manual dismiss
-  const timerRef = useRef<number | null>(null);
   useEffect(() => {
-    onRemoveRef.current = onRemove;
-  }, [onRemove]);
-
-  useEffect(() => {
-    timerRef.current = window.setTimeout(() => {
-      // read latest callback from ref
-      onRemoveRef.current(toast.id);
+    const timer = setTimeout(() => {
+      onRemove(toast.id);
     }, toast.duration || 5000);
 
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-    // only restart timer when toast id or duration changes
-  }, [toast.id, toast.duration]);
+    return () => clearTimeout(timer);
+  }, [toast.id, toast.duration, onRemove]);
 
   const getToastStyles = () => {
     switch (toast.type) {
@@ -74,6 +62,7 @@ function Toast({ toast, onRemove }: ToastProps) {
   };
 
   return (
+<<<<<<< HEAD
     <div
       className={`${getToastStyles()} rounded-lg p-4 mb-3 min-w-[300px] max-w-[400px] transform transition-all duration-300 ease-in-out animate-[slideInRight_0.3s_ease-out] cursor-pointer`}
       onClick={() => {
@@ -98,6 +87,15 @@ function Toast({ toast, onRemove }: ToastProps) {
         </div>
       )}
       <div className={`${getMessageColor()} text-sm select-none`}>
+=======
+    <div className="bg-amber-900/95 backdrop-blur-md border-2 border-amber-800/50 shadow-2xl rounded-lg p-4 mb-3 min-w-[300px] max-w-[400px] transform transition-all duration-300 ease-in-out animate-[slideInRight_0.3s_ease-out]">
+      {toast.title && (
+        <div className="font-bold text-amber-50 text-sm mb-1">
+          {toast.title}
+        </div>
+      )}
+      <div className="text-amber-200 text-sm">
+>>>>>>> bd0f805 (Refactor date handling in GameTimeProvider and MapPage for consistency, enhance ProgressBar display precision)
         {toast.message}
       </div>
     </div>
@@ -116,8 +114,12 @@ export default function ToastContainer({ toasts, onRemove }: ToastContainerProps
     setMounted(true);
   }, []);
 
+<<<<<<< HEAD
   // Avoid hydration mismatch by not rendering portal during SSR
   if (!mounted || typeof document === 'undefined') {
+=======
+  if (!mounted) {
+>>>>>>> bd0f805 (Refactor date handling in GameTimeProvider and MapPage for consistency, enhance ProgressBar display precision)
     return null;
   }
 

@@ -14,9 +14,9 @@ import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
 import ToastContainer, { ToastType } from "../components/Toast";
+import ToastContainer, { ToastType } from "../components/Toast";
 import ArtGalleryModal from "../components/ArtGalleryModal";
 import MissionDetailModal from "../components/MissionDetailModal";
-import StartClockModal from "../components/StartClockModal";
 import type { StolenGood, Agent, Skill, AcknowledgedMission, RetrievalTask } from "../types";
 import agents from "../data/agents.json";
 
@@ -42,20 +42,19 @@ export default function MapPage() {
   const [selectedMission, setSelectedMission] = useState<AcknowledgedMission | null>(null);
   const [hasInitialBubble, setHasInitialBubble] = useState(false);
   const [toasts, setToasts] = useState<ToastType[]>([]);
-  const [usedArtworkIds, setUsedArtworkIds] = useState<Set<number>>(new Set());
-  const [showStartClockModal, setShowStartClockModal] = useState(true);
-
-  // Reset timer when map page loads (but don't start it)
+  
+  // Reset and start timer when map page loads
   useEffect(() => {
     // Reset game time to start date
     reset();
-    // Timer will be started by user via StartClockModal
+    // Start the timer automatically
+    start();
   }, []); // Empty deps - only run on mount
 
-  // State for active agents in slots (start with first 2 agents)
+  // State for active agents in slots (start with first agent)
   const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
-    const firstTwoAgents = agentsData.slice(0, 2);
-    return firstTwoAgents.map(a => a.id);
+    const firstAgent = agentsData.slice(0, 1);
+    return firstAgent.map(a => a.id);
   });
 
   // Warsaw storage location (center of map, 59% from top)
@@ -86,6 +85,7 @@ export default function MapPage() {
   const addNextAgent = () => {
     const agentCost = 15;
     if (activeAgentIds.length < 4 && availableAgents.length > 0 && intelligencePoints >= agentCost) {
+    if (activeAgentIds.length < 4 && availableAgents.length > 0 && intelligencePoints >= agentCost) {
       const nextAgent = availableAgents[0];
       setIntelligencePoints(prev => prev - agentCost);
       setActiveAgentIds([...activeAgentIds, nextAgent.id]);
@@ -110,6 +110,7 @@ export default function MapPage() {
       )
     );
   };
+  const { scheduleEvery, cancelScheduled, isRunning, currentDate, reset, start } = useGameTime();
   const { scheduleEvery, cancelScheduled, isRunning, currentDate, reset, start } = useGameTime();
 
   // Track marker creation time for 20 second auto-removal
@@ -150,10 +151,11 @@ export default function MapPage() {
           setUsedArtworkIds((prev) => new Set(prev).add(artwork.id));
           setHasInitialBubble(true);
         }
+      } else {
+        setIsInitialized(true);
       }
-      setIsInitialized(true);
     }
-  }, [isInitialized, usedArtworkIds]);
+  }, [isInitialized]);
 
   // Calculate progress based on game time (from 1939-09-01 to 1945-05-08)
   // Use same date normalization as GameTimeProvider for perfect sync
@@ -162,12 +164,12 @@ export default function MapPage() {
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(1945, 4, 8); // Month is 0-indexed, so 4 = May
     endDate.setHours(0, 0, 0, 0);
-
+    
     // Use dayNumber-like calculation for consistency
     const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000);
     const currentDays = Math.floor((currentDate.getTime() - startDate.getTime()) / 86400000);
     const newProgress = Math.min(100, Math.max(0, (currentDays / totalDays) * 100));
-
+    
     setProgress(newProgress);
   }, [currentDate]);
 
@@ -338,6 +340,18 @@ export default function MapPage() {
     };
 
     setAcknowledgedMissions((prev) => [...prev, newMission]);
+
+    // Show toast notification for new mission
+    const toastId = `toast-${Date.now()}`;
+    setToasts((prev) => [
+      ...prev,
+      {
+        id: toastId,
+        title: "Nowa Misja!",
+        message: newMission.title,
+        duration: 5000,
+      },
+    ]);
 
     // Show toast notification for new mission
     const toastId = `toast-${Date.now()}`;
@@ -585,6 +599,10 @@ export default function MapPage() {
       <ToastContainer
         toasts={toasts}
         onRemove={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
+      {/* Toast Notifications */}
+      <ToastContainer
+        toasts={toasts}
+        onRemove={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
       />
 
       {/* Top Bar */}
@@ -809,14 +827,6 @@ export default function MapPage() {
       )}
 
 
-      {/* Start Clock Modal */}
-      {showStartClockModal && !isRunning && (
-        <StartClockModal
-          onClose={() => {
-            setShowStartClockModal(false);
-          }}
-        />
-      )}
 
       {/* Mission Detail Modal */}
       {selectedMission && (() => {
