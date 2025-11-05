@@ -116,7 +116,7 @@ export default function MapPage() {
   return (
     <div className="relative h-screen w-screen overflow-hidden">
       {/* Full Screen Map */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-blue-300">
         <Image
           src="/map.svg"
           alt="Mapa operacyjna Europy"
