@@ -832,34 +832,36 @@ export default function MapPage() {
         onClick={() => setShowArtGallery(true)}
         title={WARSAW_STORAGE.title}
       >
-        <div className="relative w-12 h-12 sm:w-14 sm:h-14">
+        <div className="relative w-20 h-20">
           <div className="absolute inset-0 bg-amber-800 rounded-full border-2 border-amber-600 shadow-2xl flex items-center justify-center">
-            <span className="text-xl sm:text-2xl">🏛️</span>
+            <span className="text-3xl sm:text-4xl">🏛️</span>
           </div>
         </div>
       </div>
 
       {/* Spawn Location Markers - Third priority (below agents and bubbles) */}
-      {spawnLocations.map((location) => (
-        <div
-          key={location.name}
-          className="absolute z-20 pointer-events-none"
-          style={{
-            top: location.top,
-            left: location.left,
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <div className="relative flex flex-col items-center">
-            {/* Location Pin */}
-            <div className="w-3 h-3 bg-red-600 rounded-full border border-red-800 shadow-lg"></div>
-            {/* Location Name */}
-            <div className="mt-1 text-white text-base font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
-              {location.name}
+      {
+        spawnLocations.map((location) => (
+          <div
+            key={location.name}
+            className="absolute z-20 pointer-events-none"
+            style={{
+              top: location.top,
+              left: location.left,
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <div className="relative flex flex-col items-center">
+              {/* Location Pin */}
+              <div className="w-3 h-3 bg-red-600 rounded-full border border-red-800 shadow-lg"></div>
+              {/* Location Name */}
+              <div className="mt-1 text-white text-base font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
+                {location.name}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))
+      }
 
       {/* Bottom Bar */}
       <BottomBar
@@ -938,164 +940,176 @@ export default function MapPage() {
       </svg>
 
       {/* Mission Point Markers on Map - Only show artwork when mission is active and agent hasn't retrieved it yet */}
-      {acknowledgedMissions.map((mission) => {
-        const task = retrievalTasks.find(t => t.missionId === mission.id);
-        const isActive = task && task.progress < 100;
+      {
+        acknowledgedMissions.map((mission) => {
+          const task = retrievalTasks.find(t => t.missionId === mission.id);
+          const isActive = task && task.progress < 100;
 
-        // Only show marker when mission is active AND agent hasn't retrieved the artwork yet
-        // Hide the mission point marker when agent is returning with artwork (after 50% for successful missions)
-        const isReturningWithArtwork = task && !task.failed && task.progress >= 50 && task.isReturning;
+          // Only show marker when mission is active AND agent hasn't retrieved the artwork yet
+          // Hide the mission point marker when agent is returning with artwork (after 50% for successful missions)
+          const isReturningWithArtwork = task && !task.failed && task.progress >= 50 && task.isReturning;
 
-        if (!isActive || isReturningWithArtwork) return null;
+          if (!isActive || isReturningWithArtwork) return null;
 
-        const artwork = mission.artworkId
-          ? stolenGoods.find(g => g.id === mission.artworkId)
-          : null;
-        // Always default to dama.jpg if no artwork image
-        let imageSrc = "/dama.jpg";
-        if (artwork?.image && artwork.image.trim() !== "") {
-          imageSrc = artwork.image;
-        }
+          const artwork = mission.artworkId
+            ? stolenGoods.find(g => g.id === mission.artworkId)
+            : null;
+          // Always default to dama.jpg if no artwork image
+          let imageSrc = "/dama.jpg";
+          if (artwork?.image && artwork.image.trim() !== "") {
+            imageSrc = artwork.image;
+          }
 
-        return (
-          <div
-            key={`mission-${mission.id}`}
-            className="absolute z-35 pointer-events-none"
-            style={{
-              top: mission.top,
-              left: mission.left,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <div className="relative">
-              {/* Show artwork image when mission is active and agent is going to get it */}
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-amber-600 shadow-2xl overflow-hidden">
-                <Image
-                  src={imageSrc}
-                  alt={artwork?.name || mission.title || "Dzieło sztuki"}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
+          return (
+            <div
+              key={`mission-${mission.id}`}
+              className="absolute z-35 pointer-events-none"
+              style={{
+                top: mission.top,
+                left: mission.left,
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <div className="relative">
+                {/* Show artwork image when mission is active and agent is going to get it */}
+                <div className="relative rounded-full border-4 border-amber-600 shadow-2xl overflow-hidden" style={{ width: '83.2px', height: '83.2px' }}>
+                  <Image
+                    src={imageSrc}
+                    alt={artwork?.name || mission.title || "Dzieło sztuki"}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })
+      }
 
       {/* Agent Icons on Map (during retrieval) - Second priority (below bubbles) */}
-      {retrievalTasks.map((task) => {
-        const agent = activeAgents.find((a) => a.id === task.agentId);
-        const artwork = task.artworkId ? stolenGoods.find(g => g.id === task.artworkId) : null;
-        // Show artwork following agent when returning home after successful retrieval (after 50% progress)
-        const isReturningWithArtwork = !task.failed && task.progress >= 50 && task.isReturning;
-        const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
-        const agentImageSrc = agentsData.find(a => a.id === task.agentId)?.photo || "/officers/witold-pilecki.png";
+      {
+        retrievalTasks.map((task) => {
+          const agent = activeAgents.find((a) => a.id === task.agentId);
+          const artwork = task.artworkId ? stolenGoods.find(g => g.id === task.artworkId) : null;
+          // Show artwork following agent when returning home after successful retrieval (after 50% progress)
+          const isReturningWithArtwork = !task.failed && task.progress >= 50 && task.isReturning;
+          const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
+          const agentImageSrc = agentsData.find(a => a.id === task.agentId)?.photo || "/officers/witold-pilecki.png";
 
-        return (
-          <div
-            key={task.id}
-            className="absolute z-30 transition-all duration-100"
-            style={{
-              top: task.currentTop,
-              left: task.currentLeft,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <div className="relative">
-              <div className="relative w-12 h-12 rounded-full flex-shrink-0 border-2 border-amber-700/50 overflow-hidden">
-                <Image
-                  src={agentImageSrc}
-                  alt={"🚶"}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              {/* Show artwork following agent after successful retrieval */}
-              {isReturningWithArtwork && (
-                <div
-                  className="absolute -top-8 left-1/2 -translate-x-1/2 z-31"
-                  style={{ transform: 'translateX(-50%)' }}
-                >
-                  <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-green-600 shadow-xl overflow-hidden bg-green-100">
-                    <Image
-                      src={imageSrc}
-                      alt={artwork?.name || "Odzyskane dzieło"}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border border-green-600"></div>
+          return (
+            <div
+              key={task.id}
+              className="absolute z-30 transition-all duration-100"
+              style={{
+                top: task.currentTop,
+                left: task.currentLeft,
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <div className="relative">
+                <div className="relative rounded-full flex-shrink-0 border-2 border-amber-700/50 overflow-hidden" style={{ width: '62.4px', height: '62.4px' }}>
+                  <Image
+                    src={agentImageSrc}
+                    alt={"🚶"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                {/* Show artwork following agent after successful retrieval */}
+                {isReturningWithArtwork && (
+                  <div
+                    className="absolute -top-8 left-1/2 -translate-x-1/2 z-31"
+                    style={{ transform: 'translateX(-50%)' }}
+                  >
+                    <div className="relative rounded-full border-2 border-green-600 shadow-xl overflow-hidden bg-green-100" style={{ width: '62.4px', height: '62.4px' }}>
+                      <Image
+                        src={imageSrc}
+                        alt={artwork?.name || "Odzyskane dzieło"}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border border-green-600"></div>
+                    </div>
                   </div>
+                )}
+              </div>
+              {task.progress >= 50 && task.failed && !task.isReturning && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-red-800/90 text-red-50 px-2 py-1 rounded whitespace-nowrap">
+                  ❌ Misja Nieudana
+                </div>
+              )}
+              {task.progress >= 100 && task.failed && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-amber-800/90 text-amber-50 px-2 py-1 rounded whitespace-nowrap">
+                  Powrót do Bazy
+                </div>
+              )}
+              {isReturningWithArtwork && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-green-800/90 text-green-50 px-2 py-1 rounded whitespace-nowrap">
+                  ✓ Odzyskano
                 </div>
               )}
             </div>
-            {task.progress >= 50 && task.failed && !task.isReturning && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-red-800/90 text-red-50 px-2 py-1 rounded whitespace-nowrap">
-                ❌ Misja Nieudana
-              </div>
-            )}
-            {task.progress >= 100 && task.failed && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-amber-800/90 text-amber-50 px-2 py-1 rounded whitespace-nowrap">
-                Powrót do Bazy
-              </div>
-            )}
-            {isReturningWithArtwork && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-green-800/90 text-green-50 px-2 py-1 rounded whitespace-nowrap">
-                ✓ Odzyskano
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })
+      }
 
       {/* Event Info Modal - removed, markers are collected immediately on click */}
 
       {/* Art Gallery Modal - Show only artworks recovered in current session */}
-      {showArtGallery && (
-        <ArtGalleryModal
-          stolenGoods={stolenGoods.filter((good) => recoveredInSession.has(good.id))}
-          onClose={() => setShowArtGallery(false)}
-        />
-      )}
+      {
+        showArtGallery && (
+          <ArtGalleryModal
+            stolenGoods={stolenGoods.filter((good) => recoveredInSession.has(good.id))}
+            onClose={() => setShowArtGallery(false)}
+          />
+        )
+      }
 
       {/* Location Info Modal */}
-      {selectedLocation && (
-        <LocationModal
-          location={selectedLocation}
-          onClose={() => setSelectedLocation(null)}
-        />
-      )}
+      {
+        selectedLocation && (
+          <LocationModal
+            location={selectedLocation}
+            onClose={() => setSelectedLocation(null)}
+          />
+        )
+      }
 
       {/* Start Clock Modal */}
-      {showStartClockModal && !isRunning && (
-        <StartClockModal onClose={() => setShowStartClockModal(false)} />
-      )}
+      {
+        showStartClockModal && !isRunning && (
+          <StartClockModal onClose={() => setShowStartClockModal(false)} />
+        )
+      }
 
       {/* Mission Detail Modal */}
-      {selectedMission && (() => {
-        const task = retrievalTasks.find(t => t.missionId === selectedMission.id) || null;
-        const agent = task ? activeAgents.find(a => a.id === task.agentId) || null : null;
-        const artwork = selectedMission.artworkId
-          ? stolenGoods.find(g => g.id === selectedMission.artworkId) || null
-          : null;
-        const busyAgentIds = retrievalTasks.filter(t => t.progress < 100).map(t => t.agentId);
-        const availableAgentsForMission = activeAgents.filter(a => !busyAgentIds.includes(a.id));
-        const canStart = availableAgentsForMission.length > 0 && !task;
+      {
+        selectedMission && (() => {
+          const task = retrievalTasks.find(t => t.missionId === selectedMission.id) || null;
+          const agent = task ? activeAgents.find(a => a.id === task.agentId) || null : null;
+          const artwork = selectedMission.artworkId
+            ? stolenGoods.find(g => g.id === selectedMission.artworkId) || null
+            : null;
+          const busyAgentIds = retrievalTasks.filter(t => t.progress < 100).map(t => t.agentId);
+          const availableAgentsForMission = activeAgents.filter(a => !busyAgentIds.includes(a.id));
+          const canStart = availableAgentsForMission.length > 0 && !task;
 
-        return (
-          <MissionDetailModal
-            mission={selectedMission}
-            onClose={() => setSelectedMission(null)}
-            retrievalTask={task}
-            agent={agent}
-            artwork={artwork}
-            onStartMission={startMission}
-            availableAgents={availableAgentsForMission}
-            canStart={canStart}
-          />
-        );
-      })()}
-    </div>
+          return (
+            <MissionDetailModal
+              mission={selectedMission}
+              onClose={() => setSelectedMission(null)}
+              retrievalTask={task}
+              agent={agent}
+              artwork={artwork}
+              onStartMission={startMission}
+              availableAgents={availableAgentsForMission}
+              canStart={canStart}
+            />
+          );
+        })()
+      }
+    </div >
   );
 }

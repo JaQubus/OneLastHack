@@ -73,7 +73,7 @@ export default function MapMarker({ id, top, left, title, onClick, className, is
       title={title}
       aria-label={title || `Marker ${id}`}
     >
-      <div className="relative w-12 h-12 sm:w-16 sm:h-16">
+      <div className="relative" style={{ width: '62.4px', height: '62.4px' }}>
         <Image
           src={imageSrc || "/dama.jpg"}
           alt={title || `Marker ${id}`}
