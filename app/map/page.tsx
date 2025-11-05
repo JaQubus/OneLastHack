@@ -18,6 +18,7 @@ import ArtGalleryModal from "../components/ArtGalleryModal";
 import MissionDetailModal from "../components/MissionDetailModal";
 import StartClockModal from "../components/StartClockModal";
 import type { StolenGood, Agent, Skill, AcknowledgedMission, RetrievalTask } from "../types";
+import agents from "../data/agents.json";
 
 type Marker = {
   id: number;
@@ -734,6 +735,8 @@ export default function MapPage() {
         const artwork = task.artworkId ? stolenGoods.find(g => g.id === task.artworkId) : null;
         const isReturningWithArtwork = task.progress >= 100 && !task.failed;
         const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
+        const agentImageSrc = agentsData.find(a => a.id === task.agentId)?.photo || "/officers/witold-pilecki.png";
+        console.log(agentImageSrc);
 
         return (
           <div
@@ -746,8 +749,16 @@ export default function MapPage() {
             }}
           >
             <div className="relative">
-              <div className={`text-3xl ${task.failed ? 'animate-bounce' : 'animate-pulse'}`}>
+              {/* <div className={`text-3xl ${ task.failed ? 'animate-bounce' : 'animate-pulse' } `}>
                 {task.failed ? '😞' : '🚶'}
+              </div> */}
+              <div className="relative w-12 h-12 rounded-full flex-shrink-0 border-2 border-amber-700/50 overflow-hidden">
+                <Image
+                  src={agentImageSrc}
+                  alt={"🚶"}
+                  fill
+                  className="object-cover"
+                />
               </div>
               {/* Show artwork following agent after successful retrieval */}
               {isReturningWithArtwork && (

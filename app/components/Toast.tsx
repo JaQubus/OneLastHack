@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export type ToastType = {
@@ -40,9 +40,42 @@ function Toast({ toast, onRemove }: ToastProps) {
     // only restart timer when toast id or duration changes
   }, [toast.id, toast.duration]);
 
+  const getToastStyles = () => {
+    switch (toast.type) {
+      case 'success':
+        return 'bg-green-900/95 backdrop-blur-md border-2 border-green-700/50 shadow-2xl';
+      case 'error':
+        return 'bg-red-900/95 backdrop-blur-md border-2 border-red-700/50 shadow-2xl';
+      default:
+        return 'bg-amber-900/95 backdrop-blur-md border-2 border-amber-800/50 shadow-2xl';
+    }
+  };
+
+  const getTextColor = () => {
+    switch (toast.type) {
+      case 'success':
+        return 'text-green-50';
+      case 'error':
+        return 'text-red-50';
+      default:
+        return 'text-amber-50';
+    }
+  };
+
+  const getMessageColor = () => {
+    switch (toast.type) {
+      case 'success':
+        return 'text-green-200';
+      case 'error':
+        return 'text-red-200';
+      default:
+        return 'text-amber-200';
+    }
+  };
+
   return (
     <div
-      className="bg-amber-900/95 backdrop-blur-md border-2 border-amber-800/50 shadow-2xl rounded-lg p-4 mb-3 min-w-[300px] max-w-[400px] transform transition-all duration-300 ease-in-out animate-[slideInRight_0.3s_ease-out] cursor-pointer"
+      className={`${getToastStyles()} rounded-lg p-4 mb-3 min-w-[300px] max-w-[400px] transform transition-all duration-300 ease-in-out animate-[slideInRight_0.3s_ease-out] cursor-pointer`}
       onClick={() => {
         // clear timer and call latest onRemove
         if (timerRef.current) {
@@ -60,11 +93,11 @@ function Toast({ toast, onRemove }: ToastProps) {
       }}
     >
       {toast.title && (
-        <div className="font-bold text-amber-50 text-sm mb-1 select-none">
+        <div className={`font-bold ${getTextColor()} text-sm mb-1 select-none`}>
           {toast.title}
         </div>
       )}
-      <div className="text-amber-200 text-sm select-none">
+      <div className={`${getMessageColor()} text-sm select-none`}>
         {toast.message}
       </div>
     </div>
@@ -77,10 +110,16 @@ interface ToastContainerProps {
 }
 
 export default function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
-  // Avoid referencing `document` during SSR — return null until `document`
-  // is available. This file is a client component ("use client") but the
-  // module can still be imported during server build steps, so guard here.
-  if (typeof document === 'undefined') return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Avoid hydration mismatch by not rendering portal during SSR
+  if (!mounted || typeof document === 'undefined') {
+    return null;
+  }
 
   return createPortal(
     <div className="fixed top-32 right-6 z-50 pointer-events-none">
