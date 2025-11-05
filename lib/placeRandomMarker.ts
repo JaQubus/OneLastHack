@@ -10,6 +10,44 @@ type Marker = {
 const SVG_WIDTH = 1646;
 const SVG_HEIGHT = 1447;
 
+// Function to convert SVG coordinates to viewport percentages with object-cover
+function svgToViewport(svgX: number, svgY: number): { top: string; left: string } {
+  if (typeof window === 'undefined') {
+    // Server-side rendering fallback - use simple percentage
+    return {
+      top: `${((svgY / SVG_HEIGHT) * 100).toFixed(2)}%`,
+      left: `${((svgX / SVG_WIDTH) * 100).toFixed(2)}%`,
+    };
+  }
+
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const viewportRatio = viewportWidth / viewportHeight;
+  const svgRatio = SVG_WIDTH / SVG_HEIGHT;
+  
+  if (viewportRatio > svgRatio) {
+    // Viewport is wider - scale by width, crop top/bottom
+    const scale = viewportWidth / SVG_WIDTH;
+    const scaledHeight = SVG_HEIGHT * scale;
+    const offsetY = (scaledHeight - viewportHeight) / 2;
+    
+    const left = (svgX / SVG_WIDTH) * 100;
+    const top = ((svgY * scale - offsetY) / viewportHeight) * 100;
+    
+    return { top: `${top.toFixed(2)}%`, left: `${left.toFixed(2)}%` };
+  } else {
+    // Viewport is taller - scale by height, crop left/right
+    const scale = viewportHeight / SVG_HEIGHT;
+    const scaledWidth = SVG_WIDTH * scale;
+    const offsetX = (scaledWidth - viewportWidth) / 2;
+    
+    const top = (svgY / SVG_HEIGHT) * 100;
+    const left = ((svgX * scale - offsetX) / viewportWidth) * 100;
+    
+    return { top: `${top.toFixed(2)}%`, left: `${left.toFixed(2)}%` };
+  }
+}
+
 // Define the six spawn locations from map.svg rectangles
 // Berlin: x="647.38879" y="794.15015" width="4.2229729" height="11.975099"
 // Moskwa: x="1170.4689" y="544.43744" width="19.241098" height="15.148209"
@@ -137,14 +175,8 @@ export function placeRandomMarker(markers: Marker[]): Marker[] {
     const finalX = location.centerX + varianceX;
     const finalY = location.centerY + varianceY;
     
-    // Convert to percentages
-    const leftPercent = (finalX / SVG_WIDTH) * 100;
-    const topPercent = (finalY / SVG_HEIGHT) * 100;
-    
-    return {
-      top: `${topPercent.toFixed(2)}%`,
-      left: `${leftPercent.toFixed(2)}%`,
-    };
+    // Convert SVG coordinates to viewport coordinates with object-cover adjustment
+    return svgToViewport(finalX, finalY);
   };
 
   const newMarkers = markers.map((m, i) => {
@@ -190,7 +222,7 @@ function isTooCloseToExistingMarkers(
 }
 
 export function getRandomPosition(): { top: string; left: string } {
-  // Randomly select one of the three spawn locations
+  // Randomly select one of the spawn locations
   const location = SPAWN_LOCATIONS[Math.floor(Math.random() * SPAWN_LOCATIONS.length)];
   
   // Add some random variance within the rectangle area
@@ -200,14 +232,8 @@ export function getRandomPosition(): { top: string; left: string } {
   const finalX = location.centerX + varianceX;
   const finalY = location.centerY + varianceY;
   
-  // Convert to percentages
-  const leftPercent = (finalX / SVG_WIDTH) * 100;
-  const topPercent = (finalY / SVG_HEIGHT) * 100;
-  
-  return {
-    top: `${topPercent.toFixed(2)}%`,
-    left: `${leftPercent.toFixed(2)}%`,
-  };
+  // Convert SVG coordinates to viewport coordinates with object-cover adjustment
+  return svgToViewport(finalX, finalY);
 }
 
 // Get a random position that is not too close to existing markers
@@ -216,7 +242,7 @@ export function getRandomPositionAwayFromMarkers(
   maxAttempts: number = 100
 ): { top: string; left: string } | null {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    // Randomly select one of the three spawn locations
+    // Randomly select one of the spawn locations
     const location = SPAWN_LOCATIONS[Math.floor(Math.random() * SPAWN_LOCATIONS.length)];
     
     // Add some random variance within the rectangle area
@@ -226,12 +252,8 @@ export function getRandomPositionAwayFromMarkers(
     const finalX = location.centerX + varianceX;
     const finalY = location.centerY + varianceY;
     
-    // Convert to percentages
-    const leftPercent = (finalX / SVG_WIDTH) * 100;
-    const topPercent = (finalY / SVG_HEIGHT) * 100;
-    
-    const top = `${topPercent.toFixed(2)}%`;
-    const left = `${leftPercent.toFixed(2)}%`;
+    // Convert SVG coordinates to viewport coordinates with object-cover adjustment
+    const { top, left } = svgToViewport(finalX, finalY);
     
     // Check if this position is not too close to existing markers
     if (!isTooCloseToExistingMarkers(top, left, existingMarkers)) {

@@ -81,6 +81,87 @@ export default function MapPage() {
   const WARSAW_START_TOP = 59; // Starting position for agents
   const WARSAW_START_LEFT = 50;
 
+  // Map dimensions from SVG
+  const SVG_WIDTH = 1646;
+  const SVG_HEIGHT = 1447;
+
+  // State to store adjusted positions for object-cover
+  const [mapScale, setMapScale] = useState({ scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0 });
+
+  // Calculate map scale and offset for object-cover
+  useEffect(() => {
+    const updateMapScale = () => {
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const svgRatio = SVG_WIDTH / SVG_HEIGHT;
+      const viewportRatio = viewportWidth / viewportHeight;
+
+      let scale, offsetX = 0, offsetY = 0;
+      
+      if (viewportRatio > svgRatio) {
+        // Viewport is wider - scale by width, crop top/bottom
+        scale = viewportWidth / SVG_WIDTH;
+        const scaledHeight = SVG_HEIGHT * scale;
+        offsetY = (scaledHeight - viewportHeight) / 2 / scaledHeight * 100;
+      } else {
+        // Viewport is taller - scale by height, crop left/right
+        scale = viewportHeight / SVG_HEIGHT;
+        const scaledWidth = SVG_WIDTH * scale;
+        offsetX = (scaledWidth - viewportWidth) / 2 / scaledWidth * 100;
+      }
+      
+      setMapScale({ scaleX: scale, scaleY: scale, offsetX, offsetY });
+    };
+
+    updateMapScale();
+    window.addEventListener('resize', updateMapScale);
+    return () => window.removeEventListener('resize', updateMapScale);
+  }, []);
+
+  // Function to convert SVG coordinates to viewport percentages with object-cover
+  const svgToViewport = (svgX: number, svgY: number) => {
+    const viewportRatio = window.innerWidth / window.innerHeight;
+    const svgRatio = SVG_WIDTH / SVG_HEIGHT;
+    
+    if (viewportRatio > svgRatio) {
+      // Viewport is wider - scale by width, crop top/bottom
+      const scale = window.innerWidth / SVG_WIDTH;
+      const scaledHeight = SVG_HEIGHT * scale;
+      const offsetY = (scaledHeight - window.innerHeight) / 2;
+      
+      const left = (svgX / SVG_WIDTH) * 100;
+      const top = ((svgY * scale - offsetY) / window.innerHeight) * 100;
+      
+      return { top: `${top.toFixed(2)}%`, left: `${left.toFixed(2)}%` };
+    } else {
+      // Viewport is taller - scale by height, crop left/right
+      const scale = window.innerHeight / SVG_HEIGHT;
+      const scaledWidth = SVG_WIDTH * scale;
+      const offsetX = (scaledWidth - window.innerWidth) / 2;
+      
+      const top = (svgY / SVG_HEIGHT) * 100;
+      const left = ((svgX * scale - offsetX) / window.innerWidth) * 100;
+      
+      return { top: `${top.toFixed(2)}%`, left: `${left.toFixed(2)}%` };
+    }
+  };
+
+  // Spawn locations with their SVG coordinates (raw from map.svg)
+  const SPAWN_LOCATIONS_RAW = [
+    { name: 'Berlin', x: 647.38879 + 4.2229729 / 2, y: 794.15015 + 11.975099 / 2 },
+    { name: 'Moskwa', x: 1170.4689 + 19.241098 / 2, y: 544.43744 + 15.148209 / 2 },
+    { name: 'Führermuseum', x: 687.17358 + 5.841177 / 2, y: 955.79181 + 5.9414663 / 2 },
+    { name: 'Altaussee', x: 600.20392 + 8.0817862 / 2, y: 989.81628 + 3.9278119 / 2 },
+    { name: 'Merkers', x: 589.38519 + 9.9166393 / 2, y: 847.62286 + 8.7934942 / 2 },
+    { name: 'Neuschwanstein', x: 610.38757 + 13.836784 / 2, y: 968.58258 + 6.2316003 / 2 },
+  ];
+
+  // Convert to viewport coordinates
+  const SPAWN_LOCATIONS = SPAWN_LOCATIONS_RAW.map(loc => ({
+    name: loc.name,
+    ...svgToViewport(loc.x, loc.y)
+  }));
+
   // Get active agents from activeAgentIds
   const activeAgents: Agent[] = activeAgentIds
     .map(id => {
@@ -750,6 +831,28 @@ export default function MapPage() {
           </div>
         </div>
       </div>
+
+      {/* Spawn Location Markers */}
+      {SPAWN_LOCATIONS.map((location) => (
+        <div
+          key={location.name}
+          className="absolute z-15 pointer-events-none"
+          style={{
+            top: location.top,
+            left: location.left,
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <div className="relative flex flex-col items-center">
+            {/* Location Pin */}
+            <div className="w-3 h-3 bg-red-600 rounded-full border border-red-800 shadow-lg"></div>
+            {/* Location Name */}
+            <div className="mt-1 text-white text-base font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
+              {location.name}
+            </div>
+          </div>
+        </div>
+      ))}
 
       {/* Bottom Bar */}
       <BottomBar
