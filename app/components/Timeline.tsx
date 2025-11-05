@@ -11,7 +11,7 @@ interface TimelineProps {
 
 const Timeline = ({
   initialDate,
-  speed = 50, // 1 second = 1 day
+  speed = 500, // 1 second = 1 day
   className = ''
 }: TimelineProps) => {
   const { currentDate, isRunning, toggle, reset, fastForward, setSpeed } = useGameTime();
