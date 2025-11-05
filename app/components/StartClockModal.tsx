@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useGameTime } from "./GameTimeProvider";
+import Image from "next/image";
 
 interface StartClockModalProps {
   onClose: () => void;
@@ -36,10 +37,15 @@ export default function StartClockModal({ onClose }: StartClockModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center space-y-6">
-          <div className="text-6xl mb-4">⏰</div>
-          <h2 className="text-4xl font-bold text-amber-900 mb-2">
-            Strażnicy Dziedzictwa
-          </h2>
+          <div className="mb-4">
+            <Image
+              src="/logo.png"
+              alt="Logo 'Strażnicy Dziedzictwa'"
+              width={160}
+              height={160}
+              className="mx-auto object-contain"
+            />
+          </div>
           
           {/* Introduction */}
           <div className="text-left space-y-4">
