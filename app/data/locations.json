@@ -8,9 +8,9 @@
   },
   {
     "id": "berlin",
-    "name": "Muzeum Pergamońskie",
+    "name": "Berlin",
     "location": "Berlin, Niemcy",
-    "description": "Miasto pełne muzeuów sztuki, takie jak słynne Muzeum Pergamońskie na Wyspie Muzeów. Podczas wojny III Rzeszy służyło jako miejsce przechowywania skradzionych dzieł sztuki z całej Europy.",
+    "description": "Stolica III Rzeszy - jako najważniejsze miasto w państwie, to tutaj przechowywano skradzione dzieła sztuki z całej Europy.",
     "imageUrl": "/panoramas/berlin.png"
   },
   {

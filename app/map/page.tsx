@@ -165,20 +165,21 @@ export default function MapPage() {
 
   // Spawn locations with their SVG coordinates (raw from map.svg)
   const SPAWN_LOCATIONS_RAW = [
-    { name: 'Berlin', x: 647.38879 + 4.2229729 / 2, y: 794.15015 + 11.975099 / 2 },
-    { name: 'Moskwa', x: 1170.4689 + 19.241098 / 2, y: 544.43744 + 15.148209 / 2 },
-    { name: 'Führermuseum', x: 687.17358 + 5.841177 / 2, y: 955.79181 + 5.9414663 / 2 },
-    { name: 'Altaussee', x: 600.20392 + 8.0817862 / 2, y: 989.81628 + 3.9278119 / 2 },
-    { name: 'Merkers', x: 589.38519 + 9.9166393 / 2, y: 847.62286 + 8.7934942 / 2 },
-    // { name: 'Neuschwanstein', x: 610.38757 + 13.836784 / 2, y: 968.58258 + 6.2316003 / 2 },
+    { id: 'berlin', name: 'Berlin', x: 647.38879 + 4.2229729 / 2, y: 794.15015 + 11.975099 / 2 },
+    { id: 'moskwa', name: 'Moskwa', x: 1170.4689 + 19.241098 / 2, y: 544.43744 + 15.148209 / 2 },
+    { id: 'fuhrermuseum', name: 'Führermuseum', x: 687.17358 + 5.841177 / 2, y: 955.79181 + 5.9414663 / 2 },
+    { id: 'altaussee', name: 'Altaussee', x: 600.20392 + 8.0817862 / 2, y: 989.81628 + 3.9278119 / 2 },
+    { id: 'merkers', name: 'Merkers', x: 589.38519 + 9.9166393 / 2, y: 847.62286 + 8.7934942 / 2 },
+    // { id: 'neuschwanstein', name: 'Neuschwanstein', x: 610.38757 + 13.836784 / 2, y: 968.58258 + 6.2316003 / 2 },
   ];
 
   // Convert to viewport coordinates (use state to avoid SSR issues)
-  const [spawnLocations, setSpawnLocations] = useState<Array<{ name: string; top: string; left: string }>>([]);
+  const [spawnLocations, setSpawnLocations] = useState<Array<{ id: string; name: string; top: string; left: string }>>([]);
 
   useEffect(() => {
     // Convert to viewport coordinates on client side only
     const locations = SPAWN_LOCATIONS_RAW.map(loc => ({
+      id: loc.id,
       name: loc.name,
       ...svgToViewport(loc.x, loc.y)
     }));
@@ -840,28 +841,31 @@ export default function MapPage() {
       </div>
 
       {/* Spawn Location Markers - Third priority (below agents and bubbles) */}
-      {
-        spawnLocations.map((location) => (
+      {spawnLocations.map((location) => {
+        const locationData = (locationsData as Location[]).find(l => l.id === location.id);
+        
+        return (
           <div
             key={location.name}
-            className="absolute z-20 pointer-events-none"
+            className="absolute z-20 cursor-pointer group"
             style={{
               top: location.top,
               left: location.left,
               transform: 'translate(-50%, -50%)',
             }}
+            onClick={() => locationData && setSelectedLocation(locationData)}
           >
             <div className="relative flex flex-col items-center">
-              {/* Location Pin */}
-              <div className="w-3 h-3 bg-red-600 rounded-full border border-red-800 shadow-lg"></div>
+              {/* Location Pin with hover effect */}
+              <div className="w-3 h-3 bg-red-600 rounded-full border border-red-800 shadow-lg group-hover:scale-125 group-hover:bg-red-500 transition-all duration-200"></div>
               {/* Location Name */}
-              <div className="mt-1 text-white text-base font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
+              <div className="mt-1 text-white text-base font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap group-hover:text-amber-400 transition-colors duration-200">
                 {location.name}
               </div>
             </div>
           </div>
-        ))
-      }
+        );
+      })}
 
       {/* Bottom Bar */}
       <BottomBar
