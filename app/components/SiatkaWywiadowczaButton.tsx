@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import type { Agent, Skill } from "../types";
+import Image from "next/image";
 
 interface SiatkaWywiadowczaButtonProps {
   intelligencePoints: number;
@@ -35,7 +36,14 @@ export default function SiatkaWywiadowczaButton({
           className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-xs sm:text-sm flex items-center"
         >
           <div className="flex items-center gap-3">
-            <div className="text-2xl">🕵️</div>
+            <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden">
+              <Image
+                src="/Logo_Agencji_Wywiadu.png"
+                alt={"Wywiad"}
+                fill
+                className="object-cover"
+              />
+            </div>
             <div className="flex-1 text-left">
               <div className="text-sm font-semibold text-amber-50">Siatka Wywiadowcza</div>
               <div className="text-xs text-amber-200 mt-1">Punkty: {intelligencePoints}</div>
@@ -61,7 +69,7 @@ export default function SiatkaWywiadowczaButton({
                 ✕
               </button>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-6 flex-1 min-h-0">
               {/* Left Column - Active Agents */}
               <div className="flex flex-col min-h-0">
@@ -73,11 +81,10 @@ export default function SiatkaWywiadowczaButton({
                     return (
                       <div
                         key={index}
-                        className={`p-4 rounded-lg border-2 ${
-                          agent
-                            ? "bg-amber-200/50 border-amber-800/50"
-                            : "bg-amber-200/20 border-amber-800/20 border-dashed"
-                        }`}
+                        className={`p-4 rounded-lg border-2 ${agent
+                          ? "bg-amber-200/50 border-amber-800/50"
+                          : "bg-amber-200/20 border-amber-800/20 border-dashed"
+                          }`}
                       >
                         <div className="flex items-center gap-3">
                           <div className="relative w-14 h-14 bg-amber-700 rounded-full border-2 border-amber-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 
 type Marker = {
   id: number;
@@ -15,9 +16,10 @@ interface PinsListProps {
   markers: Marker[];
   selectedMarkerId: number | null;
   onMarkerClick: (marker: Marker) => void;
+  onMarkerHighlight?: (markerId: number | null) => void; // Callback to trigger animation
 }
 
-export default function PinsList({ markers, selectedMarkerId, onMarkerClick }: PinsListProps) {
+export default function PinsList({ markers, selectedMarkerId, onMarkerClick, onMarkerHighlight }: PinsListProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -28,6 +30,17 @@ export default function PinsList({ markers, selectedMarkerId, onMarkerClick }: P
     const query = searchQuery.toLowerCase();
     return title.includes(query) || description.includes(query);
   });
+
+  const handleMarkerClick = (marker: Marker) => {
+    // Trigger animation on map marker
+    if (onMarkerHighlight) {
+      onMarkerHighlight(marker.id);
+      setTimeout(() => onMarkerHighlight(null), 1000);
+    }
+    // Open modal
+    onMarkerClick(marker);
+    setIsExpanded(false);
+  };
 
   return (
     <>
@@ -77,10 +90,7 @@ export default function PinsList({ markers, selectedMarkerId, onMarkerClick }: P
                 {filteredMarkers.map((marker) => (
                   <button
                     key={marker.id}
-                    onClick={() => {
-                      onMarkerClick(marker);
-                      setIsExpanded(false);
-                    }}
+                    onClick={() => handleMarkerClick(marker)}
                     className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                       selectedMarkerId === marker.id
                         ? "bg-amber-700/90 border-amber-600 shadow-lg"
@@ -88,7 +98,14 @@ export default function PinsList({ markers, selectedMarkerId, onMarkerClick }: P
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="text-2xl flex-shrink-0">📍</div>
+                      <div className="relative w-10 h-10 flex-shrink-0 border-2 border-amber-700/50 overflow-hidden">
+                        <Image
+                          src="/dama.jpg"
+                          alt={marker.title || `Marker ${marker.id}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-amber-50 text-sm mb-1 truncate">
                           {marker.title || `Zdarzenie #${marker.id}`}

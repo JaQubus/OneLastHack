@@ -21,7 +21,14 @@ export default function StolenGoodButton({ stolenGood }: StolenGoodButtonProps) 
         className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] text-xs sm:text-sm flex items-center"
       >
         <div className="flex items-center gap-3">
-          <div className="text-2xl">🎨</div>
+         <div className="relative w-10 h-10 flex-shrink-0 border-2 border-amber-700/50 overflow-hidden">
+                        <Image
+                          src="/dama.jpg"
+                          alt={stolenGood.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
           <div className="flex-1 text-left">
             <div className="text-sm font-semibold text-amber-50 mb-1">{stolenGood.name}</div>
             <div className="w-full bg-amber-900/50 rounded-full h-4 border border-amber-700/50 shadow-inner overflow-hidden">

@@ -9,7 +9,7 @@ import skillsData from "../data/skills.json";
 // start with no pre-existing markers; markers will be spawned by the game time
 import EventModal from "../components/EventModal";
 import MapMarker from "../components/MapMarker";
-import { placeRandomMarker } from "../../lib/placeRandomMarker";
+import { placeRandomMarker, clampMarkerPosition, getRandomPositionAwayFromMarkers } from "../../lib/placeRandomMarker";
 import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
@@ -29,6 +29,7 @@ export default function MapPage() {
   const [intelligencePoints, setIntelligencePoints] = useState(125);
   const [progress, setProgress] = useState(60);
   const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
+  const [highlightedMarkerId, setHighlightedMarkerId] = useState<number | null>(null);
   
   // State for active agents in slots (start with first agent if available)
   const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
@@ -91,18 +92,26 @@ export default function MapPage() {
       // pick a random template from the JSON titles/descriptions
       const pool = initialMarkers as { id: number; top: string; left: string; title: string; description: string }[];
       const tpl = pool[Math.floor(Math.random() * pool.length)] || {};
-      // use placeRandomMarker util to compute a random position for the template
-      const moved = placeRandomMarker([ { id: tpl.id, top: tpl.top, left: tpl.left, title: tpl.title, description: tpl.description } ])[0];
-      const newMarker: Marker = {
-        id: Date.now(),
-        top: moved.top,
-        left: moved.left,
-        title: tpl.title ?? `Wydarzenie`,
-        description: tpl.description ?? "Nowe zdarzenie wykryte przez siatkę wywiadowczą.",
-      };
+      
+      // Get current markers to check distance
+      const currentMarkers = markersRef.current;
+      
+      // Find a position that's not too close to existing markers
+      const newPosition = getRandomPositionAwayFromMarkers(currentMarkers);
+      
+      if (newPosition) {
+        const newMarker: Marker = {
+          id: Date.now(),
+          top: newPosition.top,
+          left: newPosition.left,
+          title: tpl.title ?? `Wydarzenie`,
+          description: tpl.description ?? "Nowe zdarzenie wykryte przez siatkę wywiadowczą.",
+        };
 
-      // add marker (do NOT open modal automatically)
-      setMarkers((prev) => [...prev, newMarker]);
+        // add marker (do NOT open modal automatically)
+        setMarkers((prev) => [...prev, newMarker]);
+      }
+      // If we couldn't find a valid position, skip this spawn (prevents infinite loops)
     });
 
     return () => cancelScheduled(id);
@@ -131,6 +140,7 @@ export default function MapPage() {
         markers={markers}
         selectedMarkerId={selectedMarker?.id || null}
         onMarkerClick={(marker) => setSelectedMarker(marker)}
+        onMarkerHighlight={setHighlightedMarkerId}
       />
 
       {/* Top Bar */}
@@ -164,6 +174,7 @@ export default function MapPage() {
                 setSelectedMarker(found);
               }}
               title={m.title}
+              isAnimating={highlightedMarkerId === m.id}
             />
           ))}
         </div>
