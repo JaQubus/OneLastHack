@@ -23,8 +23,8 @@ export default function Home() {
         <div className="flex flex-col items-center gap-3 sm:gap-4">
           <h1 className="text-6xl font-bold flex flex-row tracking-wider  drop-shadow-[2px_2px_4px_rgba(139,69,19,0.3)] sm:text-7xl md:text-8xl lg:text-9xl">
             <div className="text-amber-900">Wojna</div>
-            <div className="text-amber-700">o</div>
-            <div className="text-amber-800">kulturę</div>
+            <div className="text-amber-700">&nbsp;o</div>
+            <div className="text-amber-800">&nbsp;kulturę</div>
           </h1>
         </div>
 
