@@ -8,7 +8,7 @@ export default function TopBar() {
         <Link href="/" className="btn btn-ghost btn-sm text-amber-50 hover:bg-amber-800/50 transition-all">
           ← Powrót
         </Link>
-        <h1 className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight">KULTURKAMPF</h1>
+        <h1 className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight">Wojna o kulturę</h1>
         <div className="text-sm font-mono text-amber-100 bg-amber-800/50 px-3 py-1 rounded-md border border-amber-700/50">
           <Timeline />
         </div>
