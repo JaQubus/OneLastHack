@@ -55,7 +55,7 @@ let globalIdCounter = 1;
 export function GameTimeProvider({ children }: { children: React.ReactNode }) {
   const defaultDate = useMemo(() => startOfDay(new Date("1939-09-01")), []);
   const [currentDate, setCurrentDate] = useState<Date>(defaultDate);
-  const [isRunning, setIsRunning] = useState<boolean>(true);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
   const [speed, setSpeedState] = useState<number>(500);
 
   const onceRef = useRef<ScheduledOnce[]>([]);

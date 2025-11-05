@@ -27,7 +27,7 @@ type Marker = {
 export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
   const [intelligencePoints, setIntelligencePoints] = useState(125);
-  const [progress, setProgress] = useState(60);
+  const [progress, setProgress] = useState(0);
   const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
   const [highlightedMarkerId, setHighlightedMarkerId] = useState<number | null>(null);
   
@@ -84,7 +84,41 @@ export default function MapPage() {
     markersRef.current = markers;
   }, [markers]);
 
-  const { scheduleEvery, cancelScheduled } = useGameTime();
+  const { scheduleEvery, cancelScheduled, start, stop, reset, currentDate } = useGameTime();
+  
+  // Calculate progress based on game time (from 1939-09-01 to 1945-05-08 = ~2190 days)
+  useEffect(() => {
+    const startDate = new Date("1939-09-01");
+    const endDate = new Date("1945-05-08");
+    const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const currentDays = Math.floor((currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const newProgress = Math.min(100, Math.max(0, (currentDays / totalDays) * 100));
+    setProgress(newProgress);
+  }, [currentDate]);
+
+  // Reset progress and start timer when map page is entered, stop when leaving
+  useEffect(() => {
+    // Reset all progress-related state
+    setProgress(0);
+    setIntelligencePoints(125);
+    setMarkers([]);
+    setSelectedMarker(null);
+    setActiveAgentIds(() => {
+      const firstAgent = agentsData[0];
+      return firstAgent ? [firstAgent.id] : [];
+    });
+    setSkills(skillsData as Skill[]);
+    
+    // Reset game time to initial date
+    reset();
+    
+    // Start the timer
+    start();
+    
+    return () => {
+      stop();
+    };
+  }, [start, stop, reset]);
 
   // Schedule an event every 30 in-game days to spawn a new marker and open its modal
   useEffect(() => {
