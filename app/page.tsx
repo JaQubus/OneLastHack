@@ -38,13 +38,21 @@ export default function Home() {
           <span className="sm:hidden"> </span>i prowadź operację odzyskania zagrabionych skarbów kultury.
         </p>
 
-        {/* Main CTA Button - VERY CLICKABLE! */}
-        <Link href="/map" className="mt-4 sm:mt-6">
-          <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-700 text-lg font-bold uppercase tracking-widest text-amber-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-amber-800 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl rounded-xl">
-            <span className="relative z-10">Rozpocznij Misję</span>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-800 to-amber-900 opacity-0 transition-opacity group-hover:opacity-100"></div>
-          </button>
-        </Link>
+        {/* Main CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mt-4 sm:mt-6">
+          <Link href="/map" className="mt-4 sm:mt-0">
+            <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-700 text-lg font-bold uppercase tracking-widest text-amber-50 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-amber-800 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl rounded-xl">
+              <span className="relative z-10">Rozpocznij Misję</span>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-800 to-amber-900 opacity-0 transition-opacity group-hover:opacity-100"></div>
+            </button>
+          </Link>
+          <Link href="/artworks" className="mt-4 sm:mt-0">
+            <button className="group relative btn btn-lg h-16 min-w-[240px] border-2 border-amber-800 bg-amber-100 text-lg font-bold uppercase tracking-widest text-amber-900 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-amber-200 hover:shadow-2xl active:scale-95 sm:h-20 sm:min-w-[300px] sm:text-xl rounded-xl">
+              <span className="relative z-10">Kolekcja Dzieł</span>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-200 to-amber-300 opacity-0 transition-opacity group-hover:opacity-100"></div>
+            </button>
+          </Link>
+        </div>
 
         {/* Additional Info Cards */}
         <div className="mt-8 grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
@@ -71,7 +79,7 @@ export default function Home() {
           <div className="card bg-amber-100/80 border-2 border-amber-800/30 shadow-xl backdrop-blur-sm rounded-xl">
             <div className="card-body items-center p-4 text-center sm:p-6">
               <div className="mb-2 text-4xl">🎨</div>
-              <h3 className="card-title text-amber-900 text-base sm:text-lg">Kolekcja Dzieł</h3>
+              <h3 className="card-title text-amber-900 text-base sm:text-lg">Kolekcjonuj Dzieła</h3>
               <p className="text-sm text-amber-800 sm:text-base">
                 Odzyskaj najcenniejsze skarby kultury
               </p>

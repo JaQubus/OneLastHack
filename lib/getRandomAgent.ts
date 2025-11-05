@@ -1,4 +1,4 @@
-import agents from "../data/agents.json";
+import agents from "../app/data/agents.json";
 
 export type Agent = {
   id: number;

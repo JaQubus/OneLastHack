@@ -13,7 +13,6 @@ export type StolenGood = {
 export type Agent = {
   id: number;
   name: string;
-  codename: string;
 };
 
 export type Skill = {

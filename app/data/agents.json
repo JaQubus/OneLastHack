@@ -2,49 +2,31 @@
   {
     "id": 1,
     "name": "Witold Pilecki",
-    "photo": "/officers/witold-pilecki.png",
-    "location": "Warszawa",
-    "status": "odkryty",
-    "specialization": "Infiltracja"
+    "photo": "/officers/witold-pilecki.png"
   },
   {
     "id": 2,
     "name": "Elżbieta Zawicka",
-    "photo": "/officers/elzbieta-zawicka.png",
-    "location": "Kraków",
-    "status": "odkryty",
-    "specialization": "Infiltracja"
+    "photo": "/officers/elzbieta-zawicka.png"
   },
   {
     "id": 3,
     "name": "Mieczysław Słowik",
-    "photo": "/officers/mieczyslaw-slowik.png",
-    "location": "Warszawa",
-    "status": "odkryty",
-    "specialization": "Sabotaż"
+    "photo": "/officers/mieczyslaw-slowik.png"
   },
   {
     "id": 4,
     "name": "Wacław Berka",
-    "photo": "/officers/waclaw-berka.png",
-    "location": "Warszawa",
-    "status": "ukryty",
-    "specialization": "Wywiad"
+    "photo": "/officers/waclaw-berka.png"
   },
   {
     "id": 5,
     "name": "Kazimierz Iranek-Osmecki",
-    "photo": "/officers/kazimierz-iranek-osmecki.png",
-    "location": "Poznań",
-    "status": "ukryty",
-    "specialization": "Wywiad"
+    "photo": "/officers/kazimierz-iranek-osmecki.png"
   },
   {
     "id": 6,
     "name": "Krystyna Skarbek",
-    "photo": "/officers/krystyna-skarbek.png",
-    "location": "Warszawa",
-    "status": "odkryty",
-    "specialization": "Łączność"
+    "photo": "/officers/krystyna-skarbek.png"
   }
 ]

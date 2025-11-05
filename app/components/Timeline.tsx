@@ -38,26 +38,6 @@ const Timeline = ({
     <div className={`date-counter p-2 rounded-lg ${className}`}>
       <div className="text-center">
         <div className="text-2xl font-mono font-bold">{formatDate(currentDate)}</div>
-        <div className="mt-2 flex items-center justify-center gap-2">
-          <button 
-            className="min-w-[80px] px-3 py-1.5 bg-amber-700/80 hover:bg-amber-700 text-amber-50 text-xs font-semibold rounded-lg border border-amber-600/50 shadow-md transition-all hover:scale-105 active:scale-95 text-center" 
-            onClick={toggle}
-          >
-            {isRunning ? '⏸ Pause' : '▶ Play'}
-          </button>
-          <button 
-            className="min-w-[60px] px-3 py-1.5 bg-amber-700/80 hover:bg-amber-700 text-amber-50 text-xs font-semibold rounded-lg border border-amber-600/50 shadow-md transition-all hover:scale-105 active:scale-95 text-center" 
-            onClick={() => fastForward(10)}
-          >
-            +10d
-          </button>
-          <button 
-            className="min-w-[60px] px-3 py-1.5 bg-amber-700/80 hover:bg-amber-700 text-amber-50 text-xs font-semibold rounded-lg border border-amber-600/50 shadow-md transition-all hover:scale-105 active:scale-95 text-center" 
-            onClick={() => reset()}
-          >
-            Reset
-          </button>
-        </div>
       </div>
     </div>
   );
