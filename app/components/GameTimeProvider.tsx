@@ -75,16 +75,74 @@ export function GameTimeProvider({ children }: { children: React.ReactNode }) {
   const setSpeed = React.useCallback((msPerDay: number) => setSpeedState(msPerDay), []);
 
   const reset = React.useCallback((date?: Date) => {
-    setCurrentDate(startOfDay(date ?? defaultDate));
+    const prev = currentDateRef.current;
+    const newDate = startOfDay(date ?? defaultDate);
+    setCurrentDate(newDate);
+    currentDateRef.current = newDate;
     stop();
+
+    const prevNum = dayNumber(prev);
+    const newNum = dayNumber(newDate);
+    if (newNum > prevNum) processSchedulesBetween(prevNum, newNum);
   }, [defaultDate, stop]);
 
-  const fastForward = React.useCallback((days: number) => {
-    setCurrentDate((prev) => {
-      const d = new Date(prev);
-      d.setDate(d.getDate() + days);
-      return startOfDay(d);
+  // process schedules that were skipped when time is advanced from prevDayNum (exclusive)
+  // to newDayNum (inclusive). Runs any one-off schedules in the range and runs recurring
+  // callbacks once for each interval that passed.
+  const processSchedulesBetween = (prevDayNum: number, newDayNum: number) => {
+    if (newDayNum <= prevDayNum) return;
+
+    const callbacks: (() => void)[] = [];
+
+    // one-off schedules
+    const toRunOnce = onceRef.current.filter((s) => {
+      const sd = dayNumber(new Date(s.dateISO));
+      return sd > prevDayNum && sd <= newDayNum;
     });
+    if (toRunOnce.length) {
+      callbacks.push(...toRunOnce.map(s => s.callback));
+      onceRef.current = onceRef.current.filter((s) => {
+        const sd = dayNumber(new Date(s.dateISO));
+        return !(sd > prevDayNum && sd <= newDayNum);
+      });
+    }
+
+    // recurring schedules: if multiple intervals passed, run callback multiple times
+    everyRef.current.forEach((s) => {
+      while (s.nextDayNumber <= newDayNum) {
+        if (s.nextDayNumber > prevDayNum) {
+          callbacks.push(s.callback);
+        } else if (s.nextDayNumber <= prevDayNum) {
+          // if nextDayNumber already behind prev, still advance without running until it passes prev
+        }
+        s.nextDayNumber += s.intervalDays;
+      }
+    });
+
+    if (callbacks.length) {
+      setTimeout(() => {
+        callbacks.forEach(cb => {
+          try { cb(); } catch { /* swallow */ }
+        });
+      }, 0);
+    }
+  };
+
+  const fastForward = React.useCallback((days: number) => {
+    // Advance time immediately and process any schedules that were skipped
+    const prev = currentDateRef.current;
+    const d = new Date(prev);
+    d.setDate(d.getDate() + days);
+    const newDate = startOfDay(d);
+    setCurrentDate(newDate);
+    currentDateRef.current = newDate;
+
+    // process schedules for any days between prev (exclusive) and newDate (inclusive)
+    const prevNum = dayNumber(prev);
+    const newNum = dayNumber(newDate);
+    if (newNum > prevNum) {
+      processSchedulesBetween(prevNum, newNum);
+    }
   }, []);
 
   // scheduling APIs
@@ -98,11 +156,12 @@ export function GameTimeProvider({ children }: { children: React.ReactNode }) {
 
   const scheduleEvery = React.useCallback((intervalDays: number, cb: () => void, startInDays?: number) => {
     const id = `every_${globalIdCounter++}`;
-    const currentDay = dayNumber(currentDate);
+    // use the canonical current date from the ref to avoid stale closure
+    const currentDay = dayNumber(currentDateRef.current);
     const next = currentDay + (typeof startInDays === "number" ? startInDays : intervalDays);
     everyRef.current.push({ id, nextDayNumber: next, intervalDays, callback: cb });
     return id;
-  }, [currentDate]);
+  }, []);
 
   const cancelScheduled = React.useCallback((id: string) => {
     onceRef.current = onceRef.current.filter((s) => s.id !== id);
@@ -128,41 +187,14 @@ export function GameTimeProvider({ children }: { children: React.ReactNode }) {
       next.setDate(next.getDate() + 1);
       const nextDay = startOfDay(next);
 
-      // prepare callbacks to run AFTER we update state
-      const iso = toISODate(nextDay);
-      const toRunOnce = onceRef.current.filter((s) => s.dateISO <= iso);
-      if (toRunOnce.length) {
-        // remove them from the queue
-        onceRef.current = onceRef.current.filter((s) => s.dateISO > iso);
-      }
-
-      // process every: collect callbacks that should run and advance their nextDayNumber
-      const currentDayNumber = dayNumber(nextDay);
-      const everyToRun: (() => void)[] = [];
-      everyRef.current.forEach((s) => {
-        if (currentDayNumber >= s.nextDayNumber) {
-          everyToRun.push(s.callback);
-          s.nextDayNumber = s.nextDayNumber + s.intervalDays;
-        }
-      });
+      // process any schedules between prev (exclusive) and nextDay (inclusive)
+      const prevNum = dayNumber(prev);
+      const newNum = dayNumber(nextDay);
+      processSchedulesBetween(prevNum, newNum);
 
       // Update state and ref synchronously
       setCurrentDate(nextDay);
       currentDateRef.current = nextDay;
-
-      // Run callbacks asynchronously so we don't trigger setState during another component's render
-      if (toRunOnce.length || everyToRun.length) {
-        const allCallbacks = [...toRunOnce.map(s => s.callback), ...everyToRun];
-        setTimeout(() => {
-          allCallbacks.forEach(cb => {
-            try {
-              cb();
-            } catch {
-              // swallow errors in callbacks
-            }
-          });
-        }, 0);
-      }
     }, speed);
 
     return () => {
