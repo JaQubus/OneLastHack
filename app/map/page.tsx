@@ -10,13 +10,9 @@ import museumsData from "../data/museums.json";
 // start with no pre-existing markers; markers will be spawned by the game time
 import EventModal from "../components/EventModal";
 import MapMarker from "../components/MapMarker";
-<<<<<<< HEAD
-import { placeRandomMarker, clampMarkerPosition, getRandomPositionAwayFromMarkers } from "../../lib/placeRandomMarker";
-=======
 import MuseumMarker from "../components/MuseumMarker";
 import MuseumModal from "../components/MuseumModal";
-import { placeRandomMarker } from "../../lib/placeRandomMarker";
->>>>>>> e129016 (map rework,k a and added museums)
+import { placeRandomMarker, clampMarkerPosition, getRandomPositionAwayFromMarkers } from "../../lib/placeRandomMarker";
 import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
@@ -51,7 +47,13 @@ export default function MapPage() {
   const [intelligencePoints, setIntelligencePoints] = useState(125);
   const [progress, setProgress] = useState(0);
   const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
-<<<<<<< HEAD
+  
+  // Map panning state
+  const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(2.0);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const [highlightedMarkerId, setHighlightedMarkerId] = useState<number | null>(null);
   const [acknowledgedMissions, setAcknowledgedMissions] = useState<AcknowledgedMission[]>([]);
   const [retrievalTasks, setRetrievalTasks] = useState<RetrievalTask[]>([]);
@@ -70,17 +72,6 @@ export default function MapPage() {
   }, []); // Empty deps - only run on mount
 
   // State for active agents in slots (start with first 2 agents)
-=======
-  
-  // Map panning state
-  const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(2.0);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  
-  // State for active agents in slots (start with first agent if available)
->>>>>>> e129016 (map rework,k a and added museums)
   const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
     const firstTwoAgents = agentsData.slice(0, 2);
     return firstTwoAgents.map(a => a.id);
@@ -151,10 +142,63 @@ export default function MapPage() {
     markersRef.current = markers;
   }, [markers]);
 
-<<<<<<< HEAD
   // Initialize with one bubble at game start (client-side only to avoid hydration mismatch)
-=======
-  const { scheduleEvery, cancelScheduled } = useGameTime();
+  useEffect(() => {
+    if (!isInitialized && typeof window !== 'undefined') {
+      // Get first available artwork
+      const availableArtworks = (stolenGoodsData as StolenGood[]).filter((good) => good.progress < 100);
+      if (availableArtworks.length > 0) {
+        const artwork = availableArtworks[0];
+        const initialMarkerId = Date.now();
+        const initialPosition = getRandomPositionAwayFromMarkers([]);
+        if (initialPosition) {
+          const initialMarker: Marker = {
+            id: initialMarkerId,
+            top: initialPosition.top,
+            left: initialPosition.left,
+            title: artwork.name,
+            description: `Lokalizacja: ${artwork.location}. ${artwork.description}`,
+            artworkId: artwork.id,
+          };
+          setMarkers([initialMarker]);
+          setMarkerCreationTimes((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(initialMarkerId, Date.now());
+            return newMap;
+          });
+          setIsInitialized(true);
+        }
+      } else {
+        setIsInitialized(true);
+      }
+    }
+  }, [isInitialized]);
+
+  // Auto-remove markers after 20 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setMarkers((prev) => {
+        return prev.filter((m) => {
+          if (m.id === WARSAW_STORAGE.id) return true; // Keep storage
+          const createdAt = markerCreationTimes.get(m.id);
+          if (!createdAt) return true; // Keep if no timestamp
+          return now - createdAt < 20000; // Remove after 20 seconds
+        });
+      });
+      // Clean up old timestamps
+      setMarkerCreationTimes((prev) => {
+        const newMap = new Map(prev);
+        prev.forEach((createdAt, id) => {
+          if (now - createdAt >= 20000) {
+            newMap.delete(id);
+          }
+        });
+        return newMap;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [markerCreationTimes]);
 
   // Function to constrain map position within bounds
   const constrainPosition = (x: number, y: number, currentZoom: number) => {
@@ -272,6 +316,7 @@ export default function MapPage() {
     setMapPosition(constrained);
   };
 
+<<<<<<< HEAD
   // Schedule an event every 30 in-game days to spawn a new marker and open its modal
 >>>>>>> e129016 (map rework,k a and added museums)
   useEffect(() => {
@@ -408,6 +453,8 @@ export default function MapPage() {
     return () => clearInterval(interval);
   }, []);
 
+=======
+>>>>>>> bc0675f (merging)
   // Calculate failure chance
   const calculateFailureChance = (): number => {
     const baseFailureChance = 30;
@@ -664,13 +711,12 @@ export default function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Get active stolen good (first one with progress > 0)
+  const activeStolenGood = (stolenGoodsData as StolenGood[]).find((good: StolenGood) => good.progress > 0) || stolenGoodsData[0] as StolenGood;
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
       {/* Full Screen Map */}
-<<<<<<< HEAD
-      <div className="absolute inset-0 bg-blue-300">
-=======
       <div 
         ref={mapContainerRef}
         className="absolute inset-0 bg-blue-300"
@@ -688,7 +734,6 @@ export default function MapPage() {
         onTouchEnd={handleTouchEnd}
         onWheel={handleWheel}
       >
->>>>>>> e129016 (map rework,k a and added museums)
         <Image
           src="/map.svg"
           alt="Mapa operacyjna Europy"
@@ -706,24 +751,6 @@ export default function MapPage() {
 
       {/* Top Bar */}
       <TopBar />
-
-      {/* Warsaw Storage Marker - smaller, no blinking */}
-      <div
-        className="absolute z-20 cursor-pointer transition-all duration-300 hover:scale-110"
-        style={{
-          top: WARSAW_STORAGE.top, // 59%
-          left: WARSAW_STORAGE.left,
-          transform: 'translate(-50%, -50%)',
-        }}
-        onClick={() => setShowArtGallery(true)}
-        title={WARSAW_STORAGE.title}
-      >
-        <div className="relative w-12 h-12 sm:w-14 sm:h-14">
-          <div className="absolute inset-0 bg-amber-800 rounded-full border-2 border-amber-600 shadow-2xl flex items-center justify-center">
-            <span className="text-xl sm:text-2xl">🏛️</span>
-          </div>
-        </div>
-      </div>
 
       {/* Bottom Bar */}
       <BottomBar
@@ -774,11 +801,6 @@ export default function MapPage() {
       </div>
 
       {/* Clickable markers overlay */}
-<<<<<<< HEAD
-      <div className="absolute inset-0 z-10 pointer-events-none">
-        <div className="pointer-events-auto">
-          {/* Example marker positions loaded from JSON */}
-=======
       <div 
         className="absolute inset-0 z-10 pointer-events-none"
         style={{
@@ -788,7 +810,6 @@ export default function MapPage() {
       >
           <div className="pointer-events-auto">
           {/* Event markers */}
->>>>>>> e129016 (map rework,k a and added museums)
           {markers.map((m) => (
             <MapMarker
               key={m.id}
@@ -797,14 +818,9 @@ export default function MapPage() {
               left={m.left}
               onClick={(id) => {
                 const found = markers.find((x) => x.id === id) || null;
-                if (found && found.id !== WARSAW_STORAGE.id) {
-                  // Collect the bubble - gives points and adds to missions
-                  collectMarker(found);
-                  setSelectedMarker(null); // Close modal immediately
-                }
+                setSelectedMarker(found);
               }}
               title={m.title}
-              isAnimating={highlightedMarkerId === m.id}
             />
           ))}
 
@@ -824,124 +840,20 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* Path Lines from Storage to Mission Points - Only show for active missions */}
-      <svg className="absolute inset-0 z-5 pointer-events-none" style={{ width: '100%', height: '100%' }}>
-        {acknowledgedMissions.map((mission) => {
-          const task = retrievalTasks.find(t => t.missionId === mission.id);
-          const isActive = task && task.progress < 100;
-          // Only show path for active missions
-          if (!isActive) return null;
-
-          const startX = parseFloat(WARSAW_STORAGE.left.replace('%', ''));
-          const startY = parseFloat(WARSAW_STORAGE.top.replace('%', ''));
-          const endX = parseFloat(mission.left.replace('%', ''));
-          const endY = parseFloat(mission.top.replace('%', ''));
-
-          return (
-            <line
-              key={`path-${mission.id}`}
-              x1={`${startX}%`}
-              y1={`${startY}%`}
-              x2={`${endX}%`}
-              y2={`${endY}%`}
-              stroke="rgba(251, 191, 36, 0.6)"
-              strokeWidth="3"
-              strokeDasharray="6,2"
-            />
-          );
-        })}
-      </svg>
-
-      {/* Mission Point Markers on Map - Only show artwork when mission is active */}
-      {acknowledgedMissions.map((mission) => {
-        const task = retrievalTasks.find(t => t.missionId === mission.id);
-        const isActive = task && task.progress < 100;
-
-        // Only show marker when mission is active
-        if (!isActive) return null;
-
-        const artwork = mission.artworkId
-          ? stolenGoods.find(g => g.id === mission.artworkId)
-          : null;
-        // Always default to dama.jpg if no artwork image
-        let imageSrc = "/dama.jpg";
-        if (artwork?.image && artwork.image.trim() !== "") {
-          imageSrc = artwork.image;
-        }
-
-        return (
-          <div
-            key={`mission-${mission.id}`}
-            className="absolute z-12 pointer-events-none"
-            style={{
-              top: mission.top,
-              left: mission.left,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <div className="relative animate-pulse">
-              {/* Show artwork image when mission is active */}
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-amber-600 shadow-2xl overflow-hidden">
-                <Image
-                  src={imageSrc}
-                  alt={artwork?.name || mission.title || "Dzieło sztuki"}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600 animate-ping"></div>
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-green-600"></div>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* Agent Icons on Map (during retrieval) */}
-      {retrievalTasks.map((task) => {
-        const agent = activeAgents.find((a) => a.id === task.agentId);
-        return (
-          <div
-            key={task.id}
-            className="absolute z-15 transition-all duration-100"
-            style={{
-              top: task.currentTop,
-              left: task.currentLeft,
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <div className={`text-3xl ${task.failed ? 'animate-bounce' : 'animate-pulse'}`}>
-              {task.failed ? '😞' : '🚶'}
-            </div>
-            {task.progress >= 50 && task.failed && !task.isReturning && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-red-800/90 text-red-50 px-2 py-1 rounded whitespace-nowrap">
-                ❌ Misja Nieudana
-              </div>
-            )}
-            {task.progress >= 100 && task.failed && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-amber-800/90 text-amber-50 px-2 py-1 rounded whitespace-nowrap">
-                Powrót do Bazy
-              </div>
-            )}
-            {task.progress >= 100 && !task.failed && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-xs bg-green-800/90 text-green-50 px-2 py-1 rounded whitespace-nowrap">
-                ✓ Odzyskano
-              </div>
-            )}
-          </div>
-        );
-      })}
-
-      {/* Event Info Modal - removed, markers are collected immediately on click */}
-
-      {/* Art Gallery Modal */}
-      {showArtGallery && (
-        <ArtGalleryModal
-          stolenGoods={stolenGoods}
-          onClose={() => setShowArtGallery(false)}
+      {/* Event Info Modal - moved to component */}
+      {selectedMarker != null && (
+        <EventModal
+          marker={selectedMarker}
+          onClose={() => {
+            if (selectedMarker) {
+              setMarkers((prev) => prev.filter((m) => m.id !== selectedMarker.id));
+            }
+            setSelectedMarker(null);
+          }}
         />
       )}
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -976,6 +888,8 @@ export default function MapPage() {
         );
       })()}
 =======
+=======
+>>>>>>> bc0675f (merging)
       {/* Museum Modal */}
       {selectedMuseum != null && (
         <MuseumModal
@@ -984,7 +898,6 @@ export default function MapPage() {
           onClose={() => setSelectedMuseum(null)}
         />
       )}
->>>>>>> e129016 (map rework,k a and added museums)
     </div>
   );
 }
