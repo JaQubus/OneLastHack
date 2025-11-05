@@ -19,6 +19,7 @@ import ArtGalleryModal from "../components/ArtGalleryModal";
 import MissionDetailModal from "../components/MissionDetailModal";
 import StartClockModal from "../components/StartClockModal";
 import LocationModal from "../components/LocationModal";
+import EndScreen from "../components/EndScreen";
 import type { StolenGood, Agent, Skill, AcknowledgedMission, RetrievalTask } from "../types";
 
 type Marker = {
@@ -60,6 +61,9 @@ export default function MapPage() {
   const [toasts, setToasts] = useState<ToastType[]>([]);
   const [showStartClockModal, setShowStartClockModal] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [showEndScreen, setShowEndScreen] = useState(false);
+  const [totalMissionsStarted, setTotalMissionsStarted] = useState(0);
+  const [successfulMissionsCount, setSuccessfulMissionsCount] = useState(0);
 
   // Memoized function to remove toast
   const removeToast = useCallback((id: string) => {
@@ -229,7 +233,7 @@ export default function MapPage() {
       )
     );
   };
-  const { scheduleEvery, cancelScheduled, isRunning, currentDate, reset, start } = useGameTime();
+  const { scheduleEvery, cancelScheduled, isRunning, currentDate, reset, start, stop } = useGameTime();
 
   // Track marker creation time for 20 second auto-removal (in game time seconds)
   const [markerCreationTimes, setMarkerCreationTimes] = useState<Map<number, number>>(new Map());
@@ -298,6 +302,20 @@ export default function MapPage() {
 
     setProgress(newProgress);
   }, [currentDate]);
+
+  // Check if game should end (progress reaches 100% OR all artworks recovered)
+  useEffect(() => {
+    const allArtworksRecovered = stolenGoods.every((good) => good.progress === 100);
+    const progressReached100 = progress >= 100;
+
+    if ((allArtworksRecovered || progressReached100) && !showEndScreen) {
+      setShowEndScreen(true);
+      // Pause the game when ending
+      if (isRunning) {
+        stop();
+      }
+    }
+  }, [progress, stolenGoods, showEndScreen, isRunning, stop]);
 
   // Track game time in seconds (only when game is running)
   useEffect(() => {
@@ -420,6 +438,7 @@ export default function MapPage() {
     };
 
     setRetrievalTasks((prev) => [...prev, newTask]);
+    setTotalMissionsStarted((prev) => prev + 1);
   };
 
   // Collect marker when clicked - gives intelligence points and adds to missions
@@ -605,6 +624,8 @@ export default function MapPage() {
               );
               // Track artwork as recovered in current session
               setRecoveredInSession((prev) => new Set(prev).add(task.artworkId));
+              // Increment successful missions counter
+              setSuccessfulMissionsCount((prev) => prev + 1);
               // Decrease overall progress by 3% when mission succeeds (or reset to 0 if < 3%)
               setProgress((prev) => {
                 const newProgress = prev >= 3 ? prev - 3 : 0;
@@ -843,7 +864,7 @@ export default function MapPage() {
       {/* Spawn Location Markers - Third priority (below agents and bubbles) */}
       {spawnLocations.map((location) => {
         const locationData = (locationsData as Location[]).find(l => l.id === location.id);
-        
+
         return (
           <div
             key={location.name}
@@ -1114,6 +1135,18 @@ export default function MapPage() {
           );
         })()
       }
+
+      {/* End Screen */}
+      {showEndScreen && (
+        <EndScreen
+          stolenGoods={stolenGoods}
+          recoveredArtworks={stolenGoods.filter((good) => good.progress === 100)}
+          totalMissions={totalMissionsStarted}
+          successfulMissions={successfulMissionsCount}
+          activeAgents={activeAgents}
+          onClose={() => setShowEndScreen(false)}
+        />
+      )}
     </div >
   );
 }
