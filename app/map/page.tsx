@@ -6,10 +6,17 @@ import stolenGoodsData from "../data/stolen-goods.json";
 import initialMarkers from "../data/map-markers.json";
 import agentsData from "../data/agents.json";
 import skillsData from "../data/skills.json";
+import museumsData from "../data/museums.json";
 // start with no pre-existing markers; markers will be spawned by the game time
 import EventModal from "../components/EventModal";
 import MapMarker from "../components/MapMarker";
+<<<<<<< HEAD
 import { placeRandomMarker, clampMarkerPosition, getRandomPositionAwayFromMarkers } from "../../lib/placeRandomMarker";
+=======
+import MuseumMarker from "../components/MuseumMarker";
+import MuseumModal from "../components/MuseumModal";
+import { placeRandomMarker } from "../../lib/placeRandomMarker";
+>>>>>>> e129016 (map rework,k a and added museums)
 import { useGameTime } from "../components/GameTimeProvider";
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
@@ -27,11 +34,24 @@ type Marker = {
   artworkId?: number;
 };
 
+type Museum = {
+  id: string;
+  name: string;
+  location: string;
+  description: string;
+  imageUrl?: string;
+  capacity: number;
+  top: string;
+  left: string;
+};
+
 export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
+  const [selectedMuseum, setSelectedMuseum] = useState<Museum | null>(null);
   const [intelligencePoints, setIntelligencePoints] = useState(125);
   const [progress, setProgress] = useState(0);
   const [skills, setSkills] = useState<Skill[]>(skillsData as Skill[]);
+<<<<<<< HEAD
   const [highlightedMarkerId, setHighlightedMarkerId] = useState<number | null>(null);
   const [acknowledgedMissions, setAcknowledgedMissions] = useState<AcknowledgedMission[]>([]);
   const [retrievalTasks, setRetrievalTasks] = useState<RetrievalTask[]>([]);
@@ -50,6 +70,17 @@ export default function MapPage() {
   }, []); // Empty deps - only run on mount
 
   // State for active agents in slots (start with first 2 agents)
+=======
+  
+  // Map panning state
+  const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(2.0);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  
+  // State for active agents in slots (start with first agent if available)
+>>>>>>> e129016 (map rework,k a and added museums)
   const [activeAgentIds, setActiveAgentIds] = useState<number[]>(() => {
     const firstTwoAgents = agentsData.slice(0, 2);
     return firstTwoAgents.map(a => a.id);
@@ -120,7 +151,129 @@ export default function MapPage() {
     markersRef.current = markers;
   }, [markers]);
 
+<<<<<<< HEAD
   // Initialize with one bubble at game start (client-side only to avoid hydration mismatch)
+=======
+  const { scheduleEvery, cancelScheduled } = useGameTime();
+
+  // Function to constrain map position within bounds
+  const constrainPosition = (x: number, y: number, currentZoom: number) => {
+    if (!mapContainerRef.current) return { x, y };
+    
+    const container = mapContainerRef.current;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    
+    // SVG map is roughly square (1646x1450), with object-contain it will fit to the smaller dimension
+    // Calculate actual displayed map size based on container aspect ratio
+    const containerAspect = containerWidth / containerHeight;
+    const mapAspect = 1646 / 1450; // roughly 1.135
+    
+    let displayedMapWidth, displayedMapHeight;
+    
+    if (containerAspect > mapAspect) {
+      // Container is wider - map height matches container height
+      displayedMapHeight = containerHeight;
+      displayedMapWidth = containerHeight * mapAspect;
+    } else {
+      // Container is taller - map width matches container width
+      displayedMapWidth = containerWidth;
+      displayedMapHeight = containerWidth / mapAspect;
+    }
+    
+    // Apply zoom
+    const scaledWidth = displayedMapWidth * currentZoom;
+    const scaledHeight = displayedMapHeight * currentZoom;
+    
+    // Calculate how much the map extends beyond the viewport
+    const excessWidth = scaledWidth - containerWidth;
+    const excessHeight = scaledHeight - containerHeight;
+    
+    // Limit panning to map boundaries
+    if (excessWidth > 0) {
+      // Map is wider than viewport - allow horizontal panning
+      const maxX = excessWidth / 2;
+      x = Math.max(-maxX, Math.min(maxX, x));
+    } else {
+      // Map is narrower than viewport - center horizontally
+      x = 0;
+    }
+    
+    if (excessHeight > 0) {
+      // Map is taller than viewport - allow vertical panning
+      const maxY = excessHeight / 2;
+      y = Math.max(-maxY, Math.min(maxY, y));
+    } else {
+      // Map is shorter than viewport - center vertically
+      y = 0;
+    }
+    
+    return { x, y };
+  };
+
+  // Map panning handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - mapPosition.x,
+      y: e.clientY - mapPosition.y
+    });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    const newX = e.clientX - dragStart.x;
+    const newY = e.clientY - dragStart.y;
+    
+    const constrained = constrainPosition(newX, newY, zoom);
+    setMapPosition(constrained);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setDragStart({
+      x: touch.clientX - mapPosition.x,
+      y: touch.clientY - mapPosition.y
+    });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    const touch = e.touches[0];
+    const newX = touch.clientX - dragStart.x;
+    const newY = touch.clientY - dragStart.y;
+    
+    const constrained = constrainPosition(newX, newY, zoom);
+    setMapPosition(constrained);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  // Zoom handler
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    
+    const delta = e.deltaY * -0.001;
+    const newZoom = Math.min(Math.max(2.0, zoom + delta), 3);
+    
+    setZoom(newZoom);
+    
+    // Adjust position to keep it within bounds after zoom
+    const constrained = constrainPosition(mapPosition.x, mapPosition.y, newZoom);
+    setMapPosition(constrained);
+  };
+
+  // Schedule an event every 30 in-game days to spawn a new marker and open its modal
+>>>>>>> e129016 (map rework,k a and added museums)
   useEffect(() => {
     if (!isInitialized && typeof window !== 'undefined') {
       // Get first available artwork
@@ -515,12 +668,32 @@ export default function MapPage() {
   return (
     <div className="relative h-screen w-screen overflow-hidden">
       {/* Full Screen Map */}
+<<<<<<< HEAD
       <div className="absolute inset-0 bg-blue-300">
+=======
+      <div 
+        ref={mapContainerRef}
+        className="absolute inset-0 bg-blue-300"
+        style={{
+          transform: `translate(${mapPosition.x}px, ${mapPosition.y}px) scale(${zoom})`,
+          cursor: isDragging ? 'grabbing' : 'grab',
+          transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onWheel={handleWheel}
+      >
+>>>>>>> e129016 (map rework,k a and added museums)
         <Image
           src="/map.svg"
           alt="Mapa operacyjna Europy"
           fill
-          className="object-cover pointer-events-none"
+          className="object-contain pointer-events-none"
           priority
         />
       </div>
@@ -569,10 +742,53 @@ export default function MapPage() {
         onMissionClick={setSelectedMission}
       />
 
+      {/* Zoom Controls */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
+        <button
+          onClick={() => {
+            const newZoom = Math.min(3, zoom + 0.2);
+            setZoom(newZoom);
+            const constrained = constrainPosition(mapPosition.x, mapPosition.y, newZoom);
+            setMapPosition(constrained);
+          }}
+          className="w-10 h-10 bg-white/90 hover:bg-white rounded-lg shadow-lg flex items-center justify-center text-2xl font-bold text-gray-700 hover:text-gray-900 transition-colors"
+          title="Przybliż"
+        >
+          +
+        </button>
+        <button
+          onClick={() => {
+            const newZoom = Math.max(2.0, zoom - 0.2);
+            setZoom(newZoom);
+            const constrained = constrainPosition(mapPosition.x, mapPosition.y, newZoom);
+            setMapPosition(constrained);
+          }}
+          className="w-10 h-10 bg-white/90 hover:bg-white rounded-lg shadow-lg flex items-center justify-center text-2xl font-bold text-gray-700 hover:text-gray-900 transition-colors"
+          title="Oddal"
+        >
+          −
+        </button>
+        <div className="text-xs text-center bg-white/90 rounded px-2 py-1 shadow-lg">
+          {Math.round(zoom * 100)}%
+        </div>
+      </div>
+
       {/* Clickable markers overlay */}
+<<<<<<< HEAD
       <div className="absolute inset-0 z-10 pointer-events-none">
         <div className="pointer-events-auto">
           {/* Example marker positions loaded from JSON */}
+=======
+      <div 
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          transform: `translate(${mapPosition.x}px, ${mapPosition.y}px) scale(${zoom})`,
+          transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+        }}
+      >
+          <div className="pointer-events-auto">
+          {/* Event markers */}
+>>>>>>> e129016 (map rework,k a and added museums)
           {markers.map((m) => (
             <MapMarker
               key={m.id}
@@ -589,6 +805,20 @@ export default function MapPage() {
               }}
               title={m.title}
               isAnimating={highlightedMarkerId === m.id}
+            />
+          ))}
+
+          {/* Museum markers */}
+          {(museumsData as Museum[]).map((museum) => (
+            <MuseumMarker
+              key={museum.id}
+              id={museum.id}
+              top={museum.top}
+              left={museum.left}
+              onClick={(id) => {
+                const found = (museumsData as Museum[]).find((m) => m.id === id) || null;
+                setSelectedMuseum(found);
+              }}
             />
           ))}
         </div>
@@ -712,6 +942,14 @@ export default function MapPage() {
         />
       )}
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+      {/* Start Clock Modal */}
+      {showStartClockModal && !isRunning && (
+        <StartClockModal onClose={() => setShowStartClockModal(false)} />
+      )}
+>>>>>>> 352936a (map rework,k a and added museums)
 
       {/* Mission Detail Modal */}
       {selectedMission && (() => {
@@ -737,6 +975,16 @@ export default function MapPage() {
           />
         );
       })()}
+=======
+      {/* Museum Modal */}
+      {selectedMuseum != null && (
+        <MuseumModal
+          museum={selectedMuseum}
+          paintings={[]} // TODO: Add paintings state management
+          onClose={() => setSelectedMuseum(null)}
+        />
+      )}
+>>>>>>> e129016 (map rework,k a and added museums)
     </div>
   );
 }

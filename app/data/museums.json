@@ -1,0 +1,62 @@
+[
+  {
+    "id": "moskwa",
+    "name": "Muzeum Puszkina",
+    "location": "Moskwa, Związek Radziecki",
+    "description": "Muzeum Sztuk Pięknych im. Puszkina - jedno z największych muzeów sztuki w Moskwie. Podczas II wojny światowej wiele dzieł sztuki z okupowanych terytoriów trafiło do Związku Radzieckiego.",
+    "imageUrl": "/panoramas/moskwa.jpg",
+    "capacity": 6,
+    "top": "37.6%",
+    "left": "71.7%"
+  },
+  {
+    "id": "berlin",
+    "name": "Muzeum Pergamońskie",
+    "location": "Berlin, Niemcy",
+    "description": "Miasto pełne muzeuów sztuki, takie jak słynne Muzeum Pergamońskie na Wyspie Muzeów. Podczas wojny III Rzeszy służyło jako miejsce przechowywania skradzionych dzieł sztuki z całej Europy.",
+    "imageUrl": "/panoramas/berlin.png",
+    "capacity": 9,
+    "top": "55.3%",
+    "left": "39.5%"
+  },
+  {
+    "id": "fuhrermuseum",
+    "name": "Führermuseum",
+    "location": "Linz, Austria",
+    "description": "Planowane przez Hitlera muzeum w Linzu, które miało stać się największym muzeum sztuki w Europie. Naziści gromadzili dla niego tysiące skradzionych dzieł sztuki z całego kontynentu.",
+    "imageUrl": "/panoramas/fuhrersmuseum.png",
+    "capacity": 9,
+    "top": "66.2%",
+    "left": "41.9%"
+  },
+  {
+    "id": "altaussee",
+    "name": "Kopalnia soli Alt Aussee",
+    "location": "Alt Aussee, Austria",
+    "description": "Podziemna kopalnia soli wykorzystywana przez nazistów jako skarbiec sztuki. Przechowywano tu tysiące bezcennych dzieł, w tym Ołtarz z Gandawy i Madonnę Brudzką Michała Anioła.",
+    "imageUrl": "/panoramas/altaussee.png",
+    "capacity": 9,
+    "top": "68.6%",
+    "left": "36.7%"
+  },
+  {
+    "id": "merkers",
+    "name": "Kopalnia Merkers",
+    "location": "Merkers, Niemcy",
+    "description": "Kopalnia potasu w Merkers, gdzie naziści ukryli złoto Reichsbanku oraz bezcenne dzieła sztuki. Odkryta przez wojska amerykańskie w 1945 roku.",
+    "imageUrl": "/panoramas/merkers.jpg",
+    "capacity": 9,
+    "top": "58.9%",
+    "left": "36.1%"
+  },
+  {
+    "id": "neuschwanstein",
+    "name": "Zamek Neuschwanstein",
+    "location": "Bawaria, Niemcy",
+    "description": "Bajkowy zamek w Alpach Bawarskich wykorzystywany przez nazistów jako magazyn skradzionych dzieł sztuki z Francji i innych krajów.",
+    "imageUrl": "/panoramas/neuschwanstein.png",
+    "capacity": 9,
+    "top": "67.2%",
+    "left": "37.5%"
+  }
+]
