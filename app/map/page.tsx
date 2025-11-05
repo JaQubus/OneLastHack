@@ -517,7 +517,7 @@ export default function MapPage() {
       {/* Full Screen Map */}
       <div className="absolute inset-0 bg-blue-300">
         <Image
-          src="/map.svg"
+          src="/map-new.svg"
           alt="Mapa operacyjna Europy"
           fill
           className="object-cover pointer-events-none"
