@@ -53,5 +53,7 @@ export type RetrievalTask = {
   failed?: boolean;
   failureChance: number;
   isReturning?: boolean;
+  pausedAt?: number; // timestamp when paused, null when running
+  accumulatedPausedTime?: number; // total milliseconds paused
 };
 

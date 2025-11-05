@@ -110,7 +110,7 @@ export default function MapPage() {
       const viewportRatio = viewportWidth / viewportHeight;
 
       let scale, offsetX = 0, offsetY = 0;
-      
+
       if (viewportRatio > svgRatio) {
         // Viewport is wider - scale by width, crop top/bottom
         scale = viewportWidth / SVG_WIDTH;
@@ -122,7 +122,7 @@ export default function MapPage() {
         const scaledWidth = SVG_WIDTH * scale;
         offsetX = (scaledWidth - viewportWidth) / 2 / scaledWidth * 100;
       }
-      
+
       setMapScale({ scaleX: scale, scaleY: scale, offsetX, offsetY });
     };
 
@@ -131,71 +131,58 @@ export default function MapPage() {
     return () => window.removeEventListener('resize', updateMapScale);
   }, []);
 
+  // Function to convert SVG coordinates to viewport percentages with object-cover
+  const svgToViewport = (svgX: number, svgY: number) => {
+    if (typeof window === 'undefined') {
+      // SSR fallback - return default percentages
+      return { top: '50%', left: '50%' };
+    }
+    const viewportRatio = window.innerWidth / window.innerHeight;
+    const svgRatio = SVG_WIDTH / SVG_HEIGHT;
+
+    if (viewportRatio > svgRatio) {
+      // Viewport is wider - scale by width, crop top/bottom
+      const scale = window.innerWidth / SVG_WIDTH;
+      const scaledHeight = SVG_HEIGHT * scale;
+      const offsetY = (scaledHeight - window.innerHeight) / 2;
+
+      const left = (svgX / SVG_WIDTH) * 100;
+      const top = ((svgY * scale - offsetY) / window.innerHeight) * 100;
+
+      return { top: `${top.toFixed(2)}%`, left: `${left.toFixed(2)}%` };
+    } else {
+      // Viewport is taller - scale by height, crop left/right
+      const scale = window.innerHeight / SVG_HEIGHT;
+      const scaledWidth = SVG_WIDTH * scale;
+      const offsetX = (scaledWidth - window.innerWidth) / 2;
+
+      const top = (svgY / SVG_HEIGHT) * 100;
+      const left = ((svgX * scale - offsetX) / window.innerWidth) * 100;
+
+      return { top: `${top.toFixed(2)}%`, left: `${left.toFixed(2)}%` };
+    }
+  };
+
   // Spawn locations with their SVG coordinates (raw from map.svg)
   const SPAWN_LOCATIONS_RAW = [
-    { id: 'berlin', name: 'Berlin', x: 647.38879 + 4.2229729 / 2, y: 794.15015 + 11.975099 / 2 },
-    { id: 'moskwa', name: 'Moskwa', x: 1170.4689 + 19.241098 / 2, y: 544.43744 + 15.148209 / 2 },
-    { id: 'fuhrermuseum', name: 'Führermuseum', x: 687.17358 + 5.841177 / 2, y: 955.79181 + 5.9414663 / 2 },
-    { id: 'altaussee', name: 'Altaussee', x: 600.20392 + 8.0817862 / 2, y: 989.81628 + 3.9278119 / 2 },
-    { id: 'merkers', name: 'Merkers', x: 589.38519 + 9.9166393 / 2, y: 847.62286 + 8.7934942 / 2 },
-    { id: 'neuschwanstein', name: 'Neuschwanstein', x: 610.38757 + 13.836784 / 2, y: 968.58258 + 6.2316003 / 2 },
+    { name: 'Berlin', x: 647.38879 + 4.2229729 / 2, y: 794.15015 + 11.975099 / 2 },
+    { name: 'Moskwa', x: 1170.4689 + 19.241098 / 2, y: 544.43744 + 15.148209 / 2 },
+    { name: 'Führermuseum', x: 687.17358 + 5.841177 / 2, y: 955.79181 + 5.9414663 / 2 },
+    { name: 'Altaussee', x: 600.20392 + 8.0817862 / 2, y: 989.81628 + 3.9278119 / 2 },
+    { name: 'Merkers', x: 589.38519 + 9.9166393 / 2, y: 847.62286 + 8.7934942 / 2 },
+    // { name: 'Neuschwanstein', x: 610.38757 + 13.836784 / 2, y: 968.58258 + 6.2316003 / 2 },
   ];
 
-  // State for spawn locations (will be computed on client side)
-  const [spawnLocations, setSpawnLocations] = useState<Array<{
-    id: string;
-    name: string;
-    top: string;
-    left: string;
-  }>>([]);
+  // Convert to viewport coordinates (use state to avoid SSR issues)
+  const [spawnLocations, setSpawnLocations] = useState<Array<{ name: string; top: string; left: string }>>([]);
 
-  // Calculate spawn locations on mount and when window resizes
   useEffect(() => {
-    const updateLocations = () => {
-      // Only run on client side where window is available
-      if (typeof window !== 'undefined') {
-        const viewportRatio = window.innerWidth / window.innerHeight;
-        const svgRatio = SVG_WIDTH / SVG_HEIGHT;
-        
-        const locations = SPAWN_LOCATIONS_RAW.map(loc => {
-          let top: string, left: string;
-          
-          if (viewportRatio > svgRatio) {
-            // Viewport is wider - scale by width, crop top/bottom
-            const scale = window.innerWidth / SVG_WIDTH;
-            const scaledHeight = SVG_HEIGHT * scale;
-            const offsetY = (scaledHeight - window.innerHeight) / 2;
-            
-            left = `${((loc.x / SVG_WIDTH) * 100).toFixed(2)}%`;
-            top = `${(((loc.y * scale - offsetY) / window.innerHeight) * 100).toFixed(2)}%`;
-          } else {
-            // Viewport is taller - scale by height, crop left/right
-            const scale = window.innerHeight / SVG_HEIGHT;
-            const scaledWidth = SVG_WIDTH * scale;
-            const offsetX = (scaledWidth - window.innerWidth) / 2;
-            
-            top = `${((loc.y / SVG_HEIGHT) * 100).toFixed(2)}%`;
-            left = `${(((loc.x * scale - offsetX) / window.innerWidth) * 100).toFixed(2)}%`;
-          }
-          
-          return {
-            id: loc.id,
-            name: loc.name,
-            top,
-            left
-          };
-        });
-        
-        setSpawnLocations(locations);
-      }
-    };
-
-    // Initial calculation
-    updateLocations();
-    
-    // Update on resize
-    window.addEventListener('resize', updateLocations);
-    return () => window.removeEventListener('resize', updateLocations);
+    // Convert to viewport coordinates on client side only
+    const locations = SPAWN_LOCATIONS_RAW.map(loc => ({
+      name: loc.name,
+      ...svgToViewport(loc.x, loc.y)
+    }));
+    setSpawnLocations(locations);
   }, []);
 
   // Get active agents from activeAgentIds
@@ -427,6 +414,8 @@ export default function MapPage() {
       failed: willFail,
       failureChance: failureChance,
       isReturning: false,
+      pausedAt: undefined,
+      accumulatedPausedTime: 0,
     };
 
     setRetrievalTasks((prev) => [...prev, newTask]);
@@ -502,13 +491,53 @@ export default function MapPage() {
     }, 800);
   };
 
+  // Track pause/resume state for tasks
+  useEffect(() => {
+    setRetrievalTasks((prev) => {
+      const now = Date.now();
+      return prev.map((task) => {
+        if (!isRunning) {
+          // Game paused - mark pause time if not already paused
+          if (!task.pausedAt) {
+            return {
+              ...task,
+              pausedAt: now,
+            };
+          }
+          // Already paused, return unchanged
+          return task;
+        } else {
+          // Game running - resume if was paused
+          if (task.pausedAt) {
+            const pauseDuration = now - task.pausedAt;
+            const newAccumulatedPausedTime = (task.accumulatedPausedTime || 0) + pauseDuration;
+            return {
+              ...task,
+              pausedAt: undefined,
+              accumulatedPausedTime: newAccumulatedPausedTime,
+            };
+          }
+          // Already running, return unchanged
+          return task;
+        }
+      });
+    });
+  }, [isRunning]);
+
   // Update retrieval tasks progress and agent position in real-time
   useEffect(() => {
     const interval = setInterval(() => {
+      // Don't update progress when game time is paused
+      if (!isRunning) {
+        return;
+      }
+
       setRetrievalTasks((prev) => {
         const now = Date.now();
         return prev.map((task) => {
-          const elapsed = now - task.startTime;
+          // Calculate elapsed time accounting for paused time
+          const accumulatedPaused = task.accumulatedPausedTime || 0;
+          const elapsed = (now - task.startTime) - accumulatedPaused;
           const newProgress = Math.min(100, (elapsed / task.duration) * 100);
 
           let currentTop: number;
@@ -657,7 +686,7 @@ export default function MapPage() {
       });
     }, 100);
     return () => clearInterval(interval);
-  }, [stolenGoods, activeAgents]);
+  }, [stolenGoods, activeAgents, isRunning]);
 
   // Spawn initial bubble when clock starts for the first time (only if not already spawned on mount)
   useEffect(() => {
@@ -772,8 +801,8 @@ export default function MapPage() {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
-      {/* Full Screen Map */}
-      <div className="absolute inset-0 bg-blue-300">
+      {/* Full Screen Map - Lowest z-index */}
+      <div className="absolute inset-0 bg-blue-300 z-0">
         <Image
           src="/map-new.svg"
           alt="Mapa operacyjna Europy"
@@ -794,7 +823,7 @@ export default function MapPage() {
 
       {/* Warsaw Storage Marker - smaller, no blinking */}
       <div
-        className="absolute z-20 cursor-pointer transition-all duration-300"
+        className="absolute z-25 cursor-pointer transition-all duration-300"
         style={{
           top: WARSAW_STORAGE.top, // 59%
           left: WARSAW_STORAGE.left,
@@ -810,32 +839,27 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* Spawn Location Markers */}
-      {spawnLocations.map((location) => {
-        const locationData = (locationsData as Location[]).find(l => l.id === location.id);
-        
-        return (
-          <div
-            key={location.name}
-            className="absolute z-15 cursor-pointer group"
-            style={{
-              top: location.top,
-              left: location.left,
-              transform: 'translate(-50%, -50%)',
-            }}
-            onClick={() => locationData && setSelectedLocation(locationData)}
-          >
-            <div className="relative flex flex-col items-center">
-              {/* Location Pin with hover effect */}
-              <div className="w-3 h-3 bg-red-600 rounded-full border border-red-800 shadow-lg group-hover:scale-125 group-hover:bg-red-500 transition-all duration-200"></div>
-              {/* Location Name */}
-              <div className="mt-1 text-white text-base font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap group-hover:text-amber-400 transition-colors duration-200">
-                {location.name}
-              </div>
+      {/* Spawn Location Markers - Third priority (below agents and bubbles) */}
+      {spawnLocations.map((location) => (
+        <div
+          key={location.name}
+          className="absolute z-20 pointer-events-none"
+          style={{
+            top: location.top,
+            left: location.left,
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <div className="relative flex flex-col items-center">
+            {/* Location Pin */}
+            <div className="w-3 h-3 bg-red-600 rounded-full border border-red-800 shadow-lg"></div>
+            {/* Location Name */}
+            <div className="mt-1 text-white text-base font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
+              {location.name}
             </div>
           </div>
-        );
-      })}
+        </div>
+      ))}
 
       {/* Bottom Bar */}
       <BottomBar
@@ -854,8 +878,8 @@ export default function MapPage() {
         onMissionClick={setSelectedMission}
       />
 
-      {/* Clickable markers overlay */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
+      {/* Clickable markers overlay - Highest priority (bubbles) */}
+      <div className="absolute inset-0 z-40 pointer-events-none">
         <div className="pointer-events-auto">
           {/* Example marker positions loaded from JSON */}
           {markers.map((m) => {
@@ -886,7 +910,7 @@ export default function MapPage() {
       </div>
 
       {/* Path Lines from Storage to Mission Points - Only show for active missions */}
-      <svg className="absolute inset-0 z-5 pointer-events-none" style={{ width: '100%', height: '100%' }}>
+      <svg className="absolute inset-0 z-10 pointer-events-none" style={{ width: '100%', height: '100%' }}>
         {acknowledgedMissions.map((mission) => {
           const task = retrievalTasks.find(t => t.missionId === mission.id);
           const isActive = task && task.progress < 100;
@@ -936,7 +960,7 @@ export default function MapPage() {
         return (
           <div
             key={`mission-${mission.id}`}
-            className="absolute z-12 pointer-events-none"
+            className="absolute z-35 pointer-events-none"
             style={{
               top: mission.top,
               left: mission.left,
@@ -959,7 +983,7 @@ export default function MapPage() {
         );
       })}
 
-      {/* Agent Icons on Map (during retrieval) */}
+      {/* Agent Icons on Map (during retrieval) - Second priority (below bubbles) */}
       {retrievalTasks.map((task) => {
         const agent = activeAgents.find((a) => a.id === task.agentId);
         const artwork = task.artworkId ? stolenGoods.find(g => g.id === task.artworkId) : null;
@@ -971,7 +995,7 @@ export default function MapPage() {
         return (
           <div
             key={task.id}
-            className="absolute z-15 transition-all duration-100"
+            className="absolute z-30 transition-all duration-100"
             style={{
               top: task.currentTop,
               left: task.currentLeft,
@@ -990,7 +1014,7 @@ export default function MapPage() {
               {/* Show artwork following agent after successful retrieval */}
               {isReturningWithArtwork && (
                 <div
-                  className="absolute -top-8 left-1/2 -translate-x-1/2 z-16"
+                  className="absolute -top-8 left-1/2 -translate-x-1/2 z-31"
                   style={{ transform: 'translateX(-50%)' }}
                 >
                   <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-green-600 shadow-xl overflow-hidden bg-green-100">

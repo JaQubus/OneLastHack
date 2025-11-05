@@ -82,11 +82,22 @@ export default function MissionManagementButton({
         onClick={() => {
           setShowList(!showList);
         }}
-        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex items-center justify-center cursor-pointer"
+        className="w-full h-full min-h-[60px] p-2 bg-amber-800/70 hover:bg-amber-800/90 rounded-lg border-2 border-amber-700/50 shadow-lg transition-all active:scale-[0.98] text-xs sm:text-sm flex flex-row  items-center justify-start cursor-pointer"
       >
-        <div className="flex flex-col items-center gap-1">
-          <span className="text-sm font-semibold text-amber-50">Zarządzanie Misjami</span>
-          <span className="text-xs text-amber-200">({missionCount} misji)</span>
+        <div className="flex flex-row gap-3">
+
+          <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden">
+            <Image
+              src="/dama.jpg"
+              alt={"Wywiad"}
+              fill
+              className="object-cover"
+            />
+          </div>
+          <div className="flex flex-col items-start gap-1">
+            <span className="text-sm font-semibold text-amber-50">Zarządzanie Misjami</span>
+            <span className="text-xs text-amber-200">({missionCount} misji)</span>
+          </div>
         </div>
       </button>
 
@@ -97,7 +108,7 @@ export default function MissionManagementButton({
             className="fixed inset-0 z-[25]"
             onClick={() => setShowList(false)}
           />
-          <div 
+          <div
             className="fixed max-h-96 bg-amber-900/95 backdrop-blur-md border-2 border-amber-800/50 shadow-2xl rounded-lg overflow-hidden z-[30]"
             style={{
               bottom: `${position.bottom}px`,
@@ -132,7 +143,7 @@ export default function MissionManagementButton({
                       ? stolenGoods.find(g => g.id === mission.artworkId)
                       : null;
                     const imageSrc = artwork?.image && artwork.image.trim() !== "" ? artwork.image : "/dama.jpg";
-                    
+
                     return (
                       <button
                         key={mission.id}
@@ -144,6 +155,7 @@ export default function MissionManagementButton({
                       >
                         <div className="flex items-start justify-between gap-3">
                           {/* Artwork Image */}
+
                           <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 border-amber-600/50">
                             <Image
                               src={imageSrc}
