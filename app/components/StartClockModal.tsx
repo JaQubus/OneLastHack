@@ -41,9 +41,9 @@ export default function StartClockModal({ onClose }: StartClockModalProps) {
             <Image
               src="/logo.png"
               alt="Logo 'Strażnicy Dziedzictwa'"
-              width={160}
-              height={160}
-              className="mx-auto object-contain"
+              width={250}
+              height={250}
+              className="mx-auto object-contain w-48 sm:w-72 md:w-96 lg:w-[420px]"
             />
           </div>
           

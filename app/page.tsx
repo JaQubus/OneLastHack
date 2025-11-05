@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -21,9 +22,14 @@ export default function Home() {
       <main className="relative z-10 flex w-full max-w-5xl flex-col items-center justify-center gap-8 px-4 py-12 text-center sm:gap-12 sm:px-6 sm:py-16">
         {/* Game Title with vintage styling */}
         <div className="flex flex-col items-center gap-3 sm:gap-4">
-          <h1 className="text-6xl font-bold flex flex-row tracking-wider  drop-shadow-[2px_2px_4px_rgba(139,69,19,0.3)] sm:text-7xl md:text-8xl lg:text-9xl">
-            <div className="text-amber-900">Strażnicy</div>
-            <div className="text-amber-800">&nbsp;dziedzictwa</div>
+          <h1 className="flex items-center justify-center">
+            <Image
+              src="/logo.png"
+              alt="Strażnicy Dziedzictwa"
+              width={320}
+              height={320}
+              className="w-56 sm:w-72 md:w-80 lg:w-96 object-contain"
+            />
           </h1>
         </div>
 

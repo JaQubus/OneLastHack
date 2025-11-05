@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import Timeline from "./Timeline";
 import { useGameTime } from "./GameTimeProvider";
 
@@ -9,9 +10,16 @@ export default function TopBar() {
 
   return (
     <header className="absolute top-0 left-0 right-0 z-20 bg-amber-900/50 backdrop-blur-sm border-b-2 border-amber-800/50 shadow-lg">
-      <div className="container mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="text-2xl font-bold text-amber-50 drop-shadow-lg sm:text-3xl tracking-tight hover:text-amber-100 transition-colors cursor-pointer">
-          Strażnicy dziedzictwa
+      <div className="container mx-auto flex items-center justify-between px-4 py-4 sm:px-6">
+        <Link href="/" className="flex items-center gap-2 text-amber-50 drop-shadow-lg hover:text-amber-100 transition-colors cursor-pointer">
+          <Image
+            src="/logo.png"
+            alt="Strażnicy Dziedzictwa"
+            width={96}
+            height={96}
+            className="object-contain w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
+          />
+          <span className="sr-only">Strażnicy dziedzictwa</span>
         </Link>
         <div className="flex items-center gap-3">
           <button 
