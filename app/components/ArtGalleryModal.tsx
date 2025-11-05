@@ -11,8 +11,8 @@ type Props = {
 };
 
 export default function ArtGalleryModal({ stolenGoods, onClose }: Props) {
-  // Show only artworks recovered in current gameplay session (from props, not localStorage)
-  const recoveredArtworks = stolenGoods.filter((good) => good.progress === 100);
+  // Show only artworks recovered in current gameplay session (already filtered by parent)
+  const recoveredArtworks = stolenGoods;
 
   return (
     typeof window !== 'undefined' && createPortal(
